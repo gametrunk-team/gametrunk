@@ -4,14 +4,14 @@ var defaultEnvConfig = require('./default');
 
 module.exports = {
   db: {
-    name: process.env.DB_NAME || "gametrunk_dev",
-    host: process.env.DB_HOST || "localhost",
+    name: process.env.DB_NAME || "d2r0e33e59ng3s",
+    host: process.env.DB_HOST || "ec2-50-17-237-148.compute-1.amazonaws.com",
     port: process.env.DB_PORT || 5432,
-    username: process.env.DB_USERNAME || "gametrunk-team-team",
-    password: process.env.DB_PASSWORD || "Whit3*Elephant",
+    username: process.env.DB_USERNAME || "opjnomflmidcwn",
+    password: process.env.DB_PASSWORD || "Uxe1g8Iy_ip9os8RkSeawd1MPT",
     dialect: process.env.DB_DIALECT || "postgres",
     enableSequelizeLog: process.env.DB_LOG || false,
-    ssl: process.env.DB_SSL || false,
+    ssl: process.env.DB_SSL || true,
     sync: process.env.DB_SYNC || true //Synchronizing any model changes with database
   },
   redis: {
