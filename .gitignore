@@ -19,7 +19,6 @@ npm-debug.log
 
 # SEAN.JS app and assets
 # ======================
-public/dist/
 public/uploads/users/profile/*
 config/env/local.js
 *.pem
