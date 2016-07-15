@@ -1,8 +1,7 @@
 {
-  "name": "seanjs",
+  "name": "gametrunk-dev",
+  "version": "0.0.0",
   "description": "Full-Stack Javascript with SequelizeJS, ExpressJS, AngularJS, and NodeJS",
-  "homepage": "http://seanjs.org",
-  "license": "MIT",
   "dependencies": {
     "bootstrap": "~3",
     "angular": "~1.3",
@@ -13,7 +12,7 @@
     "angular-ui-utils": "bower",
     "angular-ui-router": "~0.2",
     "angular-file-upload": "1.1.5",
-    "angular-messages": "~1.3.17",
+    "angular-messages": "1.3.17",
     "owasp-password-strength-test": "~1.3.0"
   },
   "resolutions": {

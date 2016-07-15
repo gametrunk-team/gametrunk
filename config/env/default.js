@@ -2,11 +2,10 @@
 
 module.exports = {
   app: {
-    title: 'SEAN.JS',
-    description: 'Full-Stack Javascript with SequelizeJS, ExpressJS, AngularJS, and Node.js',
-    keywords: 'sequelizejs, expressjs, angularjs, nodejs, postgresql, mysql, sqlite3, passport, redis, socket.io',
-    googleAnalyticsTrackingID: process.env.GOOGLE_ANALYTICS_TRACKING_ID || '',
-    reCaptchaSecret: process.env.RECAPTCHA_SECRET || ''
+    title: 'gametrunk',
+    description: 'Full-Stack Javascript with SequelizeJS, ExpressJS, AngularJS, and NodeJS',
+    keywords: 'Deckster,SequelizeJS,ExpressJS,AngularJS,NodeJS,Karma',
+    googleAnalyticsTrackingID: process.env.GOOGLE_ANALYTICS_TRACKING_ID || 'GOOGLE_ANALYTICS_TRACKING_ID'
   },
   port: process.env.PORT || 3000,
   templateEngine: 'swig',

@@ -1,15 +1,10 @@
 {
-  "name": "seanjs",
-  "description": "Full-Stack Javascript with SequelizeJS, ExpressJS, AngularJS, and Node.js",
+  "name": "gametrunk-dev",
+  "description": "Full-Stack Javascript with SequelizeJS, ExpressJS, AngularJS, and NodeJS",
   "version": "0.0.1",
-  "seanjs-version": "0.0.42",
-  "private": false,
-  "author": "https://github.com/seanjs-stack/seanjs/graphs/contributors",
+  "seanjs-version": "0.0.40",
+  "author": "Gametrunk-team-team",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/seanjs-stack/seanjs.git"
-  },
   "engines": {
     "node": ">=0.10.28",
     "npm": ">=1.4.28"
