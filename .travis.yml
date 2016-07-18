@@ -1,26 +1,22 @@
 language: node_js
 sudo: false
 node_js:
-  - 0.10
-  - 0.12
-  - 4
-  - 5
-  - "iojs-v1"
-  - "iojs-v2"
-# NodeJS v4 requires gcc 4.8
+- 0.1
+- 0.12
+- 4
+- 5
+- iojs-v1
+- iojs-v2
 env:
-  - NODE_ENV=travis CXX="g++-4.8" CC="gcc-4.8"
-
+- NODE_ENV=travis CXX="g++-4.8" CC="gcc-4.8"
 matrix:
   allow_failures:
-    - node_js: 0.10
-    - node_js: 5
-
+  - node_js: 0.1
+  - node_js: 5
 services:
-  - redis-server
-# gcc 4.8 requires ubuntu-toolchain-r-test
+- redis-server
 addons:
-  postgresql: "9.4"
+  postgresql: '9.4'
   apt:
     sources:
     - ubuntu-toolchain-r-test
@@ -29,29 +25,29 @@ addons:
     - gcc-4.8
     - clang
 before_install:
-  - "mysql -e 'create database seanjs_dev;'"
-  - "psql -c 'create database seanjs_dev;' -U postgres"
-  - "psql seanjs_dev -c 'create extension postgis;' -U postgres"
-  - gem update --system
-  - gem install sass --version "=3.3.7"
-  - npm i nsp -g
-  - npm install protractor
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - 'node_modules/protractor/bin/webdriver-manager update --standalone --firefox'
-  - 'node_modules/protractor/bin/webdriver-manager start 2>&1 &'
-  - sleep 3
+- mysql -e 'create database seanjs_dev;'
+- psql -c 'create database seanjs_dev;' -U postgres
+- psql seanjs_dev -c 'create extension postgis;' -U postgres
+- gem update --system
+- gem install sass --version "=3.3.7"
+- npm i nsp -g
+- npm install protractor
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- node_modules/protractor/bin/webdriver-manager update --standalone --firefox
+- node_modules/protractor/bin/webdriver-manager start 2>&1 &
+- sleep 3
 after_script:
-  - nsp audit-package
-  - grunt coverage
+- nsp audit-package
+- grunt coverage
 notifications:
   webhooks:
     urls:
-      - $GITTER_IM_URL
-    on_success: change  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: never     # options: [always|never|change] default: always
+    - $GITTER_IM_URL
+    on_success: change
+    on_failure: always
+    on_start: never
 deploy:
   provider: heroku
   api_key:
-    secure: "FXje6iL0lID+nawhnCOodldEGIY+5011gVgWLxBGcsqvNwGMyvkV6iCltRCwnN8Kr2q0ICAyTpRv2o34RjTude0UfwuPBVmQIYm2Abcm8cli5a7HQqLdd7VOU1zwobbt2+2kr6zwb6dm6IcrbisdK2OZGOiBqWxjGrXbwu6kriNUJIkZwFuFmipVEAD3m0DszMW9IGQw1GL6KPRrHR07O2T2k5hrp51M1W9hx3uwwegWtQ8boYy9h1q2dVy4lAOCZuILiS5n8crg1YbgN61qxNTi+o5wfCd+ompCHV/BpuSHGVUCM9rWcVDnlKRZFYDW39uW2lefhjD2dYAFyv1F7Op3/VLSLLbahCiSEbny25z4g5+eUh92GpQRQk0a1p7/j9fAeIbDFMxxO54xdWId+GYs+1yn8V8eHY9ui5rdK7t3gXEJnJOJkJif5MSkxTMXRSAK0eaX3DIVcIn3EKOtyriMmM1+cbp0tTBepTeVktshgIoEn0u/Q0x1JWrfPF9X1G9ieUxviRruiiHha68plKO5Bs+5RwgLfJ5F/E5OoYD6OQP0U8sRlhIR7SKlnP4HTVlLV5G3hYkrclrc/PXRJXb0SpG1dtX7i4hpndYep3N1YMDfGngVVy/b7Kzj5QzVSqTofhGol9MrQjKpX0iM0d5FJJ5tvTe5X89U1p6qayU="
+    secure: HJa7jLD/UDG+nGZi1z+x14jsyGpPlImcEfgN0eAsqBhSrJ3IkGJQlQzvw1XNyAtFCqetz77wWlnes8eTtYxBsnMKaeXXyqZ+hLv21WF0RUh22HsSMRzO1uMp96Vn/BmXnaZdZL1UlEF4aoNZVS/BvFveu/H/azJ5iMkx1fKXI1DdDpmERqAAsqjfGSSm6R+ODMXcmYLRJGlKobF+M/d/mZ05BG1MkGmDrNHHZX/czHWeVEQfZnPbhzuws1YG5Fs/Z6yEYi8V8FSDdCqXzGc6ucGW6nv+F85Z6oScwe+RIowmy9DEz1+WeDTIZCOlmOzNelkRPKX25LmUV3GuaBjgMv5umTjZFa75T7vcDPB+JDNoWzaGcL8CEWeDRalw7eg0AKwSf+DTw0V8v0aLbdMShinciP3fDMUUlf7AP0rq3mJQ5OBZ4gTQPKRJHlqjkTEcFfxko6g9+0jHAJGJXgEJif7bE2lvHROB/B8kHTAMcthoOVG3AOEtG4ni4tNXQkzaUi66WWgS4tMzBmKTiRmLB7/AkHGVVydvuNaIAxhABkofkucwJLXD0uQTdjeErVRB9qIwXeT0sMpIKUt+eKwf61nQHV1CyUigSE05ZGfaMWgs5cUec2ywy70Sj0US8fUmJU6w8LI6Kc7R7IU7Mv2W3faP9eos9SHLr+pc/kzGYiI=
