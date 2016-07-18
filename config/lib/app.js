@@ -17,7 +17,8 @@ module.exports.init = function init(callback) {
 
 module.exports.start = function start(callback) {
   winston.info('Initializing SEAN.JS Stack...');
-
+  winston.info('Configuring dotenv...');
+  require('dotenv').config();
   var _this = this;
 
   _this.init(function(app, db, config) {

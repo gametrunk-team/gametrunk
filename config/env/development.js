@@ -4,11 +4,11 @@ var defaultEnvConfig = require('./default');
 
 module.exports = {
   db: {
-    name: process.env.DB_NAME || "d2r0e33e59ng3s",
-    host: process.env.DB_HOST || "ec2-50-17-237-148.compute-1.amazonaws.com",
+    name: process.env.DB_NAME || "postgres",
+    host: process.env.DB_HOST || "localhost",
     port: process.env.DB_PORT || 5432,
-    username: process.env.DB_USERNAME || "opjnomflmidcwn",
-    password: process.env.DB_PASSWORD || "Uxe1g8Iy_ip9os8RkSeawd1MPT",
+    username: process.env.DB_USERNAME || "postgres",
+    password: process.env.DB_PASSWORD || "postgres",
     dialect: process.env.DB_DIALECT || "postgres",
     enableSequelizeLog: process.env.DB_LOG || false,
     ssl: process.env.DB_SSL || true,
