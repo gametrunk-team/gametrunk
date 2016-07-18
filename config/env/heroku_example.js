@@ -4,11 +4,11 @@ var defaultEnvConfig = require('./default');
 
 module.exports = {
   db: {
-    name: "dfuue4lro8u0qk",
-    host: "ec2-54-217-240-205.eu-west-1.compute.amazonaws.com",
+    name: "postgres",
+    host: "localhost",
     port: 5432,
-    username: "xjwecgnyhogzdw",
-    password: "iH1awetnARl9-HltdMqMWuF0dN",
+    username: "postgres",
+    password: "postgres",
     dialect: "postgres",
     enableSequelizeLog: false,
     ssl: true,
