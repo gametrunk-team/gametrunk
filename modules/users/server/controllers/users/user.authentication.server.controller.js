@@ -307,7 +307,6 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
 
                 ],
                 function(err, results) {
-                  console.log(results);
                   if (results) {
                     //Rename the tmp image
                     fs.renameSync('./public/uploads/users/profile/' + results[0][0], './public/uploads/users/profile/' + results[0][1], function(err) {
