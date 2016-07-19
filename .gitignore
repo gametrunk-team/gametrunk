@@ -42,6 +42,7 @@ _site/
 *.tmp
 *.bak
 *.swp
+*.env
 logs/
 build/
 
