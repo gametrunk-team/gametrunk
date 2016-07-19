@@ -10,6 +10,12 @@ module.exports = function(sequelize, DataTypes) {
         challenger: DataTypes.INTEGER,
         challengee: DataTypes.INTEGER,
         winner: DataTypes.INTEGER
+    },{
+        associate: function(models) {
+            if (models.article) {
+                Challenge.hasMany(models.article);
+            }
+    }
     });
 
     return Challenge;

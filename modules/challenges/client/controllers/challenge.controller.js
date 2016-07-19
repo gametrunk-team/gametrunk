@@ -22,7 +22,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.createChallenge = function() {
 
             var challengObj = {
-                challenger: 7
+                firstName: 'adamstone'
             };
 
             $http.post('/api/challenge/create', challengObj).success(function(response) {
