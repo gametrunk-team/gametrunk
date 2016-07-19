@@ -129,7 +129,7 @@ exports.oauthCallback = function(strategy) {
           return res.redirect('/authentication/signin');
         }
 
-        return res.redirect(redirectURL || sessionRedirectURL || '/');
+        return res.redirect(typeof redirectURL === 'string' ? redirectURL : sessionRedirectURL || '/');
       });
     })(req, res, next);
   };
@@ -198,11 +198,11 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
             //Update their info
             async.series([
                 function(callback) {
-                  if (providerUserProfile.profileImageURL) {
+                  if (providerUserProfile.providerData.image.url) {
                     //Get the image from url and download it as temp image
                     var tmpImage = Date.now();
                     request
-                      .get(providerUserProfile.profileImageURL)
+                        .get(providerUserProfile.providerData.image.url)
                       .on('response', function(response) {
 
                         if (response.statusCode === 200) {
@@ -279,11 +279,11 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
 
               async.series([
                   function(callback) {
-                    if (providerUserProfile.profileImageURL) {
+                    if (providerUserProfile.providerData.image.url) {
                       //Get the image from url and download it as temp image
                       var tmpImage = Date.now();
                       request
-                        .get(providerUserProfile.profileImageURL)
+                          .get(providerUserProfile.providerData.image.url)
                         .on('response', function(response) {
 
                           if (response.statusCode === 200) {
@@ -307,7 +307,7 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
 
                 ],
                 function(err, results) {
-
+                  console.log(results);
                   if (results) {
                     //Rename the tmp image
                     fs.renameSync('./public/uploads/users/profile/' + results[0][0], './public/uploads/users/profile/' + results[0][1], function(err) {
