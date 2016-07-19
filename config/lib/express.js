@@ -151,10 +151,10 @@ module.exports.initSession = function(app, db) {
     },
     key: config.sessionKey,
     store: new RedisStore({
-      host: config.redis.host || 'localhost',
-      port: config.redis.port || 6379,
-      db: config.redis.database || 0,
-      pass: config.redis.password || ''
+      host: process.env.REDIS_HOST || "loc",
+      port: process.env.REDIS_PORT || 6429,
+      db: process.env.REDIS_DATABASE || '0',
+      pass: process.env.REDIS_PASSWORD || ""
     })
   }));
 };

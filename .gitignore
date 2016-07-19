@@ -4,6 +4,7 @@
 ehthumbs.db
 Icon?
 Thumbs.db
+.env
 
 # Node and related ecosystem
 # ==========================
