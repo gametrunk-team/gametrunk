@@ -1,0 +1,9 @@
+<div ng-controller="ChallengeController">
+  <h1 ng-click="getUsers()">Create a Challenge!</h1>
+  <form novalidate class="simple-form">
+    Opponent: <input type="text" ng-model="user.name" /><br />
+    Time: <input type="radio" ng-model="user.gender" value="now" />now
+    <input type="radio" ng-model="user.time" value="later" />later<br />
+    <input type="submit" ng-click="update(user)" value="Save" />
+  </form>
+</div>
