@@ -4,6 +4,7 @@ angular.module('user.admin').controller('UserListController', ['$scope', '$filte
   function($scope, $filter, Admin) {
 
     Admin.query(function(data) {
+      console.log(data);
       $scope.users = data;
       $scope.buildPager();
     });

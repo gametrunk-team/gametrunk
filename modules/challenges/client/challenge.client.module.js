@@ -5,5 +5,5 @@
 
 // Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('challenge', ['core']);
-// ApplicationConfiguration.registerModule('challenge', ['core.admin']);
-// ApplicationConfiguration.registerModule('challenge.admin.routes', ['core.admin.routes']);
+// ApplicationConfiguration.registerModule('challenge.admin', ['core.admin']);
+// ApplicationConfiguration.registerModule('user.admin.routes', ['core.admin.routes']);
