@@ -9,8 +9,11 @@ module.exports = function(sequelize, DataTypes) {
         scheduledTime: DataTypes.DATE,
         challenger: DataTypes.INTEGER,
         challengee: DataTypes.INTEGER,
-        winner: DataTypes.INTEGER
+        winner: DataTypes.INTEGER,
+        deleted: DataTypes.BOOLEAN
     },{
+        timestamps: true,
+        paranoid: true,
         associate: function(models) {
             if (models.article) {
                 Challenge.hasMany(models.article);

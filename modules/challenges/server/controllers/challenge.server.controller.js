@@ -15,7 +15,6 @@ Create Challenge
 exports.createChallenge = function(req, res) {
 
     var challenge = Challenge.build(req.body);
-    console.log("we are here");
     challenge.save().then(function() {
         res.status(200).send();
     }).catch(function(err) {
@@ -24,4 +23,13 @@ exports.createChallenge = function(req, res) {
             message: errorHandler.getErrorMessage(err)
         });
     });
+};
+
+/*
+ Delete Challenge
+ */
+exports.deleteChallenge = function(req, res) {
+
+    Challenge.destroy({where: {id: req.body.id}});
+    res.status(200).send();
 };
