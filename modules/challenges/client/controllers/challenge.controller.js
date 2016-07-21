@@ -19,6 +19,13 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $location.path('/');
         }
 
+        $scope.getOpponents = function() {
+            $http.get('/api/user/getopponents').success(function(response) {
+                console.log(response);
+            });
+        };
+        $scope.getOpponents();
+
         $scope.createChallenge = function() {
 
             var challengObj = {
