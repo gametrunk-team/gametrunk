@@ -18,6 +18,9 @@ var noReturnUrls = [
   '/authentication/signup'
 ];
 
+var cloudinary = require('cloudinary');
+
+
 /**
  * Signup
  */
@@ -198,11 +201,11 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
             //Update their info
             async.series([
                 function(callback) {
-                  if (providerUserProfile.providerData.image.url) {
+                  if (providerUserProfile.profileImageURL) {
                     //Get the image from url and download it as temp image
                     var tmpImage = Date.now();
                     request
-                        .get(providerUserProfile.providerData.image.url)
+                        .get(providerUserProfile.profileImageURL)
                       .on('response', function(response) {
 
                         if (response.statusCode === 200) {
@@ -227,9 +230,9 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
               ],
               function(err, results) {
 
-                if (results) {
+                if (results[0]) {
                   //Rename the temp image
-                  fs.renameSync('./public/uploads/users/profile/' + results[0][0], './public/uploads/users/profile/' + results[0][1], function(err) {
+                  fs.renameSync('./public/uploads/users/profile/' + results[0][0], './public/uploads/users/profile/' + results[0][1], function (err) {
                     if (err) return done(false, err);
                   });
 
@@ -307,7 +310,7 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
 
                 ],
                 function(err, results) {
-                  if (results) {
+                  if (results[0]) {
                     //Rename the tmp image
                     fs.renameSync('./public/uploads/users/profile/' + results[0][0], './public/uploads/users/profile/' + results[0][1], function(err) {
                       if (err) return done(false, err);
@@ -329,6 +332,11 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
                     if (!user) {
                       return done(false, user);
                     } else {
+                      // Upload the profile image to cloudinary
+                      cloudinary.uploader.upload(providerUserProfile.providerData.image.url, function(result) {
+                        console.log(result);
+                      }, {public_id: user.dataValues.profileImageURL.split('.')[0]});
+
                       //Login the user
                       req.login(user, function(err) {
                         if (err)
