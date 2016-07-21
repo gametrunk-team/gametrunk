@@ -9,6 +9,13 @@ angular.module('challenge').config(['$stateProvider',
                 // abstract: true,
                 url: '/create',
                 templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html',
+            })
+            .state('challenge-result', {
+                url: '/result',
+                templateUrl: 'modules/challenges/client/views/result.client.view.html',
+                data: {
+                    ignoreState: true
+                }
             });
     }
 ]);
