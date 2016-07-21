@@ -117,7 +117,7 @@ exports.updateChallenge = function(req, res) {
     if(req.body.winner)
         updatedChallenge.winner = req.body.winner;
 
-    challenge.update({updatedChallenge}).then(function() {
+    challenge.update(updatedChallenge).then(function() {
         console.log("UPDATING: ", updatedChallenge);
         res.status(200).send();
     }).catch(function(err) {
