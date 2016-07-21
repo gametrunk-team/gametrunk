@@ -11,6 +11,33 @@ var _ = require('lodash'),
   db = require(path.resolve('./config/lib/sequelize')).models,
   User = db.user;
 
+/*
+Get all users
+ */
+exports.getAllUsers = function(req, res) {
+
+  User.findAll().then(function(users) {
+    return res.json(users);
+  }).catch(function(err) {
+    return res.status(400).send({
+      message: errorHandler.getErrorMessage(err)
+    });
+  });
+};
+
+/*
+ Get opponents users
+ */
+exports.getOpponents = function(req, res) {
+
+  User.findAll().then(function(users) {
+    return res.json(users);
+  }).catch(function(err) {
+    return res.status(400).send({
+      message: errorHandler.getErrorMessage(err)
+    });
+  });
+};
 
 exports.update = function(req, res, next) {
   var userInfo = req.body;
