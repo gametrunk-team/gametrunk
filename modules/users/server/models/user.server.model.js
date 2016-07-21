@@ -158,6 +158,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     associate: function(models) {
+      console.log(models);
       if (models.article) {
         User.hasMany(models.article);
       }
