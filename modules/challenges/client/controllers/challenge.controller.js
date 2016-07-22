@@ -82,11 +82,11 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             });
         };
 
-        // $scope.getChallenges = function() {
-        //     $http.get('/api/challenge/getall').success(function(response) {
-        //         console.log(response);
-        //     });
-        // };
-        // $scope.getChallenges();
+        $scope.getChallenges = function() {
+            $http.get('/api/challenge/getall').success(function(response) {
+                console.log(response);
+            });
+        };
+        $scope.getChallenges();
     }
 ]);
