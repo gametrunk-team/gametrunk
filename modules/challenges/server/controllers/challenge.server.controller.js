@@ -85,13 +85,21 @@ exports.getChallenge = function(req, res) {
  Get All Challenges
  */
 exports.getAllChallenges = function(req, res) {
-  
-    Challenge.findAll().then(function(challenges) {
-        return res.json(challenges);
+    console.log("\n\n\n\n\n\n\n\n" + "We are here");
+    Challenge.findAll({
+        order: [
+            ['createdAt', 'DESC']
+        ]
+    }).then(function(challenges) {
+        if (!challenges) {
+            return res.status(400).send({
+                message: 'Unable to get list of users'
+            });
+        } else {
+            res.json(challenges);
+        }
     }).catch(function(err) {
-        return res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
-        });
+        res.jsonp(err);
     });
 };
 
@@ -105,6 +113,8 @@ exports.updateChallenge = function(req, res) {
 
     var challenge = Challenge.find({where: {id: req.body.id}});
 
+    console.log("\n\n\n\n\n\n\n\n okay here we are " + challenge);
+
     if(req.body.scheduledTime)
         updatedChallenge.scheduledTime = req.body.scheduledTime;
 
@@ -117,12 +127,26 @@ exports.updateChallenge = function(req, res) {
     if(req.body.winner)
         updatedChallenge.winner = req.body.winner;
 
-    challenge.update(updatedChallenge).then(function() {
-        console.log("UPDATING: ", updatedChallenge);
-        res.status(200).send();
-    }).catch(function(err) {
-        res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
+    // Challenge.update(updatedChallenge).then(function() {
+    //     console.log("UPDATING: ", updatedChallenge);
+    //     res.status(200).send();
+    // }).catch(function(err) {
+    //     res.status(400).send({
+    //         message: errorHandler.getErrorMessage(err)
+    //     });
+    // });
+
+    Challenge.update(
+       updatedChallenge,
+        {
+            where: { id : req.body.id }
+        })
+        .then(function (result) {
+            console.log("UPDATING: ", updatedChallenge);
+            res.status(200).send();
+        }, function(err){
+            res.status(400).send({
+                message: errorHandler.getErrorMessage(err)
+            });
         });
-    });
 };
