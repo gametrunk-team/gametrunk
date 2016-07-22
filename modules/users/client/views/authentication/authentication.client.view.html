@@ -1,10 +1,14 @@
 <br /><br />
 <section class="row" ng-controller="AuthenticationController">
-  <h4 class="col-md-12 text-center">Sign in using your social accounts</h4>
-  <div class="col-md-12 text-center">
+  <h4 class="col-md-12 text-center">Sign In</h4>
+  <div id="signin" class="col-md-12 text-center">
+    <br>
     <!--<img ng-click="callOauthProvider('/api/auth/facebook')" ng-src="/modules/users/client/img/buttons/facebook.png" class="img-circle" width="100">-->
     <!--<img ng-click="callOauthProvider('/api/auth/twitter')" ng-src="/modules/users/client/img/buttons/twitter.png" class="img-circle" width="100">-->
-    <img ng-click="callOauthProvider('/api/auth/google')" ng-src="/modules/users/client/img/buttons/google.png" class="img-circle" width="100">
+    <a ng-click="callOauthProvider('/api/auth/google')">
+      <img ng-src="/modules/users/client/img/buttons/google.png" class="img" width="225">
+    </a>
+    <br>
     <!--<img ng-click="callOauthProvider('/api/auth/linkedin')" ng-src="/modules/users/client/img/buttons/linkedin.png" class="img-circle" width="100">-->
     <!--<img ng-click="callOauthProvider('/api/auth/github')" ng-src="/modules/users/client/img/buttons/github.png" class="img-circle" width="100">-->
     <!--<img ng-click="callOauthProvider('/api/auth/paypal')" ng-src="/modules/users/client/img/buttons/paypal.png" class="img-circle" width="100">-->

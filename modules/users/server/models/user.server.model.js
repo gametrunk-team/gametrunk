@@ -123,7 +123,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     salt: DataTypes.STRING,
     resetPasswordToken: DataTypes.STRING,
-    resetPasswordExpires: DataTypes.BIGINT
+    resetPasswordExpires: DataTypes.BIGINT,
+    rank: DataTypes.INTEGER
   }, {
     instanceMethods: {
       makeSalt: function() {
