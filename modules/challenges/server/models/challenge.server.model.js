@@ -9,8 +9,7 @@ module.exports = function(sequelize, DataTypes) {
         scheduledTime: DataTypes.DATE,
         challenger: DataTypes.INTEGER,
         challengee: DataTypes.INTEGER,
-        winner: DataTypes.INTEGER,
-        deleted: DataTypes.BOOLEAN
+        winner: DataTypes.INTEGER
     },{
         timestamps: true,
         paranoid: true,

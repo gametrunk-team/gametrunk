@@ -5,7 +5,7 @@
 
         <div class="form-group text-center">
           <span ng-if="imageURL && imageURL.indexOf('data') === -1">
-            <img ng-src="http://res.cloudinary.com/gametrunk/image/upload/{{imageURL}}" alt="{{user.displayName}}" class="img-thumbnail user-profile-picture">
+            <img ng-src="https://res.cloudinary.com/gametrunk/image/upload/{{imageURL}}" alt="{{user.displayName}}" class="img-thumbnail user-profile-picture">
           </span>
           <span ng-if="imageURL && imageURL.indexOf('data') !== -1">
             <img ng-src="{{imageURL}}" alt="{{user.displayName}}" class="img-thumbnail user-profile-picture">

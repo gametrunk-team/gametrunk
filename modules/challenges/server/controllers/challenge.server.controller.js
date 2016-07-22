@@ -85,13 +85,21 @@ exports.getChallenge = function(req, res) {
  Get All Challenges
  */
 exports.getAllChallenges = function(req, res) {
-    Challenge.findAll().then(function(challenges) {
-        console.log("\n\n\n\n\n\n\n\n" + challenges);
-        return res.json(challenges);
+    console.log("\n\n\n\n\n\n\n\n" + "We are here");
+    Challenge.findAll({
+        order: [
+            ['createdAt', 'DESC']
+        ]
+    }).then(function(challenges) {
+        if (!challenges) {
+            return res.status(400).send({
+                message: 'Unable to get list of users'
+            });
+        } else {
+            res.json(challenges);
+        }
     }).catch(function(err) {
-        return res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
-        });
+        res.jsonp(err);
     });
 };
 
