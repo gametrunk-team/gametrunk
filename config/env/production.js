@@ -6,7 +6,7 @@ module.exports = {
     privateKey: './config/sslcerts/key.pem',
     certificate: './config/sslcerts/cert.pem'
   },
-  port: process.env.PORT || 8443,
+  port: process.env.PORT || 3000,
   db: {
     name: process.env.DB_NAME || "seanjs_dev",
     host: process.env.DB_HOST || "localhost",

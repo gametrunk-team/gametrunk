@@ -96,6 +96,16 @@ angular.element(document).ready(function() {
   //Then init the app
   angular.bootstrap(document, [ApplicationConfiguration.applicationModuleName]);
 });
+/**
+ * Created by jmertens on 7/19/16.
+ */
+'use strict';
+
+// Use Applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('challenge', ['core']);
+ApplicationConfiguration.registerModule('challenge', ['core.admin']);
+ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
+
 'use strict';
 
 // Use Applicaion configuration module to register a new module
@@ -108,6 +118,174 @@ ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
 ApplicationConfiguration.registerModule('user', ['core']);
 ApplicationConfiguration.registerModule('user.admin', ['core.admin']);
 ApplicationConfiguration.registerModule('user.admin.routes', ['core.admin.routes']);
+// 'use strict';
+//
+// // Setting up route
+// angular.module('challenge').config(['$stateProvider',
+//     function($stateProvider) {
+//         // User state routing
+//         $stateProvider
+//             .state('challenge', {
+//                 // abstract: true,
+//                 url: '/challenge/create',
+//                 templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
+//             })
+//             .state('challenge-result', {
+//                 url: 'challenge/result',
+//                 templateUrl: 'modules/challenges/client/views/result.client.view.html'
+//             });
+//     }
+// ]);
+
+'use strict';
+
+// Setting up route
+angular.module('challenge').config(['$stateProvider',
+    function($stateProvider) {
+        // User state routing
+        $stateProvider
+            .state('edit', {
+                abstract: true,
+                url: '/edit',
+                templateUrl: 'modules/challenges/client/views/challenge.client.view.html'
+            })
+            .state('edit.create', {
+                url: '/create',
+                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
+            })
+            .state('edit.result', {
+                url: '/result',
+                templateUrl: 'modules/challenges/client/views/result.client.view.html'
+            });
+    }
+]);
+
+'use strict';
+
+angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
+        $scope.authentication = Authentication;
+        $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+        $scope.selectedTime = 'Now';
+
+        $scope.userId = -1;
+
+        $scope.opponent = {
+            model: -1
+        };
+
+        $scope.run = function() {
+            console.log($scope.opponent.model);
+        };
+
+        // Get an eventual error defined in the URL query string:
+        $scope.error = $location.search().err;
+
+        // If user is signed in then redirect back home
+        if ($scope.authentication.user) {
+            $location.path('/');
+        }
+
+        $scope.getOpponents = function() {
+            $http.get('/api/user/getopponents').success(function(response) {
+                console.log(response);
+                $scope.users = response;
+                $scope.opponent.model = $scope.users[0].id;
+            });
+        };
+        $scope.getOpponents();
+
+        $scope.createChallenge = function() {
+
+            if($scope.opponent.model===-1){
+                return;
+            }
+
+            $http.get('/api/user').success(function (response) {
+                console.log(response);
+                // If successful show success message and clear form
+                $scope.success = true;
+                console.log(response.id);
+                $scope.userId = response.id;
+                var challengObj = {
+                    scheduledTime: '2012-04-23T18:25:43.511Z',
+                    challenger: response.id,
+                    challengee: $scope.opponent.model,
+                    winner: null
+                };
+
+                console.log(challengObj);
+
+                $http.post('/api/challenge/create', challengObj).error(function (response) {
+                    $scope.error = response.message;
+                });
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+        };
+
+        $scope.Won = function() {
+            var challengObj = {
+                id: 48,
+                winner: 50
+            };
+            $http.post('/api/challenge/update', challengObj).error(function (response) {
+                $scope.error = response.message;
+            });
+        };
+
+        $scope.Lost = function() {
+            var challengObj = {
+                id: 49,
+                winner: 60
+            };
+            $http.post('/api/challenge/update', challengObj).error(function (response) {
+                $scope.error = response.message;
+            });
+        };
+
+        $scope.getChallenges = function() {
+            $http.get('/api/challenge/getall').success(function(response) {
+                console.log(response);
+            });
+        };
+        $scope.getChallenges();
+    }
+]);
+
+'use strict';
+
+// // Users service used for communicating with the users REST endpoint
+// angular.module('user').factory('User', ['$resource',
+//     function($resource) {
+//         return $resource('api/user', {}, {
+//             get: {
+//                 method: 'GET'
+//             },
+//             update: {
+//                 method: 'PUT'
+//             }
+//         });
+//     }
+// ]);
+
+// angular.module('challenge.admin').factory('Admin', ['$resource',
+//     function($resource) {
+//         return $resource('api/admin/user/:userId', {
+//             userId: '@_id'
+//         }, {
+//             query: {
+//                 method: 'GET',
+//                 params: {},
+//                 isArray: true
+//             },
+//             update: {
+//                 method: 'PUT'
+//             }
+//         });
+//     }
+// ]);
+
 'use strict';
 
 angular.module('core.admin').run(['Menus',
@@ -755,12 +933,14 @@ angular.module('user').config(['$stateProvider',
       });
   }
 ]);
+
 'use strict';
 
 angular.module('user.admin').controller('UserListController', ['$scope', '$filter', 'Admin',
   function($scope, $filter, Admin) {
 
     Admin.query(function(data) {
+      console.log(data);
       $scope.users = data;
       $scope.buildPager();
     });
@@ -787,6 +967,7 @@ angular.module('user.admin').controller('UserListController', ['$scope', '$filte
     };
   }
 ]);
+
 'use strict';
 
 angular.module('user.admin').controller('UserController', ['$scope', '$state', 'Authentication', 'userResolve',
@@ -987,14 +1168,15 @@ angular.module('user').controller('ChangePasswordController', ['$scope', '$http'
 ]);
 'use strict';
 
-angular.module('user').controller('ChangeProfilePictureController', ['$scope', '$timeout', '$window', 'Authentication', 'FileUploader',
-  function($scope, $timeout, $window, Authentication, FileUploader) {
+angular.module('user').controller('ChangeProfilePictureController', ['$scope', '$timeout', '$window', 'Authentication', 'FileUploader', '$http', 'User',
+  function($scope, $timeout, $window, Authentication, FileUploader, $http, User) {
     $scope.user = Authentication.user;
     $scope.imageURL = $scope.user.profileImageURL;
 
     // Create file uploader instance
     $scope.uploader = new FileUploader({
-      url: 'api/user/picture'
+      url: 'api/user/picture',
+      autoUpload: false
     });
 
     // Set file uploader image filter
@@ -1011,7 +1193,6 @@ angular.module('user').controller('ChangeProfilePictureController', ['$scope', '
       if ($window.FileReader) {
         var fileReader = new FileReader();
         fileReader.readAsDataURL(fileItem._file);
-
         fileReader.onload = function(fileReaderEvent) {
           $timeout(function() {
             $scope.imageURL = fileReaderEvent.target.result;
@@ -1022,11 +1203,21 @@ angular.module('user').controller('ChangeProfilePictureController', ['$scope', '
 
     // Called after the user has successfully uploaded a new picture
     $scope.uploader.onSuccessItem = function(fileItem, response, status, headers) {
-      // Show success message
-      $scope.success = true;
+      var user = new User($scope.user);
 
-      // Populate user object
-      $scope.user = Authentication.user = response;
+      user.$update(function(response) {
+        $scope.imageURL = user.profileImageURL;
+
+        $scope.$broadcast('show-errors-reset', 'updatePicture');
+
+        // Show success message
+        $scope.success = true;
+
+        // Populate user object
+        Authentication.user = response;
+      }, function(response) {
+        $scope.error = response.data.message;
+      });
 
       // Clear upload buttons
       $scope.cancelUpload();
@@ -1057,6 +1248,7 @@ angular.module('user').controller('ChangeProfilePictureController', ['$scope', '
     };
   }
 ]);
+
 'use strict';
 
 angular.module('user').controller('EditProfileController', ['$scope', '$http', '$location', 'User', 'Authentication',
