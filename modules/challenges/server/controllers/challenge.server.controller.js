@@ -85,7 +85,6 @@ exports.getChallenge = function(req, res) {
  Get All Challenges
  */
 exports.getAllChallenges = function(req, res) {
-    console.log("\n\n\n\n\n\n\n\n" + "We are here");
     Challenge.findAll({
         order: [
             ['createdAt', 'DESC']
@@ -93,7 +92,7 @@ exports.getAllChallenges = function(req, res) {
     }).then(function(challenges) {
         if (!challenges) {
             return res.status(400).send({
-                message: 'Unable to get list of users'
+                message: 'Unable to get list of challenges'
             });
         } else {
             res.json(challenges);
@@ -112,8 +111,6 @@ exports.updateChallenge = function(req, res) {
     var updatedChallenge = {};
 
     var challenge = Challenge.find({where: {id: req.body.id}});
-
-    console.log("\n\n\n\n\n\n\n\n okay here we are " + challenge);
 
     if(req.body.scheduledTime)
         updatedChallenge.scheduledTime = req.body.scheduledTime;
