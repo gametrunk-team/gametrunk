@@ -1,0 +1,36 @@
+<section>
+
+  <!--<p>Hello world! Check out these rankings</p>-->
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Rankings</h1>
+      </div>
+      <div class="col-md-4" style="margin-top: 2em">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
+      </div>
+    </div>
+  </div>
+  <div class="list-group container">
+    <a ng-repeat="user in pagedItems | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+    <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+        <span class="col-sm-1"><h1 ng-bind="user.rank"></h1></span>
+        <span class="col-sm-1">
+           <span ng-if="user.profileImageURL">
+             <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_100,h_100,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+          </span>
+
+          <span ng-if="!user.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{user.displayName}}" width="100px"/>
+          </span>
+        </span>
+        <span class="col-sm-9" style="margin:auto">
+          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+        </span>
+        <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+    </a>
+  </div>
+
+  <pagination boundary-links="true" max-size="8" items-per-page="itemsPerPage" total-items="filterLength" ng-model="currentPage" ng-change="pageChanged()"></pagination>
+</section>
