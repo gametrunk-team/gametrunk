@@ -7,6 +7,8 @@ var nodemailer = require('nodemailer');
 var smtpPool = require('nodemailer-smtp-pool');
 var templatesDir   = path.resolve(__dirname, '../templates');
 var emailTemplates = require('email-templates').EmailTemplate;
+var db = require(path.resolve('./config/lib/sequelize')).models;
+var User = db.user;
 //var mg = require('nodemailer-mailgun-transport');
 var async = require('async');
 
@@ -121,29 +123,39 @@ emailQueue.process('send email', 20, function (job, done) {
 });
 
 exports.sendChallengeCreatedNotification = function(req, res) {
+
+    var challenger;
+    var challengee;
+    
     kue.Job.rangeByState( 'inactive', 0, 50, 'asc', function( err, jobs ) {
         jobs.forEach( function( job ) {
             job.remove( function(){
-                console.log( 'removed ', job.id );
+                console.log( 'removed ', job.id ) ;
             });
         });
     });
-    var locals = {
-        challengerName : req.body.to[0].name,
-        challengedName : req.body.to[1].name,
-        subject: "Test Subject"
-    };
-
-    var emails = [];
-    _.each(req.body.to, function(user) {
-        emails.push(user.email);
-    });
     
-    createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + locals.challengedName + " on gametrunk!", 'challenge-created', locals, false, function(err) {
-        if(err) {
-            res.status(400).send(err);
-        } else {
-            res.status(200).send();
-        }
+    User.findById(req.body.challenger).then(function(challengerObj) {
+        challenger = challengerObj;
+
+        User.findById(req.body.challengee).then(function(challengeeObj) {
+            challengee = challengeeObj;
+
+            var locals = {
+                challengerName : challenger.firstName,
+                challengedName : challengee.firstName,
+                subject: "Default Subject"
+            };
+
+            var emails = [challenger.email, challengee.email];
+
+            createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + locals.challengedName + " on gametrunk!", 'challenge-created', locals, false, function(err) {
+                if(err) {
+                    res.status(400).send(err);
+                } else {
+                    res.status(200).send();
+                }
+            });
+        });
     });
 };
