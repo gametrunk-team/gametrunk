@@ -32,10 +32,10 @@ angular.module('challenge').config(['$stateProvider',
             .state('edit.create', {
                 url: '/create',
                 templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
-            })
-            .state('edit.result', {
-                url: '/result',
-                templateUrl: 'modules/challenges/client/views/result.client.view.html'
             });
+            // .state('edit.result', {
+            //     url: '/result',
+            //     templateUrl: 'modules/challenges/client/views/result.client.view.html'
+            // });
     }
 ]);

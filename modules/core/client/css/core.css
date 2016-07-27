@@ -111,24 +111,3 @@ footer {
 
 .jumbotron {
   margin: 60px; }
-
-.selected {
-  background: lightgrey;
-}
-
-.selected:hover {
-  background-color: #ddd;
-}
-
-.deselected {
-  background: #fff;
-}
-
-.deselected:hover {
-  background-color: #eee;
-}
-
-.glyphicon{
-  text-shadow: 0 0 5px #707c80;
-  color: #00A000;
-}

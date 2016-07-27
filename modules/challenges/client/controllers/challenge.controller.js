@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window','Challenges',
-    function($scope, $state, $http, $location, $window, Challenges) {
+angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Challenges', '$uibModal',
+    function($scope, $state, $http, $location, $window, Challenges, $uibModal) {
         $scope.selectedTime = 'Now';
 
         $scope.userId = -1;
@@ -18,17 +18,33 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $scope.users = data;
         });
 
-        $scope.createChallenge = function() {
+        $scope.challengerId = -1;
+        $scope.challengeeId = -1;
 
-            if($scope.model.opponentId===-1){
+        $scope.emailModal = function () {
+            console.log("making the email modal");
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/result.client.view.html', // todo
+                // template: '<p>wow check out this modal</p>'
+                controller: 'ResultController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'minimal-modal'
+            });
+        };
+
+        $scope.createChallenge = function() {
+            if($scope.model.opponentId === -1){
                 return;
             }
 
             $http.get('/api/user').success(function (response) {
-                console.log(response);
                 // If successful show success message and clear form
                 $scope.success = true;
-                console.log(response.id);
+                console.log("response", response);
+                $scope.challengerId = response.id;
+                console.log("challenger p3", $scope.challengerId);
+                $scope.challengeeId = $scope.opponent.model;
                 $scope.userId = response.id;
                 var challengObj = {
                     scheduledTime: '2012-04-23T18:25:43.511Z',
@@ -36,33 +52,22 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     challengee: $scope.model.opponentId,
                     winner: null
                 };
-                
+
                 $http.post('/api/challenge/create', challengObj).error(function (response) {
                     $scope.error = response.message;
                 });
+
+                console.log("challengeeID", $scope.challengeeId);
+                console.log("challengerId", $scope.challengerId);
+
+                //$state.go('edit.result');
+                
+                $scope.emailModal();
             }).error(function (response) {
                 $scope.error = response.message;
             });
-        };
 
-        $scope.Won = function() {
-            var challengObj = {
-                id: 48,
-                winner: 50
-            };
-            $http.post('/api/challenge/update', challengObj).error(function (response) {
-                $scope.error = response.message;
-            });
-        };
 
-        $scope.Lost = function() {
-            var challengObj = {
-                id: 49,
-                winner: 60
-            };
-            $http.post('/api/challenge/update', challengObj).error(function (response) {
-                $scope.error = response.message;
-            });
         };
 
         $scope.getChallenges = function() {
