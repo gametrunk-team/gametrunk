@@ -43,7 +43,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 $scope.success = true;
                 console.log("response", response);
                 $scope.challengerId = response.id;
-                console.log("challenger p3", $scope.challengerId);
+                console.log("challengerUserId p3", $scope.challengerId);
                 $scope.challengeeId = $scope.opponent.model;
                 $scope.userId = response.id;
                 var challengObj = {
