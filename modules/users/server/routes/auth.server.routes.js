@@ -34,7 +34,8 @@ module.exports = function(app) {
     scope: [
       'https://www.googleapis.com/auth/userinfo.profile',
       'https://www.googleapis.com/auth/userinfo.email'
-    ]
+    ],
+    hostedDomain: '42six.com*'
   }));
   app.route('/api/auth/google/callback').get(users.oauthCallback('google'));
 
