@@ -54,8 +54,8 @@ exports.getChallenge = function(req, res) {
                 message: errorHandler.getErrorMessage(err)
             });
         });
-    } else if(req.body.challenger) {
-        Challenge.findOne({where: {challenger: req.body.challenger}}).then(function (challenge) {
+    } else if(req.body.challengerUserId) {
+        Challenge.findOne({where: {challenger: req.body.challengerUserId}}).then(function (challenge) {
             return res.json(challenge);
         }).catch(function(err) {
             return res.status(400).send({
@@ -70,8 +70,8 @@ exports.getChallenge = function(req, res) {
                 message: errorHandler.getErrorMessage(err)
             });
         });
-    } else if(req.body.winner) {
-        Challenge.findOne({where: {winner: req.body.winner}}).then(function (challenge) {
+    } else if(req.body.winnerUserId) {
+        Challenge.findOne({where: {winner: req.body.winnerUserId}}).then(function (challenge) {
             return res.json(challenge);
         }).catch(function(err) {
             return res.status(400).send({
@@ -118,14 +118,14 @@ exports.updateChallenge = function(req, res) {
     if(req.body.scheduledTime)
         updatedChallenge.scheduledTime = req.body.scheduledTime;
 
-    if(req.body.challenger)
-        updatedChallenge.challenger = req.body.challenger;
+    if(req.body.challengerUserId)
+        updatedChallenge.challengerUserId = req.body.challengerUserId;
 
     if(req.body.chalengee)
-        updatedChallenge.challengee = req.body.challengee;
+        updatedChallenge.challengeeUserId = req.body.challengeeUserId;
 
-    if(req.body.winner)
-        updatedChallenge.winner = req.body.winner;
+    if(req.body.winnerUserId)
+        updatedChallenge.winnerUserId = req.body.winnerUserId;
 
     // Challenge.update(updatedChallenge).then(function() {
     //     console.log("UPDATING: ", updatedChallenge);
