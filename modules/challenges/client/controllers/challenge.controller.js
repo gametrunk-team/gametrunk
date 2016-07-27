@@ -1,9 +1,7 @@
 'use strict';
 
-angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
-        $scope.authentication = Authentication;
-        $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window','Challenges',
+    function($scope, $state, $http, $location, $window, Challenges) {
         $scope.selectedTime = 'Now';
 
         $scope.userId = -1;
@@ -11,31 +9,18 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.opponent = {
             model: -1
         };
-
-        $scope.run = function() {
-            console.log($scope.opponent.model);
+        
+        $scope.model = {
+            opponentId: -1
         };
 
-        // Get an eventual error defined in the URL query string:
-        $scope.error = $location.search().err;
-
-        // If user is signed in then redirect back home
-        if ($scope.authentication.user) {
-            $location.path('/');
-        }
-
-        $scope.getOpponents = function() {
-            $http.get('/api/user/getopponents').success(function(response) {
-                console.log(response);
-                $scope.users = response;
-                $scope.opponent.model = $scope.users[0].id;
-            });
-        };
-        $scope.getOpponents();
+        Challenges.query(function(data) {
+            $scope.users = data;
+        });
 
         $scope.createChallenge = function() {
 
-            if($scope.opponent.model===-1){
+            if($scope.model.opponentId===-1){
                 return;
             }
 
@@ -48,12 +33,10 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 var challengObj = {
                     scheduledTime: '2012-04-23T18:25:43.511Z',
                     challenger: response.id,
-                    challengee: $scope.opponent.model,
+                    challengee: $scope.model.opponentId,
                     winner: null
                 };
-
-                console.log(challengObj);
-
+                
                 $http.post('/api/challenge/create', challengObj).error(function (response) {
                     $scope.error = response.message;
                 });
@@ -87,6 +70,5 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 console.log(response);
             });
         };
-        $scope.getChallenges();
     }
 ]);

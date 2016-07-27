@@ -2,10 +2,22 @@
   <div class="jumbotron text-center">
   <h2>Create a Challenge</h2>
   <form novalidate class="simple-form">
-        <label>Opponent</label>
-        <select ng-model="opponent.model" class="selectpicker" ng-click="run()">
-          <option ng-repeat="user in users" value="{{user.id}}">{{ user.firstName }} {{ user.lastName | limitTo : 1}}.</option>
-        </select>
+    <ul>
+    <li ng-repeat="user in users | orderBy:'rank'" ng-style="myStyle" class="list-group-item row" ng-class="{selected: user.id==model.opponentId, deselected: user.id!=model.opponentId}" ng-click="model.opponentId=user.id">
+      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+      <span class="col-md-4 col-4"><h2 ng-bind="user.rank"></h2></span>
+      <span class="col-md-4 col-4">
+          <h2 ng-bind="user.displayName"></h2>
+      </span>
+       <span ng-if="user.profileImageURL && user.id!=model.opponentId" class="col-sm-4 col-4">
+         <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_100,h_100,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+      </span>
+      <span ng-if="!user.profileImageURL && user.id!=model.opponentId" class="col-md-4 col-4">
+        <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{user.displayName}}" width="100px"/>
+      </span>
+      <h1 ng-if="user.id==model.opponentId" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h1>
+      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+      </ul>
     <td class="form-group" show-errors>
       <label></label>
       <div ui-sref-active="active">

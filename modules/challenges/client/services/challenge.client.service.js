@@ -1,32 +1,32 @@
 'use strict';
 
-// // Users service used for communicating with the users REST endpoint
-// angular.module('user').factory('User', ['$resource',
-//     function($resource) {
-//         return $resource('api/user', {}, {
-//             get: {
-//                 method: 'GET'
-//             },
-//             update: {
-//                 method: 'PUT'
-//             }
-//         });
-//     }
-// ]);
+// Users service used for communicating with the users REST endpoint
+angular.module('challenge').factory('User', ['$resource',
+    function($resource) {
+        return $resource('api/user', {}, {
+            get: {
+                method: 'GET'
+            },
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
 
-// angular.module('challenge.admin').factory('Admin', ['$resource',
-//     function($resource) {
-//         return $resource('api/admin/user/:userId', {
-//             userId: '@_id'
-//         }, {
-//             query: {
-//                 method: 'GET',
-//                 params: {},
-//                 isArray: true
-//             },
-//             update: {
-//                 method: 'PUT'
-//             }
-//         });
-//     }
-// ]);
+angular.module('challenge').factory('Challenges', ['$resource',
+    function($resource) {
+        return $resource('api/rankings/user/:userId', {
+            userId: '@_id'
+        }, {
+            query: {
+                method: 'GET',
+                params: {},
+                isArray: true
+            },
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
