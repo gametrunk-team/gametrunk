@@ -64,7 +64,6 @@ exports.signup = function(req, res) {
  */
 exports.signin = function(req, res, next) {
   passport.authenticate('local', {hostedDomain: '42six.com*'}, function(err, user, info) {
-    console.log("here 1");
 
     if (err || !user) {
       res.status(400).send({
@@ -101,7 +100,6 @@ exports.signout = function(req, res) {
  */
 exports.oauthCall = function(strategy, scope) {
   return function(req, res, next) {
-    console.log("here 2" + res.user);
     // Set redirection path on session.
     // Do not redirect to a signin or signup page
     if (noReturnUrls.indexOf(req.query.redirect_to) === -1) {
@@ -117,7 +115,6 @@ exports.oauthCall = function(strategy, scope) {
  */
 exports.oauthCallback = function(strategy) {
   return function(req, res, next) {
-    console.log("here 3");
     // Pop redirect URL from session
     var sessionRedirectURL = req.session.redirect_to;
     delete req.session.redirect_to;
@@ -144,7 +141,6 @@ exports.oauthCallback = function(strategy) {
  * Helper function to save or update a OAuth user profile
  */
 exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
-  console.log("here 4" + providerUserProfile.email);
   if(providerUserProfile.email.endsWith('42six.com')) {
     if (!req.user) {
 
@@ -392,7 +388,7 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
       }
     }
   } else {
-    // return done(new Error('You are not authorized to log in.'), user);
+    return done(new Error('You are not authorized to log in.'));
   }
 };
 
