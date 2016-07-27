@@ -79,7 +79,7 @@ var sendEmail = function(data, done) {
     }
 };
 
-var createEmailJob = function(from, to, subject, template, locals, bulk, callback) {
+var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
   var data = {
       from: from,
       to: to,
@@ -105,15 +105,16 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, callbac
             data.html = results.html;
             data.to = email;
 
-            var job = emailQueue.create('send email', data).priority('medium').removeOnComplete(true);
-
-            job.save(function(err) {
-                callback(err);
-            });
+            emailQueue.create('send email', data)
+                .priority('medium')
+                .removeOnComplete(true)
+                .save(function(err) {
+                    cb(err);
+                });
 
             //callback();
         }, function (err) {
-            callback(err);
+            cb(err);
         });
    });
 };

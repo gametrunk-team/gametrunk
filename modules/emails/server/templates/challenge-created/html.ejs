@@ -16,7 +16,7 @@
 </head>
 <body bgcolor="#F5F5F5">
 <!--[if (gte mso 9)|(IE)]>
-<table width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+<table width="600" align="center" cellpadding="0" cellspacing="0" border="1">
     <tr>
         <td>
 <![endif]-->
@@ -26,7 +26,7 @@
             <table width="320" align="left" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td height="34">
-                        <a href="http://gametrunk.herokuapp.com"><img src="https://gametrunk.herokuapp.com/modules/core/client/img/brand/banner.png" width="153" height="46" border="0" alt="gametrunk logo"><a/>
+                        <a href="http://gametrunk.herokuapp.com"><img src="https://res.cloudinary.com/gametrunk/image/upload/banner_fympvx" alt="gametrunk logo"><a/>
                     </td>
                 </tr>
             </table>
@@ -37,12 +37,9 @@
         <td class="innerpadding borderbottom">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                    <td class="h3">gametrunk Challenge Alert!</td>
-                </tr>
-                <tr>
                     <td class="bodycopy">
-                        <h2><% challengerName %> challenged <% challengedName %> on gametrunk!</h2>g
-                        <p>Make sure that you are ready for your challenge on test date and time!</p>
+                        <h2><%= challengerName %> challenged <%= challengedName %> on gametrunk!</h2>
+                        <p>Meet up with your opponent right now to battle for your next rank!</p>
                     </td>
                 </tr>
             </table>
@@ -52,10 +49,10 @@
         <td class="footer" bgcolor="#FFFFFF">
             <table class="borderbottom" width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                    <td class="footercopy">
-                        Game On,
+                    <td class="footercopy innerpadding">
+                        Game on,
                         <br/>
-                        gametrunk team team
+                        The Gametrunk Team
                     </td>
                 </tr>
             </table>
@@ -74,6 +71,8 @@
 </td>
 </tr>
 </table>
+<br>
+<br>
 <![endif]-->
 </body>
 </html>
