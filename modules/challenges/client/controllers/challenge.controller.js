@@ -118,6 +118,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.dateChange = function() {
             $scope.initTimePicker($scope.dt);
-        }
+        };
     }
 ]);
