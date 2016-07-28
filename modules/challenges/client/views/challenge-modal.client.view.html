@@ -18,6 +18,24 @@
       <h1 ng-if="user.id==model.opponentId" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h1>
       <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
       </ul>
+
+    <div class="row">
+      <div>
+        <p class="input-group">
+          <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions"
+                 ng-required="true" close-text="Close" ng-change="dateChange()" />
+
+                    <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="open()"><i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div align="center" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
+
+    <p class="alert alert-info">Schedule for: {{dt | date:'EEEE, MMMM d' }} at {{dt | date:'hh:mm a' }}</p>
+
     <td class="form-group" show-errors>
       <label></label>
       <input class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
