@@ -95,9 +95,9 @@
 @media (max-width: 767px) {
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a {
     color: #777; }
+
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:focus {
     color: #333; } }
-
 .navbar-nav > li > a {
   text-shadow: none; }
 
@@ -113,22 +113,19 @@ footer {
   margin: 60px; }
 
 .selected {
-  background: lightgrey;
-}
+  background: lightgrey; }
 
 .selected:hover {
-  background-color: #ddd;
-}
+  background-color: #ddd; }
 
 .deselected {
-  background: #fff;
-}
+  background: #fff; }
 
 .deselected:hover {
-  background-color: #eee;
-}
+  background-color: #eee; }
 
-.glyphicon{
+.glyphicon {
   text-shadow: 0 0 5px #707c80;
-  color: #00A000;
-}
+  color: #00A000; }
+
+/*# sourceMappingURL=core.css.map */
