@@ -217,6 +217,7 @@ angular.module('challenge', ['ui.bootstrap']).controller('ChallengeController', 
 
         $scope.createChallenge = function() {
             if($scope.opponent.model === -1){
+            if($scope.opponent.model === -1){
                 return;
             }
 
@@ -307,6 +308,12 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
 
 
 
+
+            $uibModalInstance.close();
+        };
+
+
+
         $scope.Lost = function() {
             var challengObj = {
                 id: 49,
@@ -315,7 +322,16 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
             });
-        };
+
+
+            // Updating rankings
+            var rankingObject = {
+                challenger: $scope.challengerId,
+                challengee: $scope.challengeeId
+            };
+            $http.post('/api/rankings/update', rankingObject).error(function(response) {
+                $scope.error = response.message;
+            });
 
     }
 ]);

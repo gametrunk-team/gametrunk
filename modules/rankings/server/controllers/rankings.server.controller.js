@@ -65,3 +65,54 @@ exports.userByID = function(req, res, next, id) {
     });
 
 };
+
+
+/*
+ Update User ranking
+ */
+exports.updateRanking = function(req, res) {
+    console.log("updateRanking");
+    if (!req.body.challenger || !req.body.challengee) {
+        return;
+    }
+
+    User.findById(req.body.challenger).then(function(challenger) {
+        User.findById(req.body.challengee).then(function (challengee) {
+            if (challenger.rank < challengee.rank) {
+                console.log("Err: Challenger rank is higher than challengee:", challenger.rank, challengee.rank);
+                return;
+            }
+
+            var update = function (user, oldRank) {
+                User.update(
+                    user, {where: {rank: oldRank}})
+                    .then(function (result) {
+                        res.status(200).send();
+                    }).error(function (err) {
+                        res.status(400).send({
+                            message: errorHandler.getErrorMessage(err)
+                        });
+                    });
+            };
+
+            // challengee.rank = challenger.rank and everyone in between
+            for (var i = challengee.rank; i < challenger.rank; i++) { // starts at challengee and goes down in rank
+                //console.log("updating:" + i);
+                update({rank: i + 1}, i);
+            }
+
+            // challenger.rank = challengee.rank;
+            User.update(
+                {rank: challengee.rank}, {where: {id: challenger.id}})
+                .then(function (result) {
+                    res.status(200).send();
+                }).error(function (err) {
+                    res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
+                    });
+                });
+        });
+    });
+    
+
+};

@@ -13,10 +13,9 @@ var
 Create Challenge
  */
 exports.createChallenge = function(req, res) {
-
     var challenge = Challenge.build(req.body);
     challenge.save().then(function() {
-        res.status(200).send();
+        res.json(challenge);
     }).catch(function(err) {
         console.log(err);
         res.status(400).send({
@@ -55,7 +54,7 @@ exports.getChallenge = function(req, res) {
             });
         });
     } else if(req.body.challengerUserId) {
-        Challenge.findOne({where: {challenger: req.body.challengerUserId}}).then(function (challenge) {
+        Challenge.findOne({where: {challengerUserId: req.body.challengerUserId}}).then(function (challenge) {
             return res.json(challenge);
         }).catch(function(err) {
             return res.status(400).send({
@@ -111,9 +110,9 @@ exports.updateChallenge = function(req, res) {
 
     var updatedChallenge = {};
 
-    var challenge = Challenge.find({where: {id: req.body.id}});
+    //var challenge = Challenge.find({where: {id: req.body.id}});
 
-    console.log("\n\n\n\n\n\n\n\n okay here we are " + challenge);
+    //console.log("\n\n\n\n\n\n\n\n okay here we are " + challenge);
 
     if(req.body.scheduledTime)
         updatedChallenge.scheduledTime = req.body.scheduledTime;
@@ -121,7 +120,7 @@ exports.updateChallenge = function(req, res) {
     if(req.body.challengerUserId)
         updatedChallenge.challengerUserId = req.body.challengerUserId;
 
-    if(req.body.chalengee)
+    if(req.body.challengeeUserId)
         updatedChallenge.challengeeUserId = req.body.challengeeUserId;
 
     if(req.body.winnerUserId)

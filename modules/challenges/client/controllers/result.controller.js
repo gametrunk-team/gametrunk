@@ -7,14 +7,11 @@
 angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModalInstance',
     function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModalInstance) {
 
-        console.log("result scope", $scope);
-
         $scope.Won = function() {
-            console.log("won $scope", $scope.challengeeId, $scope.challengerId);
-
+            // Update challenge
             var challengObj = {
-                id: 48,
-                winner: $scope.challengerId
+                id: $scope.challengeId,
+                winnerUserId: $scope.challengerId
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
@@ -30,20 +27,23 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
                 $scope.error = response.message;
             });
 
-
-            $uibModalInstance.close();
+            $state.go('home');
         };
 
 
-
         $scope.Lost = function() {
+            // Update challenge
             var challengObj = {
-                id: 49,
-                winner: $scope.challengeeId
+                id: $scope.challengeId,
+                winnerUserId: $scope.challengeeId
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
             });
+            
+            // No changes to rankings necessary
+
+            $state.go('home');
         };
 
     }

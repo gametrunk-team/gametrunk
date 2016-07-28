@@ -18,5 +18,7 @@ module.exports = function(app) {
 
     app.route('/api/rankings/user/:userId').get(rankingsPolicy.isAllowed, rankings.read);
 
+    app.route('/api/rankings/update').post(rankingsPolicy.isAllowed, rankings.updateRanking);
+
     app.param('userId', rankings.userByID);
 };
