@@ -48,7 +48,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 $scope.challengeeId = $scope.model.opponentId;
                 
                 var challengObj = {
-                    scheduledTime: '2012-04-23T18:25:43.511Z',
+                    scheduledTime: $scope.dt,
                     challengerUserId: response.id,
                     challengeeUserId: $scope.model.opponentId,
                     winnerUserId: null
@@ -76,5 +76,48 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 console.log(response);
             });
         };
+
+        $scope.min = null;
+        $scope.max = null;
+
+        $scope.initTimePicker = function(selectedDate) {
+            var min = new Date(selectedDate.getTime());
+            min.setHours(0);
+            min.setMinutes(0);
+            $scope.min = min;
+
+            var max = new Date(selectedDate.getTime());
+            max.setHours(24);
+            max.setMinutes(0);
+            $scope.max = max;
+        };
+
+        $scope.init = function() {
+            $scope.dt = new Date();
+            $scope.dt.setHours(12);
+            $scope.dt.setMinutes(0);
+            $scope.dt.setMilliseconds(0);
+            $scope.initTimePicker($scope.dt);
+        };
+        $scope.init();
+
+        $scope.clear = function() {
+            $scope.dt = null;
+        };
+
+        $scope.open = function() {
+            $scope.popup.opened = true;
+        };
+
+
+        $scope.popup = {
+            opened: false
+        };
+
+
+
+        $scope.dateChange = function() {
+            $scope.initTimePicker($scope.dt);
+        }
     }
 ]);
