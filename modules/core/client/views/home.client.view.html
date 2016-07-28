@@ -10,10 +10,14 @@
       <p class="lead">gametrunk</p><br>
       <p class="lead">Cool Ping Pong League Management App</p>
     </div>
+    <div ng-show="authentication.user">
+      <a class="btn btn-default btn-lg" ui-sref-active="active" ui-sref="edit.create">Create a Challenge</a>
+      <a class="btn btn-default btn-lg" ui-sref-active="active" ui-sref="rankings.users">View Rankings</a>
+      <a class="btn btn-default btn-lg" ui-sref-active="active" ng-click="sendChallengeNotification()">Send Email</a>
+    </div>
     <div class="row">
       <p>
-        <a class="btn btn-default btn-lg" ui-sref="edit.create">Create a Challenge</a>
-        <a class="btn btn-default btn-lg" href="https://github.com/gametrunk-team/gametrunk" target="_blank">View on Github</a>
+        <!--<a class="btn btn-default btn-lg" href="https://github.com/gametrunk-team/gametrunk" target="_blank">View on Github</a>-->
         <!--<a class="btn btn-primary btn-lg" href="http://seanjs.readthedocs.org/en/latest/" target="_blank">SEAN.JS Documentation</a>-->
         <!--<a class="btn btn-success btn-lg" href="https://gitter.im/seanjs-stack/seanjs" target="_blank">Gitter: Join the chat!</a>-->
       </p>

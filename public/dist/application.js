@@ -115,9 +115,15 @@ ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
 'use strict';
 
 // Use Applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('rankings', ['core']);
+
+'use strict';
+
+// Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('user', ['core']);
 ApplicationConfiguration.registerModule('user.admin', ['core.admin']);
 ApplicationConfiguration.registerModule('user.admin.routes', ['core.admin.routes']);
+
 // 'use strict';
 //
 // // Setting up route
@@ -152,18 +158,18 @@ angular.module('challenge').config(['$stateProvider',
             .state('edit.create', {
                 url: '/create',
                 templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
-            })
-            .state('edit.result', {
-                url: '/result',
-                templateUrl: 'modules/challenges/client/views/result.client.view.html'
             });
+            // .state('edit.result', {
+            //     url: '/result',
+            //     templateUrl: 'modules/challenges/client/views/result.client.view.html'
+            // });
     }
 ]);
 
 'use strict';
 
-angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
+angular.module('challenge', ['ui.bootstrap']).controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'ui.bootstrap',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModal) {
         $scope.authentication = Authentication;
         $scope.popoverMsg = PasswordValidator.getPopoverMsg();
         $scope.selectedTime = 'Now';
@@ -186,6 +192,10 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $location.path('/');
         }
 
+        $scope.challengerId = -1;
+        $scope.challengeeId = -1;
+
+        // TODO: restrict to be only those 3 ranks higher than current user
         $scope.getOpponents = function() {
             $http.get('/api/user/getopponents').success(function(response) {
                 console.log(response);
@@ -195,17 +205,29 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
         $scope.getOpponents();
 
-        $scope.createChallenge = function() {
+        // $scope.emailModal = function () {
+        //     var modal = $uibModal.open({
+        //         templateUrl: '../views/result.client.view.html', // todo
+        //         controller: 'result.controller.js', // todo
+        //         scope: $scope,
+        //         backdrop: false,
+        //         windowClass: 'minimal-modal'
+        //     });
+        // };
 
-            if($scope.opponent.model===-1){
+        $scope.createChallenge = function() {
+            if($scope.opponent.model === -1){
+            if($scope.opponent.model === -1){
                 return;
             }
 
             $http.get('/api/user').success(function (response) {
-                console.log(response);
                 // If successful show success message and clear form
                 $scope.success = true;
-                console.log(response.id);
+                console.log("response", response);
+                $scope.challengerId = response.id;
+                console.log("challenger p3", $scope.challengerId);
+                $scope.challengeeId = $scope.opponent.model;
                 $scope.userId = response.id;
                 var challengObj = {
                     scheduledTime: '2012-04-23T18:25:43.511Z',
@@ -214,35 +236,30 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     winner: null
                 };
 
-                console.log(challengObj);
+                console.log("challenge obj", challengObj);
 
                 $http.post('/api/challenge/create', challengObj).error(function (response) {
+                    console.log("response", response);
                     $scope.error = response.message;
                 });
+
+                console.log("challengeeID", $scope.challengeeId);
+                console.log("challengerId", $scope.challengerId);
+
+                //$state.go('edit.result');
+                
+                // $scope.emailModal();
+                
             }).error(function (response) {
                 $scope.error = response.message;
             });
-        };
 
-        $scope.Won = function() {
-            var challengObj = {
-                id: 48,
-                winner: 50
-            };
-            $http.post('/api/challenge/update', challengObj).error(function (response) {
-                $scope.error = response.message;
-            });
-        };
 
-        $scope.Lost = function() {
-            var challengObj = {
-                id: 49,
-                winner: 60
-            };
-            $http.post('/api/challenge/update', challengObj).error(function (response) {
-                $scope.error = response.message;
-            });
         };
+        
+        
+
+      
 
         $scope.getChallenges = function() {
             $http.get('/api/challenge/getall').success(function(response) {
@@ -250,6 +267,72 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             });
         };
         $scope.getChallenges();
+    }
+]);
+
+/**
+ * Created by breed on 7/26/16.
+ */
+
+'use strict';
+
+angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModalInstance', 'ui.bootstrap',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModalInstance) {
+
+        console.log("result scope", $scope);
+
+        $scope.Won = function() {
+            console.log("won $scope", $scope.challengeeId, $scope.challengerId);
+
+            var challengObj = {
+                id: 48,
+                winner: $scope.challengerId
+            };
+            $http.post('/api/challenge/update', challengObj).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            // Updating rankings
+            var rankingObject = {
+                challenger: $scope.challengerId,
+                challengee: $scope.challengeeId
+            };
+            $http.post('/api/rankings/update', rankingObject).error(function(response) {
+                $scope.error = response.message;
+            });
+
+
+            $uibModalInstance.close();
+        };
+
+
+
+
+            $uibModalInstance.close();
+        };
+
+
+
+        $scope.Lost = function() {
+            var challengObj = {
+                id: 49,
+                winner: $scope.challengeeId
+            };
+            $http.post('/api/challenge/update', challengObj).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            // Updating rankings
+            var rankingObject = {
+                challenger: $scope.challengerId,
+                challengee: $scope.challengeeId
+            };
+            $http.post('/api/rankings/update', rankingObject).error(function(response) {
+                $scope.error = response.message;
+            });
+
     }
 ]);
 
@@ -783,6 +866,186 @@ angular.module('core').service('Socket', ['Authentication', '$state', '$timeout'
     };
   }
 ]);
+/**
+ * Created by breed on 7/25/16.
+ */
+
+'use strict';
+
+// Config HTTP Error Handling
+angular.module('rankings').config(['$httpProvider',
+    function($httpProvider) {
+        // Set the httpProvider "not authorized" interceptor
+        $httpProvider.interceptors.push(['$q', '$location', 'Authentication',
+            function($q, $location, Authentication) {
+                return {
+                    responseError: function(rejection) {
+                        switch (rejection.status) {
+                            case 401:
+                                // Deauthenticate the global user
+                                Authentication.user = null;
+
+                                // Redirect to signin page
+                                $location.path('signin');
+                                break;
+                            case 403:
+                                // Add unauthorized behaviour
+                                break;
+                        }
+
+                        return $q.reject(rejection);
+                    }
+                };
+            }
+        ]);
+    }
+]);
+
+'use strict';
+
+// Setting up route
+angular.module('user').config(['$stateProvider',
+    function($stateProvider) {
+        // User state routing
+        $stateProvider
+            .state('rankings', {
+                url: '/rankings',
+                abstract: true,
+                templateUrl: 'modules/rankings/client/views/rankings/list-rankings.client.view.html',
+                data: {
+                    roles: ['user']
+                },
+                controller: 'RankingController'
+            })
+            .state('rankings.users', {
+                url: '/users',
+                template: '',
+                controller: 'RankingController'
+            })
+            .state('rankings.user', {
+                url: '/user/:userId',
+                templateUrl: 'modules/rankings/client/views/rankings/view-user.client.view.html', // TODO
+                controller: 'UserController',// TODO
+                resolve: {
+                    userResolve: ['$stateParams', 'Rankings', function($stateParams, Rankings) { // TODO
+                        return Rankings.get({
+                            userId: $stateParams.userId
+                        });
+                    }]
+                }
+            });
+    }
+]);
+
+/**
+ * Created by breed on 7/22/16.
+ */
+
+'use strict';
+
+angular.module('rankings').controller('UserController', ['$scope', '$state', 'Authentication', 'userResolve',
+    function($scope, $state, Authentication, userResolve) {
+
+        $scope.authentication = Authentication;
+        $scope.user = userResolve;
+        
+        $scope.update = function(isValid) {
+            if (!isValid) {
+                $scope.$broadcast('show-errors-check-validity', 'userForm');
+                return false;
+            }
+
+            var user = $scope.user;
+
+            user.$update({
+                'userId': user.id
+            }, function() {
+                $state.go('admin.user', {
+                    userId: user.id
+                });
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
+    }
+]);
+
+/**
+ * Created by breed on 7/21/16.
+ */
+
+'use strict';
+
+angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings',
+    function($scope, $filter, Rankings) {
+
+        Rankings.query(function(data) {
+            console.log("hello from the other side");
+            console.log(data);
+            $scope.users = data;
+            $scope.buildPager();
+        });
+
+        $scope.buildPager = function() {
+            $scope.pagedItems = [];
+            $scope.itemsPerPage = 15;
+            $scope.currentPage = 1;
+            $scope.figureOutItemsToDisplay();
+        };
+
+        $scope.figureOutItemsToDisplay = function() {
+            $scope.filteredItems = $filter('filter')($scope.users, {
+                $: $scope.search
+            });
+            $scope.filterLength = $scope.filteredItems.length;
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+            var end = begin + $scope.itemsPerPage;
+            $scope.pagedItems = $scope.filteredItems.slice(begin, end);
+        };
+
+        $scope.pageChanged = function() {
+            $scope.figureOutItemsToDisplay();
+        };
+    }
+]);
+
+/**
+ * Created by breed on 7/25/16.
+ */
+
+'use strict';
+
+// Users service used for communicating with the users REST endpoint
+angular.module('rankings').factory('User', ['$resource',
+    function($resource) {
+        return $resource('api/user', {}, {
+            get: {
+                method: 'GET'
+            },
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
+
+angular.module('rankings').factory('Rankings', ['$resource',
+    function($resource) {
+        return $resource('api/rankings/user/:userId', {
+            userId: '@_id'
+        }, {
+            query: {
+                method: 'GET',
+                params: {},
+                isArray: true
+            },
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
+
 'use strict';
 
 // Configuring the Articles module
