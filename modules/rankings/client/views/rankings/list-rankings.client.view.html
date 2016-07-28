@@ -17,11 +17,11 @@
         <span class="col-sm-1"><h1 ng-bind="user.rank"></h1></span>
         <span class="col-sm-1">
            <span ng-if="user.profileImageURL">
-             <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_100,h_100,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
           </span>
 
           <span ng-if="!user.profileImageURL">
-            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{user.displayName}}" width="100px"/>
+            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
           </span>
         </span>
         <span class="col-sm-9" style="margin:auto">
