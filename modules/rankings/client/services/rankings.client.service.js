@@ -1,7 +1,11 @@
+/**
+ * Created by breed on 7/25/16.
+ */
+
 'use strict';
 
 // Users service used for communicating with the users REST endpoint
-angular.module('challenge').factory('User', ['$resource',
+angular.module('rankings').factory('User', ['$resource',
     function($resource) {
         return $resource('api/user', {}, {
             get: {
@@ -14,7 +18,7 @@ angular.module('challenge').factory('User', ['$resource',
     }
 ]);
 
-angular.module('challenge').factory('Challenges', ['$resource',
+angular.module('rankings').factory('Rankings', ['$resource',
     function($resource) {
         return $resource('api/rankings/user/:userId', {
             userId: '@_id'

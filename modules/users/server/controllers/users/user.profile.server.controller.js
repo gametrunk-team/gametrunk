@@ -9,7 +9,8 @@ var _ = require('lodash'),
   path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   db = require(path.resolve('./config/lib/sequelize')).models,
-  User = db.user;
+  User = db.user, 
+    cloudinary = require('cloudinary');
 
 /*
 Get all users
@@ -38,8 +39,6 @@ exports.getOpponents = function(req, res) {
     });
   });
 };
-
-var cloudinary = require('cloudinary');
 
 exports.update = function(req, res, next) {
   var userInfo = req.body;
@@ -143,7 +142,7 @@ exports.update = function(req, res, next) {
   }
 };
 
-/**
+ /**
  * Update profile picture
  */
 exports.changeProfilePicture = function(req, res) {
@@ -153,13 +152,16 @@ exports.changeProfilePicture = function(req, res) {
     }
   }).then(function(user) {
     if (user) {
+
       if (!req.file) {
         return res.status(400).send({
           message: 'Error occurred while uploading profile picture'
         });
+        
       } else {
         var oldImageId = user.profileImageURL.indexOf('/') === -1 ? user.profileImageURL : user.profileImageURL.split('/')[1];
         oldImageId = oldImageId.indexOf('.') === -1 ? oldImageId : oldImageId.split('.')[0];
+
         // Upload image to cloudinary
         cloudinary.uploader.upload(req.file.path, function(result) {
         }, { public_id: req.file.filename.split('.')[0]}).then(function (result) {
@@ -169,19 +171,23 @@ exports.changeProfilePicture = function(req, res) {
           req.user.profileImageURL = "v" + result.version + "/" + result.public_id + "." + result.format;
 
           user.save().then(function(saved) {
+            
             if (!saved) {
               return res.status(400).send({
                 message: errorHandler.getErrorMessage(saved)
               });
+              
             } else {
+              res.json(user);
+              
               // Delete old image from cloudinary
               if (oldImageId) {
                 console.log(oldImageId);
                 try {
                   cloudinary.v2.uploader.destroy(oldImageId,
                       function(error, result) {console.log(result); });
-                } catch (e) {
-                  console.log('Unable to delete the old image', e);
+                } catch (err) {
+                  console.log('Unable to delete the old image', err);
                 }
               }
             }
@@ -190,10 +196,8 @@ exports.changeProfilePicture = function(req, res) {
               message: errorHandler.getErrorMessage(err)
             });
           });
-
         });
       }
-      res.json(user);
     }
   }).catch(function(err) {
     return res.status(400).send({
@@ -205,7 +209,7 @@ exports.changeProfilePicture = function(req, res) {
 
 exports.getProfile = function(req, res) {
   User.findOne({
-    attributes: ['id', 'firstName', 'lastName', 'email', 'username'],
+    attributes: ['id', 'firstName', 'lastName', 'email', 'username', 'profileImageURL'],
     where: {
       id: req.user.id
     }
