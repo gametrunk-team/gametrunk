@@ -37,18 +37,20 @@ angular.module('user').controller('ChangeProfilePictureController', ['$scope', '
     $scope.uploader.onSuccessItem = function(fileItem, response, status, headers) {
       var user = new User($scope.user);
 
-      user.$update(function(response) {
-        $scope.imageURL = user.profileImageURL;
+      $scope.imageURL = user.profileImageURL;
+      $scope.$broadcast('show-errors-reset', 'updatePicture');
 
-        $scope.$broadcast('show-errors-reset', 'updatePicture');
+      // Show success message
+      $scope.success = true;
 
-        // Show success message
-        $scope.success = true;
-
+      $http.get('api/user/me').success(function (data) {
         // Populate user object
-        Authentication.user = response;
-      }, function(response) {
-        $scope.error = response.data.message;
+        Authentication.user = data;
+        $scope.imageURL = Authentication.user.profileImageURL;
+
+        if (!$scope.$$phase) { // check if digest already in progress
+          $scope.$apply(); // launch digest;
+        }
       });
 
       // Clear upload buttons
