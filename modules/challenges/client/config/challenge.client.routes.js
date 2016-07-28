@@ -23,19 +23,30 @@
 angular.module('challenge').config(['$stateProvider',
     function($stateProvider) {
         // User state routing
+        // $stateProvider
+        //     .state('edit', {
+        //         abstract: true,
+        //         url: '/edit',
+        //         templateUrl: 'modules/challenges/client/views/challenge.client.view.html'
+        //     })
+        //     .state('edit.create', {
+        //         url: '/create',
+        //         templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
+        //     });
         $stateProvider
-            .state('edit', {
+            .state('challenge', {
+                url: '/challenge',
                 abstract: true,
-                url: '/edit',
-                templateUrl: 'modules/challenges/client/views/challenge.client.view.html'
+                templateUrl: 'modules/challenges/client/views/challenge.client.view.html',
+                data: {
+                    roles: ['user']
+                },
+                controller: 'ChallengeController'
             })
-            .state('edit.create', {
-                url: '/create',
-                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
+            .state('challenge.create', {
+                url: '/challenge',
+                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html',
+                controller: 'ChallengeController'
             });
-            // .state('edit.result', {
-            //     url: '/result',
-            //     templateUrl: 'modules/challenges/client/views/result.client.view.html'
-            // });
     }
 ]);

@@ -96,6 +96,7 @@ angular.element(document).ready(function() {
   //Then init the app
   angular.bootstrap(document, [ApplicationConfiguration.applicationModuleName]);
 });
+
 /**
  * Created by jmertens on 7/19/16.
  */
@@ -103,8 +104,6 @@ angular.element(document).ready(function() {
 
 // Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('challenge', ['core']);
-ApplicationConfiguration.registerModule('challenge', ['core.admin']);
-ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
 
 'use strict';
 
@@ -149,107 +148,99 @@ ApplicationConfiguration.registerModule('user.admin.routes', ['core.admin.routes
 angular.module('challenge').config(['$stateProvider',
     function($stateProvider) {
         // User state routing
+        // $stateProvider
+        //     .state('edit', {
+        //         abstract: true,
+        //         url: '/edit',
+        //         templateUrl: 'modules/challenges/client/views/challenge.client.view.html'
+        //     })
+        //     .state('edit.create', {
+        //         url: '/create',
+        //         templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
+        //     });
         $stateProvider
-            .state('edit', {
+            .state('challenge', {
+                url: '/challenge',
                 abstract: true,
-                url: '/edit',
-                templateUrl: 'modules/challenges/client/views/challenge.client.view.html'
+                templateUrl: 'modules/challenges/client/views/challenge.client.view.html',
+                data: {
+                    roles: ['user']
+                },
+                controller: 'ChallengeController'
             })
-            .state('edit.create', {
-                url: '/create',
-                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html'
+            .state('challenge.create', {
+                url: '/challenge',
+                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html',
+                controller: 'ChallengeController'
             });
-            // .state('edit.result', {
-            //     url: '/result',
-            //     templateUrl: 'modules/challenges/client/views/result.client.view.html'
-            // });
     }
 ]);
 
 'use strict';
 
-angular.module('challenge', ['ui.bootstrap']).controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'ui.bootstrap',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModal) {
+angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges) {
         $scope.authentication = Authentication;
         $scope.popoverMsg = PasswordValidator.getPopoverMsg();
         $scope.selectedTime = 'Now';
 
         $scope.userId = -1;
 
-        $scope.opponent = {
-            model: -1
+        $scope.model = {
+            opponentId: -1
         };
 
         $scope.run = function() {
             console.log($scope.opponent.model);
         };
 
-        // Get an eventual error defined in the URL query string:
-        $scope.error = $location.search().err;
+        Challenges.query(function(data) {
+            $scope.users = data;
+        });
 
-        // If user is signed in then redirect back home
-        if ($scope.authentication.user) {
-            $location.path('/');
-        }
-
+        // Variables saved for UserController
+        $scope.challengeId = -1;
         $scope.challengerId = -1;
         $scope.challengeeId = -1;
 
-        // TODO: restrict to be only those 3 ranks higher than current user
-        $scope.getOpponents = function() {
-            $http.get('/api/user/getopponents').success(function(response) {
-                console.log(response);
-                $scope.users = response;
-                $scope.opponent.model = $scope.users[0].id;
+        $scope.emailModal = function () {
+            console.log("making the email modal");
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/result.client.view.html', // todo
+                controller: 'ResultController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'minimal-modal'
             });
         };
-        $scope.getOpponents();
-
-        // $scope.emailModal = function () {
-        //     var modal = $uibModal.open({
-        //         templateUrl: '../views/result.client.view.html', // todo
-        //         controller: 'result.controller.js', // todo
-        //         scope: $scope,
-        //         backdrop: false,
-        //         windowClass: 'minimal-modal'
-        //     });
-        // };
 
         $scope.createChallenge = function() {
-            if($scope.opponent.model === -1){
-            if($scope.opponent.model === -1){
+            if($scope.model.opponentId === -1){
                 return;
             }
 
             $http.get('/api/user').success(function (response) {
                 // If successful show success message and clear form
                 $scope.success = true;
-                console.log("response", response);
                 $scope.challengerId = response.id;
-                console.log("challenger p3", $scope.challengerId);
-                $scope.challengeeId = $scope.opponent.model;
-                $scope.userId = response.id;
+                $scope.challengeeId = $scope.model.opponentId;
+                
                 var challengObj = {
                     scheduledTime: '2012-04-23T18:25:43.511Z',
-                    challenger: response.id,
-                    challengee: $scope.opponent.model,
-                    winner: null
+                    challengerUserId: response.id,
+                    challengeeUserId: $scope.model.opponentId,
+                    winnerUserId: null
                 };
 
-                console.log("challenge obj", challengObj);
+                $http.post('/api/challenge/create', challengObj)
+                    .success(function (response) {
+                        $scope.challengeId = response.id;
+                        $scope.emailModal();
+                    })
+                    .error(function (response) {
+                        $scope.error = response.message;
+                    });
 
-                $http.post('/api/challenge/create', challengObj).error(function (response) {
-                    console.log("response", response);
-                    $scope.error = response.message;
-                });
-
-                console.log("challengeeID", $scope.challengeeId);
-                console.log("challengerId", $scope.challengerId);
-
-                //$state.go('edit.result');
-                
-                // $scope.emailModal();
-                
             }).error(function (response) {
                 $scope.error = response.message;
             });
@@ -257,16 +248,12 @@ angular.module('challenge', ['ui.bootstrap']).controller('ChallengeController', 
 
         };
         
-        
-
-      
 
         $scope.getChallenges = function() {
             $http.get('/api/challenge/getall').success(function(response) {
                 console.log(response);
             });
         };
-        $scope.getChallenges();
     }
 ]);
 
@@ -276,17 +263,14 @@ angular.module('challenge', ['ui.bootstrap']).controller('ChallengeController', 
 
 'use strict';
 
-angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModalInstance', 'ui.bootstrap',
+angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModalInstance',
     function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModalInstance) {
 
-        console.log("result scope", $scope);
-
         $scope.Won = function() {
-            console.log("won $scope", $scope.challengeeId, $scope.challengerId);
-
+            // Update challenge
             var challengObj = {
-                id: 48,
-                winner: $scope.challengerId
+                id: $scope.challengeId,
+                winnerUserId: $scope.challengerId
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
@@ -302,72 +286,60 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
                 $scope.error = response.message;
             });
 
-
-            $uibModalInstance.close();
+            $state.go('home');
         };
-
-
-
-
-            $uibModalInstance.close();
-        };
-
 
 
         $scope.Lost = function() {
+            // Update challenge
             var challengObj = {
-                id: 49,
-                winner: $scope.challengeeId
+                id: $scope.challengeId,
+                winnerUserId: $scope.challengeeId
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
             });
+            
+            // No changes to rankings necessary
 
-
-            // Updating rankings
-            var rankingObject = {
-                challenger: $scope.challengerId,
-                challengee: $scope.challengeeId
-            };
-            $http.post('/api/rankings/update', rankingObject).error(function(response) {
-                $scope.error = response.message;
-            });
+            $state.go('home');
+        };
 
     }
 ]);
 
 'use strict';
 
-// // Users service used for communicating with the users REST endpoint
-// angular.module('user').factory('User', ['$resource',
-//     function($resource) {
-//         return $resource('api/user', {}, {
-//             get: {
-//                 method: 'GET'
-//             },
-//             update: {
-//                 method: 'PUT'
-//             }
-//         });
-//     }
-// ]);
+// Users service used for communicating with the users REST endpoint
+angular.module('challenge').factory('User', ['$resource',
+    function($resource) {
+        return $resource('api/user', {}, {
+            get: {
+                method: 'GET'
+            },
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
 
-// angular.module('challenge.admin').factory('Admin', ['$resource',
-//     function($resource) {
-//         return $resource('api/admin/user/:userId', {
-//             userId: '@_id'
-//         }, {
-//             query: {
-//                 method: 'GET',
-//                 params: {},
-//                 isArray: true
-//             },
-//             update: {
-//                 method: 'PUT'
-//             }
-//         });
-//     }
-// ]);
+angular.module('challenge').factory('Challenges', ['$resource',
+    function($resource) {
+        return $resource('api/rankings/user/:userId', {
+            userId: '@_id'
+        }, {
+            query: {
+                method: 'GET',
+                params: {},
+                isArray: true
+            },
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
 
 'use strict';
 
@@ -534,12 +506,28 @@ angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '
 ]);
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-  function($scope, Authentication) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http',
+  function($scope, Authentication, $http) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+
+    $scope.sendChallengeNotification = function () {
+
+      var challengObj = {
+        id: 48,
+        challenger: 7,
+        challengee: 3
+      };
+
+      $http.post('/api/emails/challengeCreated', challengObj).error(function (response) {
+        $scope.error = response.message;
+      });
+
+    };
+
   }
 ]);
+
 'use strict';
 
 /**
