@@ -33,7 +33,7 @@ var
 acl = new acl(new acl.memoryBackend());
 
 /**
- * Invoke User Permissions to view rankings
+ * Invoke User Permissions to view and update rankings
  */
 exports.invokeRolesPolicies = function() {
     acl.allow([{
@@ -44,7 +44,11 @@ exports.invokeRolesPolicies = function() {
         }, {
             resources: '/api/rankings/user/:userId',
             permissions: '*'
-        }]
+        }, {
+            resources: '/api/rankings/update',
+            permissions: '*'
+        }
+        ]
 
     }]);
 };

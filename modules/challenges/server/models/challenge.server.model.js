@@ -7,9 +7,9 @@
 module.exports = function(sequelize, DataTypes) {
     var Challenge = sequelize.define('challenge', {
         scheduledTime: DataTypes.DATE,
-        challenger: DataTypes.INTEGER,
-        challengee: DataTypes.INTEGER,
-        winner: DataTypes.INTEGER
+        challengerUserId: DataTypes.INTEGER,
+        challengeeUserId: DataTypes.INTEGER,
+        winnerUserId: DataTypes.INTEGER
     },{
         timestamps: true,
         paranoid: true,
