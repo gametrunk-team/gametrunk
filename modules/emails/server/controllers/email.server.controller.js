@@ -12,7 +12,7 @@ var User = db.user;
 //var mg = require('nodemailer-mailgun-transport');
 var async = require('async');
 
-var emailQueue = kue.createQueue({
+/*var emailQueue = kue.createQueue({
     prefix: 'q',
     redis: {
         port: 9099,
@@ -20,7 +20,7 @@ var emailQueue = kue.createQueue({
         auth: process.env.REDIS_PASSWORD,
         db: process.env.REDIS_DATABASE
     }
-});
+});*/
 
 var mailerConfig = _.omit({
     service: process.env.EMAIL_SERVICE,
@@ -90,57 +90,64 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
   };
 
     console.log("\n\n===== MAILING LIST =====\n\n");
-    _.each(data.to, function(user) {
+    console.log(to);
+    /*_.each(data.to, function(user) {
         console.log(user);
-    });
+    });*/
 
     var renderTemplate = new emailTemplates(path.join(templatesDir, data.template));
-    async.eachSeries(to, function(email, callback) {
+    async.each(to, function(email, callback) {
         renderTemplate.render(locals, function(err, results) {
             if(err) {
                 console.log("ERR RENDERING TEMPLATE: ", err);
-                return callback(err);
+                return cb(err);
             }
-            data.text = results.text;
-            data.html = results.html;
-            data.to = email;
 
-            emailQueue.create('send email', data)
-                .priority('medium')
-                .removeOnComplete(true)
-                .save(function(err) {
-                    cb(err);
-                });
+            if(results !== null) {
+                data.html = results;
+                data.to = email;
 
-            //callback();
+                /*emailQueue.create('send email', data)
+                 .priority('medium')
+                 .removeOnComplete(true)
+                 .save(function(err) {
+                 cb(err);
+                 });*/
+
+                sendEmail(data, cb);
+                callback();
+            } else {
+                cb("NULL RESULTS");
+            }
+
         }, function (err) {
             cb(err);
         });
    });
 };
 
-emailQueue.process('send email', 20, function (job, done) {
+/*emailQueue.process('send email', 20, function (job, done) {
     sendEmail(job.data, done);
-});
+});*/
 
 exports.sendChallengeCreatedNotification = function(req, res) {
 
     var challenger;
     var challengee;
     
-    kue.Job.rangeByState( 'inactive', 0, 50, 'asc', function( err, jobs ) {
+    /*kue.Job.rangeByState( 'inactive', 0, 50, 'asc', function( err, jobs ) {
         jobs.forEach( function( job ) {
             job.remove( function(){
                 console.log( 'removed ', job.id ) ;
             });
         });
-    });
+    });*/
     
-    User.findById(req.body.challenger).then(function(challengerObj) {
-        challenger = challengerObj;
+    User.findById(req.body.challengerUserId).then(function(challengerUserObj) {
+        challenger = challengerUserObj;
 
-        User.findById(req.body.challengee).then(function(challengeeObj) {
-            challengee = challengeeObj;
+        User.findById(req.body.challengeeUserId).then(function(challengeeUserObj) {
+            challengee = challengeeUserObj;
 
             var locals = {
                 challengerName : challenger.firstName,
@@ -152,9 +159,11 @@ exports.sendChallengeCreatedNotification = function(req, res) {
 
             createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + locals.challengedName + " on gametrunk!", 'challenge-created', locals, false, function(err) {
                 if(err) {
-                    res.status(400).send(err);
+                    console.log("ERROR: ", err);
+                    //res.status(400).send(err);
                 } else {
-                    res.status(200).send();
+                    console.log("SUCCESSFUL");
+                    //res.status(200).send();
                 }
             });
         });

@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "acl": "~0.4.4",
-    "async": "^1.5.2",
+    "async": "^2.0.1",
     "body-parser": "^1.14.2",
     "bower": "^1.7.1",
     "brace-expansion": "^1.1.2",
@@ -30,7 +30,7 @@
     "crypto": "0.0.3",
     "dotenv": "^2.0.0",
     "ejs": "^2.4.2",
-    "email-templates": "^2.3.4",
+    "email-templates": "^2.4.0",
     "express": "^4.13.1",
     "express-session": "^1.11.3",
     "forever": "^0.15.1",
