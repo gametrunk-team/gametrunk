@@ -16,7 +16,7 @@ angular.module('challenge').factory('User', ['$resource',
 
 angular.module('challenge').factory('Challenges', ['$resource',
     function($resource) {
-        return $resource('api/rankings/user/:userId', {
+        return $resource('api/rankings/challengees', {
             userId: '@_id'
         }, {
             query: {
