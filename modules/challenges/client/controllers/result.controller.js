@@ -4,9 +4,21 @@
 
 'use strict';
 
-angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModalInstance',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModalInstance) {
+angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http',
+    function($scope, $state, $http) {
 
+        $scope.model = {
+            Id: -1
+        };
+
+        $scope.opponent = $scope.users.filter(function( obj ) {
+            return obj.id === $scope.challengeeId;
+        })[0];
+
+        $scope.me = $scope.users.filter(function( obj ) {
+            return obj.id === $scope.challengerId;
+        })[0];
+        
         $scope.Won = function() {
             // Update challenge
             var challengObj = {
@@ -44,6 +56,14 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
             // No changes to rankings necessary
 
             $state.go('home');
+        };
+        
+        $scope.Submit = function() {
+            if($scope.model.Id===$scope.me.id) {
+                $scope.Won();
+            } else if($scope.model.Id===$scope.opponent.id) {
+                $scope.Lost();
+            }
         };
 
     }

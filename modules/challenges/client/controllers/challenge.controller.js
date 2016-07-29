@@ -32,7 +32,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 controller: 'ResultController', // todo
                 scope: $scope,
                 backdrop: false,
-                windowClass: 'minimal-modal'
+                windowClass: 'app-modal-window'
             });
         };
 
@@ -82,6 +82,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.min = null;
         $scope.max = null;
+        $scope.dt = null;
 
         $scope.initTimePicker = function(selectedDate) {
             var min = new Date(selectedDate.getTime());
