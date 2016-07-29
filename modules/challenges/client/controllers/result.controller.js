@@ -4,8 +4,8 @@
 
 'use strict';
 
-angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http',
-    function($scope, $state, $http) {
+angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http','Authentication',
+    function($scope, $state, $http, Authentication) {
 
         $scope.model = {
             Id: -1
@@ -15,10 +15,8 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
             return obj.id === $scope.challengeeId;
         })[0];
 
-        $scope.me = $scope.users.filter(function( obj ) {
-            return obj.id === $scope.challengerId;
-        })[0];
-        
+        $scope.me = Authentication.user;
+
         $scope.Won = function() {
             // Update challenge
             var challengObj = {
