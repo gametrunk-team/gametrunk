@@ -63,6 +63,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         $scope.error = response.message;
                     });
 
+                console.log("sending challenge email");
+                $http.post('/api/emails/challengeCreated', challengObj);
+
             }).error(function (response) {
                 $scope.error = response.message;
             });
