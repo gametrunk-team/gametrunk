@@ -1,18 +1,15 @@
 language: node_js
 sudo: false
 node_js:
-- 0.1
-- 0.12
 - 4
-- 5
+- 6.2
 - iojs-v1
 - iojs-v2
 env:
 - NODE_ENV=travis CXX="g++-4.8" CC="gcc-4.8"
 matrix:
   allow_failures:
-  - node_js: 0.1
-  - node_js: 5
+  - node_js: 6.2
 services:
 - redis-server
 addons:
