@@ -10,7 +10,7 @@ This app is based on the **SEAN Stack**.
 
  * PostgreSQL 9.4 or MySQL, MariaDB, SQLite and MSSQL *(Depending on your project but SEAN.JS defaults to PostgreSQL 9.4)*
  * Redis Server
- * Node.js
+ * Node.js (v6.3.1)
  * NPM
  * Grunt
 
