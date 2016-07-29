@@ -32,6 +32,23 @@ exports.list = function(req, res) {
     });
 };
 
+exports.getChallengees = function(req, res) {
+    // TODO adjust to allow circuits
+    var upperBound = req.user.rank;
+    var lowerBound = req.user.rank - 4;
+
+    User.findAll({
+        where: [
+            {rank: {gt: lowerBound}},
+            {rank: {lt: upperBound}}
+        ]
+    }).then(function (users) {
+        res.json(users);
+    }).catch(function (err) {
+        res.jsonp(err);
+    });
+};
+
 exports.userByID = function(req, res, next, id) {
     if (!id) {
         return res.status(400).send({
@@ -86,7 +103,6 @@ exports.updateRanking = function(req, res) {
                 User.update(
                     newRankObj, {where: {rank: oldRank}})
                     .then(function (result) {
-                        res.status(200).send();
                     }).error(function (err) {
                         res.status(400).send({
                             message: errorHandler.getErrorMessage(err)
@@ -103,6 +119,7 @@ exports.updateRanking = function(req, res) {
             User.update(
                 {rank: challengee.rank}, {where: {id: challenger.id}})
                 .then(function (result) {
+                    req.user.rank = challengee.rank;
                     res.status(200).send();
                 }).error(function (err) {
                     res.status(400).send({

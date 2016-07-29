@@ -19,6 +19,9 @@ module.exports = function(app) {
     app.route('/api/rankings/user/:userId').get(rankingsPolicy.isAllowed, rankings.read);
 
     app.route('/api/rankings/update').post(rankingsPolicy.isAllowed, rankings.updateRanking);
+    
+    // Gets possible challengees (up to three ranks above)
+    app.route('/api/rankings/challengees').get(rankingsPolicy.isAllowed, rankings.getChallengees);
 
     app.param('userId', rankings.userByID);
 };

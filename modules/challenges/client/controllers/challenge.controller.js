@@ -32,7 +32,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 controller: 'ResultController', // todo
                 scope: $scope,
                 backdrop: false,
-                windowClass: 'minimal-modal'
+                windowClass: 'app-modal-window'
             });
         };
 
@@ -63,6 +63,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         $scope.error = response.message;
                     });
 
+                console.log("sending challenge email");
+                $http.post('/api/emails/challengeCreated', challengObj);
+
             }).error(function (response) {
                 $scope.error = response.message;
             });
@@ -79,6 +82,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.min = null;
         $scope.max = null;
+        $scope.dt = null;
 
         $scope.initTimePicker = function(selectedDate) {
             var min = new Date(selectedDate.getTime());
