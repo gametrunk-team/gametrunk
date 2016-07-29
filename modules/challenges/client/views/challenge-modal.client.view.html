@@ -1,10 +1,11 @@
 <div>
   <div class="jumbotron text-center">
-  <h2>Create a Challenge</h2>
-  <form novalidate class="simple-form">
+    <h2>Create a Challenge</h2>
+
+  <form novalidate class="simple-form" ng-show="users.length > 0">
     <ul>
+
     <li ng-repeat="user in users | orderBy:'rank'" ng-style="myStyle" class="list-group-item row" ng-class="{selected: user.id==model.opponentId, deselected: user.id!=model.opponentId}" ng-click="model.opponentId=user.id">
-      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
       <span class="col-md-4 col-4"><h2 ng-bind="user.rank"></h2></span>
       <span class="col-md-4 col-4">
           <h2 ng-bind="user.displayName"></h2>
@@ -16,8 +17,8 @@
         <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{user.displayName}}" width="100px"/>
       </span>
       <h1 ng-if="user.id==model.opponentId" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h1>
-      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
-      </ul>
+
+    </ul>
 
     <div class="row">
       <div>
@@ -41,5 +42,9 @@
       <input class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
     </td>
   </form>
-    </div>
+
+    <h5 ng-hide="users.length > 0">Looks like you are in position #1! Wait until someone else challenges you.</h5>
+
+
+  </div>
 </div>
