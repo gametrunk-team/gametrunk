@@ -30,7 +30,8 @@ module.exports = function(app, db) {
             email: user.email,
             profileImageURL: user.profileImageURL,
             roles: user.roles,
-            additionalProvidersData: user.additionalProvidersData
+            additionalProvidersData: user.additionalProvidersData,
+            rank: user.rank
         };
         done(null, userData);
     });

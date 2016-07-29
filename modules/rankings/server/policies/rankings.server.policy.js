@@ -47,13 +47,14 @@ exports.invokeRolesPolicies = function() {
         }, {
             resources: '/api/rankings/update',
             permissions: '*'
+        }, {
+            resources: '/api/rankings/challengees',
+            permissions: '*'
         }
         ]
 
     }]);
 };
-
-
 
 /**
  * Check If User Policy Allows
