@@ -6,8 +6,8 @@
   "author": "Gametrunk-team-team",
   "license": "MIT",
   "engines": {
-    "node": ">=0.10.28",
-    "npm": ">=1.4.28"
+    "node": "6.2.2",
+    "npm": "3.10.5"
   },
   "scripts": {
     "start": "grunt",
