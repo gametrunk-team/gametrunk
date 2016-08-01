@@ -5,25 +5,57 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.authentication = Authentication;
         $scope.popoverMsg = PasswordValidator.getPopoverMsg();
         $scope.selectedTime = 'Now';
-
-        $scope.userId = -1;
-
-        $scope.model = {
-            opponentId: -1
-        };
-
-        $scope.run = function() {
-            console.log($scope.opponent.model);
-        };
-
-        Challenges.query(function(data) {
-            $scope.users = data;
-        });
+        $scope.message = "";
 
         // Variables saved for UserController
         $scope.challengeId = -1;
         $scope.challengerId = -1;
         $scope.challengeeId = -1;
+
+        $scope.determineCircuit = function(rank) {
+            if (rank === null) {
+                return "Mosh Pit";
+            } else if (rank < 11) {
+                return "World Circuit";
+            } else if (rank < 21) {
+                return "Major Circuit";
+            } else if (rank < 31) {
+                return "Minor Circuit";
+            } else {
+                return "Circuit undetermined";
+            }
+        };
+
+        $http.get('/api/user').success(function (response) {
+            // If successful show success message and clear form
+            $scope.success = true;
+            $scope.currRank = response.rank;
+            $scope.challengerId = response.id;
+            $scope.circuit = $scope.determineCircuit($scope.currRank);
+
+            $scope.model = {
+                opponentId: -1
+            };
+
+            $scope.run = function() {
+                console.log($scope.opponent.model);
+            };
+
+            Challenges.query(function(data) {
+                $scope.users = data;
+                if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
+                    $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
+                } else if ($scope.circuit !== "World Circuit" && $scope.currRank % 10 === 1) {
+                    $scope.message = "You are at the top of your circuit! Play the bottom player from the " + $scope.determineCircuit($scope.currRank - 10) + " to move up.";
+                } else if ($scope.users.length < 1) {
+                    $scope.message = "Looks like you don't have anyone to challenge.";
+                }
+            });
+            
+        }).error(function (response) {
+            $scope.error = response.message;
+        });
+        
 
         $scope.emailModal = function () {
             console.log("making the email modal");
@@ -40,43 +72,33 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             if($scope.model.opponentId === -1){
                 return;
             }
-
-            $http.get('/api/user').success(function (response) {
-                // If successful show success message and clear form
-                $scope.success = true;
-                $scope.challengerId = response.id;
-                $scope.challengeeId = $scope.model.opponentId;
+            $scope.challengeeId = $scope.model.opponentId;
                 
-                var challengObj = {
-                    scheduledTime: $scope.dt,
-                    challengerUserId: response.id,
-                    challengeeUserId: $scope.model.opponentId,
-                    winnerUserId: null
-                };
+            var challengObj = {
+                scheduledTime: $scope.dt,
+                challengerUserId: $scope.challengerId,
+                challengeeUserId: $scope.model.opponentId,
+                winnerUserId: null
+            };
 
-                $http.post('/api/challenge/create', challengObj)
-                    .success(function (response) {
-                        $scope.challengeId = response.id;
-                        $scope.emailModal();
-                    })
-                    .error(function (response) {
-                        $scope.error = response.message;
-                    });
+            $http.post('/api/challenge/create', challengObj)
+                .success(function (response) {
+                    $scope.challengeId = response.id;
+                    $scope.emailModal();
+                })
+                .error(function (response) {
+                    $scope.error = response.message;
+                });
 
-                console.log("sending challenge email");
-                $http.post('/api/emails/challengeCreated', challengObj);
-
-            }).error(function (response) {
-                $scope.error = response.message;
-            });
-
+            console.log("sending challenge email");
+            $http.post('/api/emails/challengeCreated', challengObj);
 
         };
         
 
         $scope.getChallenges = function() {
             $http.get('/api/challenge/getall').success(function(response) {
-                console.log(response);
+                //console.log(response);
             });
         };
 
