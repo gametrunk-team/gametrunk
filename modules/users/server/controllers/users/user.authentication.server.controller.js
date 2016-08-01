@@ -10,7 +10,8 @@ var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   passport = require('passport'),
   db = require(path.resolve('./config/lib/sequelize')).models,
-  User = db.user;
+  User = db.user,
+    _ = require('lodash');
 
 // URLs for which user can't be redirected on signin
 var noReturnUrls = [
@@ -20,6 +21,8 @@ var noReturnUrls = [
 
 var cloudinary = require('cloudinary');
 
+var PropertiesReader = require('properties-reader');
+var properties = new PropertiesReader('./config/properties.ini');
 
 /**
  * Signup
@@ -141,7 +144,7 @@ exports.oauthCallback = function(strategy) {
  * Helper function to save or update a OAuth user profile
  */
 exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
-  if(providerUserProfile.email.endsWith('42six.com')) {
+  if(_.endsWith(providerUserProfile.email, properties.get('emailDomain'))) {
     if (!req.user) {
 
       //check if the email exists, add the provider data to it and login
