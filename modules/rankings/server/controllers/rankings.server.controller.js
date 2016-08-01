@@ -33,20 +33,24 @@ exports.list = function(req, res) {
 };
 
 exports.getChallengees = function(req, res) {
-    // TODO adjust to allow circuits
-    var upperBound = req.user.rank;
-    var lowerBound = req.user.rank - 4;
+    User.findById(req.user.id).then(function(user) {
+        // TODO adjust to allow circuits
+        var upperBound = user.rank;
+        var lowerBound = user.rank - 4;
 
-    User.findAll({
-        where: [
-            {rank: {gt: lowerBound}},
-            {rank: {lt: upperBound}}
-        ]
-    }).then(function (users) {
-        res.json(users);
-    }).catch(function (err) {
-        res.jsonp(err);
+        User.findAll({
+            where: [
+                {rank: {gt: lowerBound}},
+                {rank: {lt: upperBound}}
+            ]
+        }).then(function (users) {
+            res.json(users);
+        }).catch(function (err) {
+            res.jsonp(err);
+        });
     });
+
+
 };
 
 exports.userByID = function(req, res, next, id) {

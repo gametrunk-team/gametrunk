@@ -95,9 +95,9 @@
 @media (max-width: 767px) {
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a {
     color: #777; }
+
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:focus {
     color: #333; } }
-
 .navbar-nav > li > a {
   text-shadow: none; }
 
@@ -126,3 +126,5 @@ footer {
 
 .glyphicon {
   text-shadow: 0 0 5px #707c80; }
+
+/*# sourceMappingURL=core.css.map */
