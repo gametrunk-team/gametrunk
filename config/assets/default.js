@@ -5,9 +5,15 @@ module.exports = {
     lib: {
       css: [
         'public/lib/bootstrap/dist/css/bootstrap.css',
-        'public/lib/bootstrap/dist/css/bootstrap-theme.css'
+        'public/lib/bootstrap/dist/css/bootstrap-theme.css',
+        'public/lib/gridster/dist/jquery.gridster.css',
+        'public/lib/decksterjs/dist/jquery.deckster.css'
       ],
       js: [
+        'public/lib/jquery/dist/jquery.min.js',
+        'public/lib/spin.js/spin.js',
+        'public/lib/spin.js/jquery.spin.js',
+        'public/lib/gridster/dist/jquery.gridster.min.js',
         'public/lib/angular/angular.js',
         'public/lib/angular-resource/angular-resource.js',
         'public/lib/angular-animate/angular-animate.js',
@@ -17,7 +23,8 @@ module.exports = {
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/angular-file-upload/angular-file-upload.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
-        'https://www.google.com/recaptcha/api.js'
+        'https://www.google.com/recaptcha/api.js',
+        'public/lib/decksterjs/dist/jquery.deckster.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
