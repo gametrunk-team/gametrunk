@@ -38,6 +38,13 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         cb && cb($compile(html)($scope));
       });
     };
+    
+    var viewProfile = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      $http.get('modules/rankings/client/views/rankings/list-rankings.client.view.html').success(function (html) {
+        cb && cb($compile(html)($scope));
+      });
+    };
 
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
     $scope.mainDeck.cards = [
@@ -46,7 +53,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         id: 'rankingsCard',
         hasPopout: true,
         summaryContentHtml: viewRankings,
-        detailsContentHtml: getDetailsTemplate,
+        detailsContentHtml: viewRankings,
         position: {
           size_x: 1,
           size_y: 1,
@@ -55,9 +62,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         }
       },
       {
-        title: 'Alerts',
-        id: 'alertsCard',
-        summaryContentHtml: getSummaryTemplate,
+        title: 'Profile',
+        id: 'profileCard',
+        summaryContentHtml: viewProfile,
         detailsContentHtml: getDetailsTemplate,
         position: {
           size_x: 1,
