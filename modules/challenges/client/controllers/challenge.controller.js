@@ -26,10 +26,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.challengeeId = -1;
 
         $scope.emailModal = function () {
-            console.log("making the email modal");
             var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/result.client.view.html', // todo
-                controller: 'ResultController', // todo
+                templateUrl: 'modules/challenges/client/views/result.client.view.html',
+                controller: 'ResultController',
                 scope: $scope,
                 backdrop: false,
                 windowClass: 'app-modal-window'

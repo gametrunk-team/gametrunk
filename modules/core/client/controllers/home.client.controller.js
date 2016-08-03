@@ -32,13 +32,20 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       });
     };
 
+    var viewRankings = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      $http.get('modules/rankings/client/views/rankings/list-rankings.client.view.html').success(function (html) {
+        cb && cb($compile(html)($scope));
+      });
+    };
+
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
     $scope.mainDeck.cards = [
       {
-        title: 'Photos',
-        id: 'photoCard',
+        title: 'Rankings',
+        id: 'rankingsCard',
         hasPopout: true,
-        summaryContentHtml: getSummaryTemplate,
+        summaryContentHtml: viewRankings,
         detailsContentHtml: getDetailsTemplate,
         position: {
           size_x: 1,
