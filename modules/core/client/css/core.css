@@ -119,9 +119,6 @@ body {
 .deselected:hover {
   background-color: #eee; }
 
-.glyphicon {
-  text-shadow: 0 0 5px #707c80; }
-
 .footer-text {
   width: 50px;
   padding-top: 20px; }

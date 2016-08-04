@@ -12,6 +12,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.challengerId = -1;
         $scope.challengeeId = -1;
         
+        $scope.challenges = {};
 
         $http.get('/api/user').success(function (response) {
             // If successful show success message and clear form
@@ -85,9 +86,11 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.getChallenges = function() {
             $http.get('/api/challenge/getall').success(function(response) {
-                //console.log(response);
+                $scope.challenges = response;
             });
         };
+
+        $scope.getChallenges();
 
         $scope.min = null;
         $scope.max = null;

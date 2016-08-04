@@ -1,0 +1,6 @@
+<div ng-controller="ChallengeController">
+  <li class="list-group-item row" ng-repeat="challenge in challenges">
+    <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
+    {{challenge.scheduledTime | date:'dd.MM.y' }}
+  </li>
+</div>
