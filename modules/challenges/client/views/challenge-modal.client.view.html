@@ -3,11 +3,11 @@
     <h2>Create a Challenge</h2>
     <br>
 
-  <form novalidate class="simple-form" ng-show="users.length > 0">
-    <ul>
+    <form novalidate class="simple-form" ng-show="users.length > 0">
+      <ul>
 
-    <li ng-repeat="user in users | orderBy:'rank'" ng-style="myStyle" class="list-group-item row" ng-class="{selected: user.id==model.opponentId, deselected: user.id!=model.opponentId}" ng-click="model.opponentId=user.id">
-      <span class="col-md-4 col-4"><h2 ng-bind="user.rank"></h2></span>
+        <li ng-repeat="user in users | orderBy:'rank'" ng-style="myStyle" class="list-group-item row" ng-class="{selected: user.id==model.opponentId, deselected: user.id!=model.opponentId}" ng-click="model.opponentId=user.id">
+          <span class="col-md-4 col-4"><h2 ng-bind="user.rank"></h2></span>
       <span class="col-md-4 col-4">
           <h2 ng-bind="user.displayName"></h2>
       </span>
@@ -17,34 +17,34 @@
       <span ng-if="!user.profileImageURL && user.id!=model.opponentId" class="col-md-4 col-4">
         <img class = "img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{user.displayName}}" width="100px"/>
       </span>
-      <h1 ng-if="user.id==model.opponentId" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h1>
-      </li>
+          <h1 ng-if="user.id==model.opponentId" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h1>
+        </li>
 
       </ul>
 
-    <div class="row">
-      <div>
-        <p class="input-group">
-          <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions"
-                 ng-required="true" close-text="Close" ng-change="dateChange()" />
+      <div class="row">
+        <div>
+          <p class="input-group">
+            <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions"
+                   ng-required="true" close-text="Close" ng-change="dateChange()" />
 
                     <span class="input-group-btn">
             <button type="button" class="btn btn-default" ng-click="open()"><i class="glyphicon glyphicon-calendar"></i></button>
           </span>
-        </p>
+          </p>
+        </div>
       </div>
-    </div>
-    <br>
+      <br>
 
-    <div align="center" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
+      <div align="center" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
 
-    <p class="alert alert-info">Schedule for: {{dt | date:'EEEE, MMMM d' }} at {{dt | date:'hh:mm a' }}</p>
+      <p class="alert alert-info">Schedule for: {{dt | date:'EEEE, MMMM d' }} at {{dt | date:'hh:mm a' }}</p>
 
-    <td class="form-group" show-errors>
-      <label></label>
-      <input class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
-    </td>
-  </form>
+      <td class="form-group" show-errors>
+        <label></label>
+        <input class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
+      </td>
+    </form>
 
     <h5 ng-hide="users.length > 0">Looks like you are in position #1! Wait until someone else challenges you.</h5>
 

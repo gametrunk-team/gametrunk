@@ -7,7 +7,8 @@
 var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    User = db.user;
+    User = db.user,
+    _ = require('lodash');
 
 exports.read = function(req, res) {
     res.json(req.model);
@@ -25,6 +26,21 @@ exports.list = function(req, res) {
                 message: 'Unable to get list of users'
             });
         } else {
+            // Define display rank
+            users = _.map(users, function(user) {
+                if (user.dataValues.rank === null) {
+                    user.dataValues.displayRank = "Un";
+                } else if (user.dataValues.rank < 11) {
+                    user.dataValues.displayRank = user.dataValues.rank;
+                } else if (user.dataValues.rank < 21) {
+                    user.dataValues.displayRank = user.dataValues.rank - 10;
+                } else if (user.dataValues.rank < 31) {
+                    user.dataValues.displayRank = user.dataValues.rank - 20;
+                } else {
+                    user.dataValues.displayRank = "Un";
+                }
+                return user;
+            });
             res.json(users);
         }
     }).catch(function(err) {
@@ -33,20 +49,54 @@ exports.list = function(req, res) {
 };
 
 exports.getChallengees = function(req, res) {
-    // TODO adjust to allow circuits
-    var upperBound = req.user.rank;
-    var lowerBound = req.user.rank - 4;
+    User.findById(req.user.id).then(function(user) {
 
-    User.findAll({
-        where: [
-            {rank: {gt: lowerBound}},
-            {rank: {lt: upperBound}}
-        ]
-    }).then(function (users) {
-        res.json(users);
-    }).catch(function (err) {
-        res.jsonp(err);
+        var upperBound = Infinity;
+        var lowerBound = 0;
+
+        if (user.rank === null) {
+            upperBound = 31;
+            lowerBound = 29;
+        } else {
+            upperBound = user.rank;
+
+            if (user.rank % 10 === 2 || user.rank % 10 === 1) {
+                lowerBound = user.rank - 2;
+            } else if (user.rank % 10 === 3) {
+                lowerBound = user.rank - 3;
+            } else {
+                lowerBound = user.rank - 4;
+            }
+        }
+
+        User.findAll({
+            where: [
+                {rank: {gt: lowerBound}},
+                {rank: {lt: upperBound}}
+            ]
+        }).then(function (users) {
+            users = _.map(users, function(user) {
+                if (user.dataValues.rank === null) {
+                    user.dataValues.displayRank = "Un";
+                } else if (user.dataValues.rank < 11) {
+                    user.dataValues.displayRank = user.dataValues.rank;
+                } else if (user.dataValues.rank < 21) {
+                    user.dataValues.displayRank = user.dataValues.rank - 10;
+                } else if (user.dataValues.rank < 31) {
+                    user.dataValues.displayRank = user.dataValues.rank - 20;
+                } else {
+                    user.dataValues.displayRank = "Un";
+                }
+                return user;
+            });
+
+            res.json(users);
+        }).catch(function (err) {
+            res.jsonp(err);
+        });
     });
+
+
 };
 
 exports.userByID = function(req, res, next, id) {
@@ -104,10 +154,10 @@ exports.updateRanking = function(req, res) {
                     newRankObj, {where: {rank: oldRank}})
                     .then(function (result) {
                     }).error(function (err) {
-                        res.status(400).send({
-                            message: errorHandler.getErrorMessage(err)
-                        });
+                    res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
                     });
+                });
             };
 
             // challengee.rank = challenger.rank and everyone in between
@@ -122,12 +172,12 @@ exports.updateRanking = function(req, res) {
                     req.user.rank = challengee.rank;
                     res.status(200).send();
                 }).error(function (err) {
-                    res.status(400).send({
-                        message: errorHandler.getErrorMessage(err)
-                    });
+                res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
                 });
+            });
         });
     });
-    
+
 
 };

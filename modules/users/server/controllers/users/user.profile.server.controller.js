@@ -209,7 +209,7 @@ exports.changeProfilePicture = function(req, res) {
 
 exports.getProfile = function(req, res) {
   User.findOne({
-    attributes: ['id', 'firstName', 'lastName', 'email', 'username', 'profileImageURL'],
+    attributes: ['id', 'firstName', 'lastName', 'email', 'username', 'profileImageURL', 'rank'],
     where: {
       id: req.user.id
     }
