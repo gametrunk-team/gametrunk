@@ -36,13 +36,21 @@
 </head>
 
 <body class="ng-cloak">
-  <header ng-include="'/modules/core/client/views/header.client.view.html'" class="navbar navbar-fixed-top navbar-seanjs"></header>
-  <section class="content">
-    <section class="container">
-      {% block content %}{% endblock %}
+  <div id="container">
+    <div id="header">
+    <header ng-include="'/modules/core/client/views/header.client.view.html'" class="navbar navbar-fixed-top navbar-seanjs"></header>
+    </div>
+    <div id="body">
+    <section class="content">
+      <section class="container">
+        {% block content %}{% endblock %}
+      </section>
     </section>
-  </section>
-  <footer ng-include="'/modules/core/client/views/footer.client.view.html'"></footer>
+      </div>
+    <div id="footer">
+    <footer ng-include="'/modules/core/client/views/footer.client.view.html'"></footer>
+    </div>
+  </div>
 
   <!--Embedding The User Object-->
   <script type="text/javascript">
