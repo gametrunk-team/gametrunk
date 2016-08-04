@@ -51,11 +51,11 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     $scope.message = "Looks like you don't have anyone to challenge.";
                 }
             });
-            
+
         }).error(function (response) {
             $scope.error = response.message;
         });
-        
+
 
         $scope.emailModal = function () {
             console.log("making the email modal");
@@ -73,7 +73,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 return;
             }
             $scope.challengeeId = $scope.model.opponentId;
-                
+
             var challengObj = {
                 scheduledTime: $scope.dt,
                 challengerUserId: $scope.challengerId,
@@ -94,7 +94,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $http.post('/api/emails/challengeCreated', challengObj);
 
         };
-        
+
 
         $scope.getChallenges = function() {
             $http.get('/api/challenge/getall').success(function(response) {

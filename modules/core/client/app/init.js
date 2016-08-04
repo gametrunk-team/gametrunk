@@ -5,10 +5,23 @@ angular.module(ApplicationConfiguration.applicationModuleName, ApplicationConfig
 
 // Setting HTML5 Location Mode
 angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider', '$httpProvider',
-  function($locationProvider, $httpProvider) {
+  function($locationProvider, $httpProvider, $routeProvider) {
     $locationProvider.html5Mode(true).hashPrefix('!');
 
     $httpProvider.interceptors.push('authInterceptor');
+
+    // // configuring base url for deckster popouts
+    // var popoutRoute = Deckster.getPopoutRoute('/deckster/');
+    //
+    // // configuring the popout base template
+    // $routeProvider.when(popoutRoute.fullPath, {
+    //   templateUrl: 'partials/deckster-popout.html'
+    // });
+    //
+    // $routeProvider.when('/', {
+    //   templateUrl: 'partials/main.html',
+    //   controller: 'MainCtrl'
+    // });
   }
 ]);
 

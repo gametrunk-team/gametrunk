@@ -154,10 +154,10 @@ exports.updateRanking = function(req, res) {
                     newRankObj, {where: {rank: oldRank}})
                     .then(function (result) {
                     }).error(function (err) {
-                        res.status(400).send({
-                            message: errorHandler.getErrorMessage(err)
-                        });
+                    res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
                     });
+                });
             };
 
             // challengee.rank = challenger.rank and everyone in between
@@ -172,12 +172,12 @@ exports.updateRanking = function(req, res) {
                     req.user.rank = challengee.rank;
                     res.status(200).send();
                 }).error(function (err) {
-                    res.status(400).send({
-                        message: errorHandler.getErrorMessage(err)
-                    });
+                res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
                 });
+            });
         });
     });
-    
+
 
 };
