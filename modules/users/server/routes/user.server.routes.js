@@ -14,6 +14,7 @@ module.exports = function(app) {
   app.route('/api/user/picture').post(user.requiresLogin, user.changeProfilePicture);
   app.route('/api/user/getopponents').get(user.requiresLogin, user.getOpponents);
   app.route('/api/user/getall').get(user.requiresLogin, user.getAllUsers);
+  app.route('/api/user/getUserById').get(user.getUserById);
 
   // Finish by binding the user middleware
   app.param('userId', user.userByID);
