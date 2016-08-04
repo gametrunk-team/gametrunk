@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus',
-  function($rootScope, $scope, $location, $state, Authentication, Menus) {
+angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window',
+  function($rootScope, $scope, $location, $state, Authentication, Menus, $window) {
     // Expose view variables
     $scope.$state = $state;
     $scope.authentication = Authentication;
@@ -20,6 +20,16 @@ angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '
       $scope.isCollapsed = false;
       ga('send', 'pageview', $location.path());
     });
+
+    // OAuth provider request
+    $scope.callOauthProvider = function(url) {
+      if ($state.previous && $state.previous.href) {
+        url += '?redirect_to=' + encodeURIComponent($state.previous.href);
+      }
+
+      // Effectively call OAuth authentication route:
+      $window.location.href = url;
+    };
 
   }
 ]);

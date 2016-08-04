@@ -114,14 +114,11 @@
   text-shadow: none;
 }
 
-footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  height: 80px;
-  background-color: darkgray;
-  text-align: center;
+body {
+  padding-bottom: 60px;
 }
+
+
 
 .jumbotron {
   margin: 60px;
@@ -146,4 +143,50 @@ footer {
 
 .glyphicon{
   text-shadow: 0 0 5px #707c80;
+}
+
+.footer-text {
+  //margin-left: auto;
+  //margin-right: auto;
+  width: 50px;
+  padding-top: 20px;
+  //padding-left: 45px;
+}
+
+.facebook {
+  position: absolute;
+  //padding-left: 275px;
+  left: 0;
+}
+
+.github {
+  position: absolute;
+  //padding-right: 10px;
+  right: 0;
+}
+
+html,
+body {
+  margin:0;
+  padding:0;
+  height:100%;
+}
+#container {
+  min-height:100%;
+  position:relative;
+}
+#header {
+  background: #000000;
+  padding:10px;
+}
+#body {
+  padding:10px;
+  padding-bottom:80px;   /* Height of the footer */
+}
+#footer {
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:80px;   /* Height of the footer */
+  background: #cbcbcb;
 }

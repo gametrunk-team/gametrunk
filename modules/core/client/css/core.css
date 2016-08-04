@@ -95,19 +95,14 @@
 @media (max-width: 767px) {
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a {
     color: #777; }
-
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:focus {
     color: #333; } }
+
 .navbar-nav > li > a {
   text-shadow: none; }
 
-footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  height: 80px;
-  background-color: darkgray;
-  text-align: center; }
+body {
+  padding-bottom: 60px; }
 
 .jumbotron {
   margin: 60px; }
@@ -127,4 +122,41 @@ footer {
 .glyphicon {
   text-shadow: 0 0 5px #707c80; }
 
-/*# sourceMappingURL=core.css.map */
+.footer-text {
+  width: 50px;
+  padding-top: 20px; }
+
+.facebook {
+  position: absolute;
+  left: 0; }
+
+.github {
+  position: absolute;
+  right: 0; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%; }
+
+#container {
+  min-height: 100%;
+  position: relative; }
+
+#header {
+  background: #000000;
+  padding: 10px; }
+
+#body {
+  padding: 10px;
+  padding-bottom: 80px;
+  /* Height of the footer */ }
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  /* Height of the footer */
+  background: #cbcbcb; }

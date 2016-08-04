@@ -1,4 +1,5 @@
 <section ng-controller="HomeController">
+  <body>
   <div class="jumbotron text-center">
     <div ng-hide="authentication.user">
       <div class="row">
@@ -18,4 +19,5 @@
     </div>
   </div>
   <deckster-deck ng-show="authentication.user" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
+  </body>
 </section>
