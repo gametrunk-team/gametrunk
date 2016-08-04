@@ -41,7 +41,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     
     var viewProfile = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request
-      $http.get('modules/users/client/views/profile.client.view.html').success(function (html) {
+      $http.get('modules/core/client/views/cards/profile.client.view.html').success(function (html) {
         cb && cb($compile(html)($scope));
       });
     };

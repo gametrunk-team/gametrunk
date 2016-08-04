@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges) {
+angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges', 'Circuit',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges, Circuit) {
         $scope.authentication = Authentication;
         $scope.popoverMsg = PasswordValidator.getPopoverMsg();
         $scope.selectedTime = 'Now';
@@ -11,27 +11,14 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.challengeId = -1;
         $scope.challengerId = -1;
         $scope.challengeeId = -1;
-
-        $scope.determineCircuit = function(rank) {
-            if (rank === null) {
-                return "Mosh Pit";
-            } else if (rank < 11) {
-                return "World Circuit";
-            } else if (rank < 21) {
-                return "Major Circuit";
-            } else if (rank < 31) {
-                return "Minor Circuit";
-            } else {
-                return "Circuit undetermined";
-            }
-        };
+        
 
         $http.get('/api/user').success(function (response) {
             // If successful show success message and clear form
             $scope.success = true;
             $scope.currRank = response.rank;
             $scope.challengerId = response.id;
-            $scope.circuit = $scope.determineCircuit($scope.currRank);
+            $scope.circuit = Circuit.circuit($scope.currRank);
 
             $scope.model = {
                 opponentId: -1
