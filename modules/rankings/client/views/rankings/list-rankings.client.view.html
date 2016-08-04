@@ -1,4 +1,4 @@
-<section>
+<section ng-controller="RankingController">
 
   <!--<p>Hello world! Check out these rankings</p>-->
   <div class="page-header">
@@ -14,8 +14,8 @@
   <h2 ng-show="world.length > 0">World Circuit</h2>
   <div class="list-group container">
     <a ng-repeat="user in world | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
-    <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
-        <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
         <span class="col-sm-1">
            <span ng-if="user.profileImageURL">
              <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
@@ -29,7 +29,7 @@
           <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
           <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
         </span>
-        <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
     </a>
   </div>
   <h2 ng-show="major.length > 0">Major Circuit</h2>
