@@ -12,6 +12,26 @@ var _ = require('lodash'),
   User = db.user, 
     cloudinary = require('cloudinary');
 
+
+/*
+ Get A User By Id
+ */
+exports.getUserById = function(req, res) {
+  if (req.body.id) {
+    User.findById(req.body.id).then(function (user) {
+      return res.json(user);
+    }).catch(function (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    });
+  } else {
+    return res.status(400).send({
+      message: "No User ID provided"
+    });
+  }
+};
+
 /*
 Get all users
  */
