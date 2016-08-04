@@ -41,7 +41,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     
     var viewProfile = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request
-      $http.get('modules/rankings/client/views/rankings/list-rankings.client.view.html').success(function (html) {
+      $http.get('modules/users/client/views/profile.client.view.html').success(function (html) {
         cb && cb($compile(html)($scope));
       });
     };
@@ -55,21 +55,21 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         summaryContentHtml: viewRankings,
         detailsContentHtml: viewRankings,
         position: {
-          size_x: 1,
-          size_y: 1,
+          size_x: 3,
+          size_y: 2,
           col: 1,
-          row: 3
+          row: 2
         }
       },
       {
-        title: 'Profile',
+        title: 'Your Profile',
         id: 'profileCard',
         summaryContentHtml: viewProfile,
-        detailsContentHtml: getDetailsTemplate,
+        detailsContentHtml: viewProfile,
         position: {
           size_x: 1,
-          size_y: 2,
-          col: 3,
+          size_y: 1,
+          col: 1,
           row: 1
         }
       },
@@ -79,10 +79,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         summaryContentHtml: getSummaryTemplate,
         detailsContentHtml: getDetailsTemplate,
         position: {
-          size_x: 2,
-          size_y: 2,
-          col: 1,
-          row: 1
+          size_x: 1,
+          size_y: 1,
+          col: 4,
+          row: 3
         }
       },
       {
@@ -103,10 +103,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         summaryContentHtml: getSummaryTemplate,
         detailsContentHtml: getDetailsTemplate,
         position: {
-          size_x: 3,
+          size_x: 2,
           size_y: 1,
           col: 2,
-          row: 3
+          row: 1
         }
       }
     ];
