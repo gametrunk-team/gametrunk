@@ -6,36 +6,51 @@
 
 
 // Service to determine circuit and display rank from raw rank
-angular.module('core').factory('Circuit', [
-    function() {
+angular.module('core').factory('Circuit', ['$http', '$q',
+    function($http, $q) {
 
-        var Circuit = {};
-        
-        Circuit.circuit = function(rank) {
-            if (rank === null) {
-                return "Mosh Pit";
-            } else if (rank < 11) {
-                return "World Circuit";
-            } else if (rank < 21) {
-                return "Major Circuit";
-            } else if (rank < 31) {
-                return "Minor Circuit";
-            } else {
-                return "Circuit undetermined";
-            }
+        var circuits = function() {
+            var deferred = $q.defer();
+
+            var Circuit = {};
+
+            $http.get('/api/props').then(function (response) {
+                Circuit.cSize = response.data.circuitSize ? response.data.circuitSize : 10;
+                var cSize = Circuit.cSize;
+                Circuit.circuit = function (rank) {
+                    if (rank === null) {
+                        return "Mosh Pit";
+                    } else if (rank < (+cSize + 1)) {
+                        return "World Circuit";
+                    } else if (rank < 2 * +cSize + 1) {
+                        return "Major Circuit";
+                    } else if (rank < 3 * +cSize + 1) {
+                        return "Minor Circuit";
+                    } else {
+                        return "Circuit undetermined";
+                    }
+                };
+
+                Circuit.displayRank = function (rank) {
+                    if (rank === null) {
+                        return "Un"; // unranked
+                    } else if (rank % cSize === 0) {
+                        return cSize;
+                    } else {
+                        return rank % cSize
+                    }
+                };
+
+                deferred.resolve(Circuit);
+
+            }, function (error) {
+                console.log("Error", error);
+            });
+
+            return deferred.promise;
+
         };
-        
-        Circuit.displayRank = function(rank) {
-            if (rank === null) {
-                return "Un"; // unranked
-            } else if (rank % 10 === 0) {
-                return 10;
-            } else {
-                return rank % 10
-            }
-        };
 
-        return Circuit;
-
+        return circuits;
     }
 ]);

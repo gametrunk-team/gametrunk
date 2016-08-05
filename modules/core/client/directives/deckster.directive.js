@@ -7,8 +7,6 @@
 angular.module('core')
 
     .factory('Deckster', function () {
-        console.log("factory1");
-        console.log(window);
         return window.Deckster;
     })
 

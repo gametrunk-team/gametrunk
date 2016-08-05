@@ -25,14 +25,13 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             };
 
             $scope.run = function() {
-                console.log($scope.opponent.model);
             };
-
+            
             Challenges.query(function(data) {
                 $scope.users = data;
                 if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
                     $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
-                } else if ($scope.circuit !== "World Circuit" && $scope.currRank % 10 === 1) {
+                } else if ($scope.circuit !== "World Circuit" && $scope.currRank % Circuit.cSize === 1) {
                     $scope.message = "You are at the top of your circuit! Play the bottom player from the " + $scope.determineCircuit($scope.currRank - 10) + " to move up.";
                 } else if ($scope.users.length < 1) {
                     $scope.message = "Looks like you don't have anyone to challenge.";
@@ -45,7 +44,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.emailModal = function () {
-            console.log("making the email modal");
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/result.client.view.html', // todo
                 controller: 'ResultController', // todo
@@ -77,7 +75,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     $scope.error = response.message;
                 });
 
-            console.log("sending challenge email");
             $http.post('/api/emails/challengeCreated', challengObj);
 
         };
@@ -85,7 +82,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.getChallenges = function() {
             $http.get('/api/challenge/getall').success(function(response) {
-                //console.log(response);
             });
         };
 
