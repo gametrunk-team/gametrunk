@@ -5,8 +5,6 @@
 'use strict';
 
 angular.module('core').factory('Card', function ($http, Deckster) {
-        console.log("deckster factory");
-
         var Card = function (cardData) {
             return this.setData(cardData);
         };
