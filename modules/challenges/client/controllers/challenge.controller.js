@@ -34,14 +34,12 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
                         $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
                     } else if ($scope.circuit !== "World Circuit" && $scope.currRank % result.cSize === 1) {
-                        $scope.message = "You are at the top of your circuit! Play the bottom player from the " + result.circuit($scope.currRank - 10) + " to move up.";
+                        $scope.message = "You are at the top of your circuit! Play the bottom player from the " + result.circuit($scope.currRank - result.cSize) + " to move up.";
                     } else if ($scope.users.length < 1) {
                         $scope.message = "Looks like you don't have anyone to challenge.";
                     }
                 });
             });
-
-
 
         }).error(function (response) {
             $scope.error = response.message;

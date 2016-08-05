@@ -58,7 +58,7 @@ exports.getChallengees = function(req, res) {
         var upperBound = Infinity;
         var lowerBound = 0;
 
-        if (user.rank === null) {
+        if (user.rank === null || user.rank > 3*cSize) {
             upperBound = 3*cSize + 1;
             lowerBound = 3*cSize - 1;
         } else {
