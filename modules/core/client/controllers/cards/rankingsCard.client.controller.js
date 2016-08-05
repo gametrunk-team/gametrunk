@@ -1,11 +1,11 @@
 /**
- * Created by breed on 7/21/16.
+ * Created by breed on 8/5/16.
  */
 
 'use strict';
 
-angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings', 'Circuit',
-    function($scope, $filter, Rankings, Circuit) {
+angular.module('rankings').controller('RankingCardController', ['$scope', '$filter', 'Rankings',
+    function($scope, $filter, Rankings) {
         $scope.world = [];
         $scope.major = [];
         $scope.minor = [];
@@ -16,26 +16,22 @@ angular.module('rankings').controller('RankingController', ['$scope', '$filter',
             $scope.buildPager();
         });
 
+        $scope.buildPager = function() {
+            $scope.pagedItems = [];
+            $scope.itemsPerPage = 100;
+            $scope.currentPage = 1;
+            $scope.figureOutItemsToDisplay();
+        };
+
         $scope.figureOutItemsToDisplay = function() {
             var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
             var end = begin + $scope.itemsPerPage;
 
             // Separate out by circuit
-            $scope.world = $scope.filter($scope.users.slice(0, $scope.cSize));
-            $scope.major = $scope.filter($scope.users.slice($scope.cSize, 2*$scope.cSize));
-            $scope.minor = $scope.filter($scope.users.slice(2*$scope.cSize, 3*$scope.cSize));
-            $scope.mosh = $scope.filter($scope.users.slice(3*$scope.cSize, end));
-
-        };
-
-        $scope.buildPager = function() {
-            $scope.pagedItems = [];
-            $scope.itemsPerPage = 100;
-            $scope.currentPage = 1;
-            Circuit().then(function(result) {
-                $scope.cSize = result.cSize;
-                $scope.figureOutItemsToDisplay();
-            });
+            $scope.world = $scope.filter($scope.users.slice(0, 10));
+            $scope.major = $scope.filter($scope.users.slice(10, 20));
+            $scope.minor = $scope.filter($scope.users.slice(20, 30));
+            $scope.mosh = $scope.filter($scope.users.slice(30, end));
         };
 
         $scope.filter = function(users) {

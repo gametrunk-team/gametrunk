@@ -34,7 +34,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
     var viewRankings = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request
-      $http.get('modules/rankings/client/views/rankings/list-rankings.client.view.html').success(function (html) {
+      $http.get('modules/core/client/views/cards/rankingsCard.client.view.html').success(function (html) {
         cb && cb($compile(html)($scope));
       });
     };
