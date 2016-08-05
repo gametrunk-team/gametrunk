@@ -26,7 +26,7 @@ angular.module('core').factory('Circuit', [
         };
         
         Circuit.displayRank = function(rank) {
-            if (rank === null) {
+            if (rank === null || rank > 3*cSize) {
                 return "Un"; // unranked
             } else if (rank % 10 === 0) {
                 return 10;
