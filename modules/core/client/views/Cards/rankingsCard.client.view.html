@@ -6,6 +6,7 @@
   <div class="row">
     <div class="col-md-6">
       <h2 ng-show="world.length > 0">World Circuit</h2>
+      <h2 ng-hide="world.length > 0 || major.length > 0 || minor.length > 0 || mosh.length > 0">No results found</h2>
     </div>
     <div class="col-md-4" style="margin-top: 1em;margin-bottom: 2em">
       <input class="form-control col-md-3" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
