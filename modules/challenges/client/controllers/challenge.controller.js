@@ -18,25 +18,30 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $scope.success = true;
             $scope.currRank = response.rank;
             $scope.challengerId = response.id;
-            $scope.circuit = Circuit.circuit($scope.currRank);
 
-            $scope.model = {
-                opponentId: -1
-            };
+            Circuit().then(function(result) {
+                $scope.circuit = result.circuit($scope.currRank);
 
-            $scope.run = function() {
-            };
-            
-            Challenges.query(function(data) {
-                $scope.users = data;
-                if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
-                    $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
-                } else if ($scope.circuit !== "World Circuit" && $scope.currRank % Circuit.cSize === 1) {
-                    $scope.message = "You are at the top of your circuit! Play the bottom player from the " + $scope.determineCircuit($scope.currRank - 10) + " to move up.";
-                } else if ($scope.users.length < 1) {
-                    $scope.message = "Looks like you don't have anyone to challenge.";
-                }
+                $scope.model = {
+                    opponentId: -1
+                };
+
+                $scope.run = function() {
+                };
+
+                Challenges.query(function(data) {
+                    $scope.users = data;
+                    if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
+                        $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
+                    } else if ($scope.circuit !== "World Circuit" && $scope.currRank % result.cSize === 1) {
+                        $scope.message = "You are at the top of your circuit! Play the bottom player from the " + result.circuit($scope.currRank - 10) + " to move up.";
+                    } else if ($scope.users.length < 1) {
+                        $scope.message = "Looks like you don't have anyone to challenge.";
+                    }
+                });
             });
+
+
 
         }).error(function (response) {
             $scope.error = response.message;
