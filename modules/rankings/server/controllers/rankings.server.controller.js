@@ -10,6 +10,10 @@ var path = require('path'),
     User = db.user,
     _ = require('lodash');
 
+var PropertiesReader = require('properties-reader');
+var properties = new PropertiesReader('./config/properties.ini');
+var cSize = properties.get('circuitSize') ? properties.get('circuitSize') : 10;
+
 exports.read = function(req, res) {
     res.json(req.model);
 };
@@ -30,12 +34,12 @@ exports.list = function(req, res) {
             users = _.map(users, function(user) {
                 if (user.dataValues.rank === null) {
                     user.dataValues.displayRank = "Un";
-                } else if (user.dataValues.rank < 11) {
+                } else if (user.dataValues.rank < cSize + 1) {
                     user.dataValues.displayRank = user.dataValues.rank;
-                } else if (user.dataValues.rank < 21) {
-                    user.dataValues.displayRank = user.dataValues.rank - 10;
-                } else if (user.dataValues.rank < 31) {
-                    user.dataValues.displayRank = user.dataValues.rank - 20;
+                } else if (user.dataValues.rank < 2*cSize + 1) {
+                    user.dataValues.displayRank = user.dataValues.rank - cSize;
+                } else if (user.dataValues.rank < 3*cSize + 1) {
+                    user.dataValues.displayRank = user.dataValues.rank - 2*cSize;
                 } else {
                     user.dataValues.displayRank = "Un";
                 }
@@ -55,14 +59,14 @@ exports.getChallengees = function(req, res) {
         var lowerBound = 0;
 
         if (user.rank === null) {
-            upperBound = 31;
-            lowerBound = 29;
+            upperBound = 3*cSize + 1;
+            lowerBound = 3*cSize - 1;
         } else {
             upperBound = user.rank;
 
-            if (user.rank % 10 === 2 || user.rank % 10 === 1) {
+            if (user.rank % cSize === 2 || user.rank % cSize === 1) {
                 lowerBound = user.rank - 2;
-            } else if (user.rank % 10 === 3) {
+            } else if (user.rank % cSize === 3) {
                 lowerBound = user.rank - 3;
             } else {
                 lowerBound = user.rank - 4;
@@ -78,12 +82,12 @@ exports.getChallengees = function(req, res) {
             users = _.map(users, function(user) {
                 if (user.dataValues.rank === null) {
                     user.dataValues.displayRank = "Un";
-                } else if (user.dataValues.rank < 11) {
+                } else if (user.dataValues.rank < cSize + 1) {
                     user.dataValues.displayRank = user.dataValues.rank;
-                } else if (user.dataValues.rank < 21) {
-                    user.dataValues.displayRank = user.dataValues.rank - 10;
-                } else if (user.dataValues.rank < 31) {
-                    user.dataValues.displayRank = user.dataValues.rank - 20;
+                } else if (user.dataValues.rank < 2*cSize + 1) {
+                    user.dataValues.displayRank = user.dataValues.rank - cSize;
+                } else if (user.dataValues.rank < 3*cSize + 1) {
+                    user.dataValues.displayRank = user.dataValues.rank - 2*cSize;
                 } else {
                     user.dataValues.displayRank = "Un";
                 }

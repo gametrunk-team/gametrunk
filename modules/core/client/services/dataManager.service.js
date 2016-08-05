@@ -68,7 +68,6 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     }
 
     DataManager.generateAutocompleteConfig = function (apiUrl, nameColumn, valueColumn, titleName, formatter, selected, dependsOnFilters, dependedByFilters, selections, allowClear) {
-        //console.log("dm generateAuto...");
         return {
             name: nameColumn,
             titleName: titleName,
@@ -111,7 +110,6 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     };
 
     var setSeriesColors = function setSeriesColors(card, series) {
-        //console.log("dm setSEriesColors");
         var seriesColors = card.$deckster.options.seriesColorMap;
         _.each(series, function (series) {
             var seriesName = series.name;
@@ -258,7 +256,6 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     };
 
     function scatterPlotDataTransformer(data, options) {
-        //console.log("dm scatterplot");
         var dataTransform = options.dataTransform;
         var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
         var legends = _.uniq(_.map(data, function (point) {
@@ -297,7 +294,6 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
      */
 
     function boxPlotDataTransformer(data, options) {
-        //console.log("dm boxPlot...");
         var dataTransform = options.dataTransform;
         var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
         var categoryData;
@@ -497,7 +493,6 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     }
 
     function getDataFormatter(format) {
-        console.log('dm getDataFormatter');
         if (_.isEmpty(format)) {
             return Formatters.dataFormatter['default'];
         } else if (_.isString(format)) {
@@ -516,7 +511,6 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
      * @returns {{query: *, data: *}}
      */
     function percentageChartDataTransformer(data, options) {
-        console.log('dm percentageChart...');
         var dataTransform = options.dataTransform;
         var transformedData;
 
