@@ -13,6 +13,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.challengeeId = -1;
         
         $scope.challenges = {};
+        $scope.challengesToday = [];
+        $scope.pastChallenges = [];
+        $scope.upcomingChallenges = [];
 
         $http.get('/api/user').success(function (response) {
             // If successful show success message and clear form
@@ -31,6 +34,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
             Challenges.query(function(data) {
                 $scope.users = data;
+                console.log("data: " + data);
                 if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
                     $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
                 } else if ($scope.circuit !== "World Circuit" && $scope.currRank % 10 === 1) {
@@ -39,17 +43,35 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     $scope.message = "Looks like you don't have anyone to challenge.";
                 }
             });
+            $scope.getChallenges();
+            console.log("getting the user!!!");
 
         }).error(function (response) {
+            console.log("response: " + response);
             $scope.error = response.message;
         });
 
 
-        $scope.emailModal = function () {
-            console.log("making the email modal");
+        $scope.editModal = function () {
+            console.log("making the edit modal");
+            console.log($scope);
             var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/result.client.view.html', // todo
+                templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
                 controller: 'ResultController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'app-modal-window'
+            });
+        };
+
+        $scope.cancelModal = function (id) {
+            console.log("making the cancel modal");
+            console.log(id);
+            $scope.challengeId = id;
+            console.log($scope.challengeId);
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
+                controller: 'ChallengeController', // todo
                 scope: $scope,
                 backdrop: false,
                 windowClass: 'app-modal-window'
@@ -72,7 +94,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $http.post('/api/challenge/create', challengObj)
                 .success(function (response) {
                     $scope.challengeId = response.id;
-                    $scope.emailModal();
                 })
                 .error(function (response) {
                     $scope.error = response.message;
@@ -85,12 +106,75 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.getChallenges = function() {
-            $http.get('/api/challenge/getall').success(function(response) {
+            console.log("challenger Id: " + $scope.challengerId);
+            var params = {
+                userId: $scope.challengerId
+            };
+
+            $http.post('/api/challenge/mychallenges', params).success(function(response) {
                 $scope.challenges = response;
+                angular.forEach($scope.challenges,function(value,index){
+
+                    $http.post('/api/user/getUserById', { userId: value.challengerUserId })
+                        .success(function (data) {
+                            value.challengerUser = data;
+                        });
+
+                    $http.post('/api/user/getUserById', { userId: value.challengeeUserId })
+                        .success(function (data) {
+                            value.challengeeUser = data;
+                        });
+                });
+                $scope.filterChallenges();
+            });
+
+        };
+
+        $scope.deleteChallenge = function() {
+            console.log($scope);
+            var params = {
+                id: $scope.challengeId
+            };
+            console.log("deleting challenge with id " + $scope.challengeId);
+            $http.post('/api/challenge/delete', params)
+                .success(function (data) {
+                    console.log("success");
+                });
+            $scope.$dismiss();
+        };
+
+        $scope.dismiss = function() {
+            console.log($scope);
+            $scope.$dismiss();
+        };
+
+        //filters all a user's challenges into the ones happening today
+        $scope.filterChallenges = function() {
+            console.log($scope.challenges);
+            var minTimeToday = new Date();
+            minTimeToday.setHours(0);
+            minTimeToday.setMinutes(0);
+            
+            var maxTimeToday = new Date();
+            maxTimeToday.setHours(23);
+            maxTimeToday.setMinutes(59);
+            
+            angular.forEach($scope.challenges,function(value,index){
+                var scheduledDate = new Date(value.scheduledTime);
+                if(scheduledDate>minTimeToday && scheduledDate<maxTimeToday) {
+                    console.log("adding challenge to today: " + value);
+                    $scope.challengesToday.push(value);
+                } else if(scheduledDate<minTimeToday) {
+                    console.log("adding challenge to past challenges: " + value);
+                    $scope.pastChallenges.push(value);
+                } else if(scheduledDate>maxTimeToday) {
+                    console.log("adding challenge to upcoming: " + value);
+                    $scope.upcomingChallenges.push(value);
+                }
             });
         };
 
-        $scope.getChallenges();
+        // TODO: would probably be good to break the modal logic below out into its own controller
 
         $scope.min = null;
         $scope.max = null;
@@ -129,8 +213,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.popup = {
             opened: false
         };
-
-
 
         $scope.dateChange = function() {
             $scope.initTimePicker($scope.dt);

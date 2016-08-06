@@ -87,7 +87,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         detailsContentHtml: viewChallenges,
         position: {
           size_x: 3,
-          size_y: 1,
+          size_y: 2,
           col: 2,
           row: 1
         }
@@ -101,7 +101,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
           size_x: 1,
           size_y: 2,
           col: 4,
-          row: 1
+          row: 3
         }
       },
       {
