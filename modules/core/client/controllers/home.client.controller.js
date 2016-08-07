@@ -82,7 +82,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       },
       {
         title: 'My Challenges',
-        id: 'challengesCard',
+        id: 'ChallengesCard',
         summaryContentHtml: viewChallenges,
         detailsContentHtml: viewChallenges,
         position: {

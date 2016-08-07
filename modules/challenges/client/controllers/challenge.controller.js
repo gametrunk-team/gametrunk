@@ -18,39 +18,39 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.upcomingChallenges = [];
 
         $http.get('/api/user').success(function (response) {
-            // If successful show success message and clear form
-            $scope.success = true;
-            $scope.currRank = response.rank;
-            $scope.challengerId = response.id;
-            $scope.circuit = Circuit.circuit($scope.currRank);
+                console.log("this is a second test");
+                // If successful show success message and clear form
+                $scope.success = true;
+                $scope.currRank = response.rank;
+                $scope.challengerId = response.id;
+                $scope.circuit = Circuit.circuit($scope.currRank);
 
-            $scope.model = {
-                opponentId: -1
-            };
+                $scope.model = {
+                    opponentId: -1
+                };
 
-            $scope.run = function() {
-                console.log($scope.opponent.model);
-            };
+                $scope.run = function () {
+                    console.log($scope.opponent.model);
+                };
 
-            Challenges.query(function(data) {
-                $scope.users = data;
-                console.log("data: " + data);
-                if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
-                    $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
-                } else if ($scope.circuit !== "World Circuit" && $scope.currRank % 10 === 1) {
-                    $scope.message = "You are at the top of your circuit! Play the bottom player from the " + $scope.determineCircuit($scope.currRank - 10) + " to move up.";
-                } else if ($scope.users.length < 1) {
-                    $scope.message = "Looks like you don't have anyone to challenge.";
-                }
+                Challenges.query(function (data) {
+                    $scope.users = data;
+                    console.log("data: " + data);
+                    if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
+                        $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
+                    } else if ($scope.circuit !== "World Circuit" && $scope.currRank % 10 === 1) {
+                        $scope.message = "You are at the top of your circuit! Play the bottom player from the " + $scope.determineCircuit($scope.currRank - 10) + " to move up.";
+                    } else if ($scope.users.length < 1) {
+                        $scope.message = "Looks like you don't have anyone to challenge.";
+                    }
+                });
+                $scope.getChallenges();
+                console.log("getting the user!!!");
+
+            }).error(function (response) {
+                console.log("response: " + response);
+                $scope.error = response.message;
             });
-            $scope.getChallenges();
-            console.log("getting the user!!!");
-
-        }).error(function (response) {
-            console.log("response: " + response);
-            $scope.error = response.message;
-        });
-
 
         $scope.editModal = function () {
             console.log("making the edit modal");
@@ -126,6 +126,8 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         });
                 });
                 $scope.filterChallenges();
+                console.log($scope.challenges);
+                $scope.$apply();
             });
 
         };
@@ -175,7 +177,10 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         // TODO: would probably be good to break the modal logic below out into its own controller
-
+        $scope.deleteChallenge = function(id) {
+            $http.post('/api/emails/challengeCreated', id);
+        };
+        
         $scope.min = null;
         $scope.max = null;
         $scope.dt = null;

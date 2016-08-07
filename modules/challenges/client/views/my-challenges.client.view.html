@@ -1,9 +1,10 @@
-<div ng-controller="ChallengeController">
+<section ng-controller="ChallengeController">
   <div class="list-group-item row">
   <h2><span class="col-md-3 label label-default">Today's Challenges</span></h2>
   <div class="pull-right"><a class="btn btn-default btn-lg" ui-sref-active="active" ui-sref="challenge.create">Create a Challenge</a></div>
   </div>
     <div class="list-group-item row center" ng-repeat="challenge in challengesToday">
+  <div class="list-group-item row text-center"><a class="btn btn-default btn-lg" ui-sref-active="active" ui-sref="challenge.create">Create a Challenge</a></div>
     <div class="col-sm-8">
     <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
     {{challenge.scheduledTime | date:'dd.MM.y' }}
@@ -16,6 +17,10 @@
       </div>
       <div ng-if="!challenge.challengerUser.profileImageURL">
         <img class="img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengerUser.displayName}}" width="50px"/>
+         <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
+      </div>
+      <div ng-if="!challenge.challengerUser.profileImageURL">
+        <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengerUser.displayName}}" width="50px"/>
       </div>
       <p>{{challenge.challengerUser.firstName}}</p>
     </div>
@@ -26,6 +31,10 @@
       </div>
       <div ng-if="!challenge.challengeeUser.profileImageURL">
         <img class="img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengeeUser.displayName}}" width="50px"/>
+        <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
+      </div>
+      <div ng-if="!challenge.challengeeUser.profileImageURL">
+        <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengeeUser.displayName}}" width="50px"/>
       </div>
       <p>{{challenge.challengeeUser.firstName}}</p>
     </div>
@@ -102,8 +111,10 @@
         <div class="col-md-3 text-center">
           <div class="btn btn-default glyphicon glyphicon-pencil btn-space" ng-click="editModal()"></div>
           <div class="btn btn-default glyphicon glyphicon-trash" ng-if="challenge.winnerUserId===null" ng-click="cancelModal()"></div>
+        <a class="btn btn-default glyphicon glyphicon-pencil btn-space"></a>
+        <a class="btn btn-default glyphicon glyphicon-trash btn-space"></a>
         </div>
       </div>
     </div>
   </div>
-</div>
+  </section>
