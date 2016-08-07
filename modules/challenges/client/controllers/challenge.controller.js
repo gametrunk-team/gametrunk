@@ -126,8 +126,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         });
                 });
                 $scope.filterChallenges();
-                console.log($scope.challenges);
-                $scope.$apply();
             });
 
         };
