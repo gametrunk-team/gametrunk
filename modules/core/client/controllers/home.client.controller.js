@@ -49,12 +49,23 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         });
       }
     };
-
+      
+    var viewNews = function(cardConfig, cb) {
+        if($scope.authentication.user) {
+            // Not using the cardConfig here but you could use it to make request
+            $http.get('modules/core/client/views/cards/news.client.view.html').success(function (html) {
+                return cb && cb($compile(html)($scope));
+            });
+        }
+    };
+          
     var viewChallenges = function(cardConfig, cb) {
-      // Not using the cardConfig here but you could use it to make request
-      $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
-        return cb && cb($compile(html)($scope));
-      });
+        if($scope.authentication.user) {
+            // Not using the cardConfig here but you could use it to make request
+            $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
+                return cb && cb($compile(html)($scope));
+            });
+        }
     };
 
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
@@ -66,10 +77,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         summaryContentHtml: viewRankings,
         detailsContentHtml: viewRankings,
         position: {
-          size_x: 3,
+          size_x: 2,
           size_y: 2,
-          col: 1,
-          row: 2
+          col: 3,
+          row: 3
         }
       },
       {
@@ -79,12 +90,25 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         detailsContentHtml: viewProfile,
         position: {
           size_x: 1,
-          size_y: 1,
+          size_y: 2,
           col: 1,
           row: 1
         }
       },
-      {
+        {
+
+            title: 'News Feed',
+            id: 'newsFeedCard',
+            summaryContentHtml: viewNews,
+            detailsContentHtml: viewNews,
+            position: {
+                size_x: 2,
+                size_y: 2,
+                col: 1,
+                row: 3
+            }
+        },
+        {   
         title: 'My Challenges',
         id: 'ChallengesCard',
         summaryContentHtml: viewChallenges,
@@ -95,31 +119,31 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
           col: 2,
           row: 1
         }
-      },
-      {
-        title: 'Table Data',
-        id: 'tableCard',
-        summaryContentHtml: getSummaryTemplate,
-        detailsContentHtml: getDetailsTemplate,
-        position: {
-          size_x: 1,
-          size_y: 2,
-          col: 4,
-          row: 3
-        }
-      },
-      {
-        title: 'Timeline',
-        id: 'timelineCard',
-        summaryContentHtml: getSummaryTemplate,
-        detailsContentHtml: getDetailsTemplate,
-        position: {
-          size_x: 2,
-          size_y: 1,
-          col: 2,
-          row: 4
-        }
       }
+      // {
+      //   title: 'Table Data',
+      //   id: 'tableCard',
+      //   summaryContentHtml: getSummaryTemplate,
+      //   detailsContentHtml: getDetailsTemplate,
+      //   position: {
+      //     size_x: 1,
+      //     size_y: 2,
+      //     col: 4,
+      //     row: 3
+      //   }
+      // },
+      // {
+      //   title: 'Timeline',
+      //   id: 'timelineCard',
+      //   summaryContentHtml: getSummaryTemplate,
+      //   detailsContentHtml: getDetailsTemplate,
+      //   position: {
+      //     size_x: 1,
+      //     size_y: 1,
+      //     col: 4,
+      //     row: 3
+      //   }
+      // }
     ];
 
     // Once the cards are loaded (could be done in a async call) initialize the deck

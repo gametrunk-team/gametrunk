@@ -49,6 +49,19 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
+
+            });
+
+
+            //create news
+            var newsObj = {
+                challenger: $scope.challengerId,
+                challengee: $scope.challengeeId
+            };
+
+            $http.post('/api/news/createChallengeLost', newsObj).success(function(response) {
+
+
             });
         };
 
