@@ -47,7 +47,7 @@ exports.createChallengeResultNews = function(req, res, next) {
 /*
  Create Challenge Lost News
  */
-exports.createChallengeLostNews = function(req, res, next) {
+exports.createChallengeLostNews = function(req, res) {
 
     var challengerName;
     var challengeeName;
@@ -66,7 +66,7 @@ exports.createChallengeLostNews = function(req, res, next) {
 
             var news = News.build(newNews);
             news.save().then(function() {
-                return next();
+                return res.status(200).send;
             }).catch(function(err) {
                 console.log(err);
                 return res.status(400).send({
