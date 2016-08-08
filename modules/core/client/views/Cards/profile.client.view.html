@@ -3,7 +3,7 @@
   <section ng-controller="ProfileCardController">
     <div style="text-align: center">
       <span ng-if="authentication.user.profileImageURL">
-        <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/h_115/{{authentication.user.profileImageURL}}' alt='{{authentication.user.displayName}}'/>
+        <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/h_150/{{authentication.user.profileImageURL}}' alt='{{authentication.user.displayName}}'/>
       </span>
 
       <span ng-if="!authentication.user.profileImageURL">
