@@ -37,7 +37,7 @@ angular.module('core').factory('Circuit', ['$http', '$q',
                     } else if (rank % cSize === 0) {
                         return cSize;
                     } else {
-                        return rank % cSize
+                        return rank % cSize;
                     }
                 };
 

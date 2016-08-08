@@ -2,10 +2,9 @@
  * Created by breed on 8/3/16.
  */
 
-
 'use strict';
 
-angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
+angular.module('core').factory('DataManager', function ($http, $q, Deckster, lodash) {
 
     var DataManager = {};
     DataManager.fiscalYearStart = new Date('4/4/2015'); // TODO: This needs to be pulled from a DB at some point.
@@ -58,8 +57,8 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     };
 
     function setDefaultTransformOptions(options) {
-        options.dataTransform = _.merge({}, options.dataTransform);
-        options.dataTransform.titleFormats = _.merge({
+        options.dataTransform = lodash.merge({}, options.dataTransform);
+        options.dataTransform.titleFormats = lodash.merge({
             category: 'default',
             series: 'default',
             categoryX: 'default',
@@ -111,9 +110,9 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
 
     var setSeriesColors = function setSeriesColors(card, series) {
         var seriesColors = card.$deckster.options.seriesColorMap;
-        _.each(series, function (series) {
+        lodash.each(series, function (series) {
             var seriesName = series.name;
-            if (_.contains(_.keys(seriesColors), seriesName)) {
+            if (lodash.contains(lodash.keys(seriesColors), seriesName)) {
                 series.color = seriesColors[seriesName];
             }
         });
@@ -166,7 +165,7 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
         }
 
         // load card controls
-        //if(!_.isUndefined(cardOptions.controls) && _.isFunction(cardOptions.controls.loadControls)) {
+        //if(!lodash.isUndefined(cardOptions.controls) && lodash.isFunction(cardOptions.controls.loadControls)) {
         //  cardOptions.controls.loadControls(card);
         //}
 
@@ -174,7 +173,7 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
             var transformData = function transformData(data) {
                 data = DataManager.transformDataForCard(data, cardType, cardOptions);
                 setSeriesColors(card, data.series);
-                callback && callback(data);
+                if (callback) callback(data);
                 card.hideSpinner();
             };
 
@@ -203,7 +202,7 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
                     card.hideSpinner();
                 });
             } else {
-                callback && callback();
+                if (callback) callback();
                 card.hideSpinner();
             }
         } else {
@@ -225,7 +224,8 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     DataManager.getLastUpdated = function (card, callback) {
         $http.post('/api/data/lastUpdated/', card.lastUpdated || {}).then(function (response) {
             var date = response.data;
-            callback(date ? moment(date).toDate() : null);
+            //callback(date ? moment(date).toDate() : null);
+            callback(date ? date : null); // TODO
         });
     };
     //
@@ -251,41 +251,41 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
         'quadChart': quadChartDataTransformer,
         'heatmapChart': heatmapChartDataTransformer,
         'boxPlot': boxPlotDataTransformer,
-        'histogramChart': chartDataTransformer,
-        'scatterPlotChart': scatterPlotDataTransformer
+        'histogramChart': chartDataTransformer
+        //'scatterPlotChart': scatterPlotDataTransformer
     };
 
-    function scatterPlotDataTransformer(data, options) {
-        var dataTransform = options.dataTransform;
-        var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
-        var legends = _.uniq(_.map(data, function (point) {
-            return categoryTitleFormatter(point[dataTransform.legendPivot], dataTransform.titleFormats.category.format);
-        }));
-
-        var symbols = _.keys(Highcharts.SVGRenderer.prototype.symbols);
-        options.legendSymbols = {};
-        _.each(legends, function (legendItem, index) {
-            options.legendSymbols[legendItem] = symbols[index % symbols.length];
-        });
-
-        var myData = {};
-        _.each(data, function (point) {
-            var legendKey = categoryTitleFormatter(point[dataTransform.legendPivot], dataTransform.titleFormats.category.format);
-            var name = categoryTitleFormatter(point[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
-            myData[name] = myData[name] || { name: name, data: [], marker: { symbol: 'circle' } };
-            myData[name].data.push({
-                y: _.isNaN(point[dataTransform.yAxisColumn]) ? 0 : parseFloat(point[dataTransform.yAxisColumn]),
-                x: _.isNaN(point[dataTransform.xAxisColumn]) ? 0 : parseFloat(point[dataTransform.xAxisColumn]),
-                name: name,
-                marker: {
-                    symbol: options.legendSymbols[legendKey]
-                }
-            });
-        });
-
-        myData = _.values(myData);
-        return { query: options.query, series: myData };
-    }
+    // function scatterPlotDataTransformer(data, options) {
+    //     var dataTransform = options.dataTransform;
+    //     var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
+    //     var legends = lodash.uniq(lodash.map(data, function (point) {
+    //         return categoryTitleFormatter(point[dataTransform.legendPivot], dataTransform.titleFormats.category.format);
+    //     }));
+    //
+    //     var symbols = lodash.keys(Highcharts.SVGRenderer.prototype.symbols);
+    //     options.legendSymbols = {};
+    //     lodash.each(legends, function (legendItem, index) {
+    //         options.legendSymbols[legendItem] = symbols[index % symbols.length];
+    //     });
+    //
+    //     var myData = {};
+    //     lodash.each(data, function (point) {
+    //         var legendKey = categoryTitleFormatter(point[dataTransform.legendPivot], dataTransform.titleFormats.category.format);
+    //         var name = categoryTitleFormatter(point[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
+    //         myData[name] = myData[name] || { name: name, data: [], marker: { symbol: 'circle' } };
+    //         myData[name].data.push({
+    //             y: lodash.isNaN(point[dataTransform.yAxisColumn]) ? 0 : parseFloat(point[dataTransform.yAxisColumn]),
+    //             x: lodash.isNaN(point[dataTransform.xAxisColumn]) ? 0 : parseFloat(point[dataTransform.xAxisColumn]),
+    //             name: name,
+    //             marker: {
+    //                 symbol: options.legendSymbols[legendKey]
+    //             }
+    //         });
+    //     });
+    //
+    //     myData = lodash.values(myData);
+    //     return { query: options.query, series: myData };
+    // }
 
     /**
      * Transform data for injecting into a box plot
@@ -299,14 +299,14 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
         var categoryData;
 
         if (dataTransform.row === 'category') {
-            categoryData = _.map(_.pluck(data, dataTransform.nameColumn), function (week) {
+            categoryData = lodash.map(lodash.pluck(data, dataTransform.nameColumn), function (week) {
                 return categoryTitleFormatter(week, dataTransform.titleFormats.category.format);
             });
         } else {
-            categoryData = _.pluck(data, dataTransform.nameColumn);
+            categoryData = lodash.pluck(data, dataTransform.nameColumn);
         }
 
-        var seriesData = _.map(data, function (row) {
+        var seriesData = lodash.map(data, function (row) {
             var lowerLimit = parseFloat(row.lower_limit);
             var upperLimit = parseFloat(row.upper_limit);
 
@@ -316,16 +316,16 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
             if (row.max >= upperLimit) {
                 row.max = upperLimit;
             }
-            return _.map([row.min, row.q1, row.median, row.q3, row.max], parseFloat);
+            return lodash.map([row.min, row.q1, row.median, row.q3, row.max], parseFloat);
         });
 
-        var meanData = _.map(data, function (meanValue) {
+        var meanData = lodash.map(data, function (meanValue) {
 
             if (dataTransform.row === 'category') {
                 meanValue[dataTransform.nameColumn] = categoryTitleFormatter(meanValue[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
             }
 
-            return _.map([categoryData.indexOf(meanValue[dataTransform.nameColumn]), parseFloat(meanValue.mean)]);
+            return lodash.map([categoryData.indexOf(meanValue[dataTransform.nameColumn]), parseFloat(meanValue.mean)]);
         });
         return {
             name: 'Hourly Distribution By Week',
@@ -352,10 +352,10 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     var applySeriesOptions = function applySeriesOptions(series, options) {
         if (options.seriesOptions) {
             //Creates an array corresponding to what we want our series to look like. It is unsorted at this point
-            _.each(series, function (seriesItem) {
+            lodash.each(series, function (seriesItem) {
                 if (options.seriesOptions.name[seriesItem.name]) {
-                    seriesItem = _.merge(seriesItem, options.seriesOptions.name[seriesItem.name]);
-                    var names = _.map(_.keys(options.seriesOptions.name), function (key) {
+                    seriesItem = lodash.merge(seriesItem, options.seriesOptions.name[seriesItem.name]);
+                    var names = lodash.map(lodash.keys(options.seriesOptions.name), function (key) {
                         return key;
                     });
                     seriesItem.order = names.indexOf(seriesItem.name);
@@ -400,30 +400,30 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
         var nameColumn = dataTransform.nameColumn;
 
         if (dataTransform.row === 'series') {
-            categories = _.map(_.keys(_.omit(firstRow, dataTransform.nameColumn)), function (category) {
+            categories = lodash.map(lodash.keys(lodash.omit(firstRow, dataTransform.nameColumn)), function (category) {
                 //return categoryTitleFormatter(category, dataTransform.titleFormats.category.format);
                 return category;
             });
-            _.forEach(data, function (obj) {
+            lodash.forEach(data, function (obj) {
                 series.push({
                     //name: seriesTitleFormatter(obj[dataTransform.nameColumn], dataTransform.titleFormats.series.format),
                     name: obj[dataTransform.nameColumn],
-                    data: _.map(_.values(_.omit(obj, dataTransform.nameColumn)), Number)
+                    data: lodash.map(lodash.values(lodash.omit(obj, dataTransform.nameColumn)), Number)
                 });
             });
         } else if (dataTransform.row === 'category') {
             console.log(data);
-            categories = _.map(data, function (obj) {
+            categories = lodash.map(data, function (obj) {
                 //return categoryTitleFormatter(obj[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
                 return obj[nameColumn];
             });
-            _.forOwn(firstRow, function (value, key) {
+            lodash.forOwn(firstRow, function (value, key) {
                 if (key !== nameColumn) {
                     series.push({
                         //name: seriesTitleFormatter(key, dataTransform.titleFormats.series.format),
                         name: key,
-                        data: _.map(_.pluck(data, key), Number),
-                        visible: !_.includes(options.nonVisibleSeries, key)
+                        data: lodash.map(lodash.pluck(data, key), Number),
+                        visible: !lodash.includes(options.nonVisibleSeries, key)
                     });
                 }
             });
@@ -465,19 +465,19 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
         var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
         var seriesTitleFormatter = getDataFormatter(dataTransform.titleFormats.series);
 
-        var categories = _.map(data, function (obj) {
+        var categories = lodash.map(data, function (obj) {
             return categoryTitleFormatter(obj[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
         });
 
-        _.forEach(dataTransform.seriesMap, function (seriesInfo) {
+        lodash.forEach(dataTransform.seriesMap, function (seriesInfo) {
             var seriesName = seriesInfo.name;
             series.push({
                 name: seriesTitleFormatter(seriesName, dataTransform.titleFormats.series.format),
-                data: _.map(data, function (row) {
+                data: lodash.map(data, function (row) {
                     var returnData = [];
                     // If only a single series column is defined, then store it individually.
                     // This is needed for laying point data on top of the columnrange chart.
-                    if (!_.isUndefined(seriesInfo.seriesColumn)) {
+                    if (!lodash.isUndefined(seriesInfo.seriesColumn)) {
                         returnData = [row[seriesInfo.seriesColumn]];
                     } else {
                         returnData = [row[seriesInfo.minColumn], row[seriesInfo.maxColumn]];
@@ -493,14 +493,14 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     }
 
     function getDataFormatter(format) {
-        if (_.isEmpty(format)) {
-            return Formatters.dataFormatter['default'];
-        } else if (_.isString(format)) {
-            return Formatters.dataFormatter[format];
+        if (lodash.isEmpty(format)) {
+            return dataTransformer['default'];
+        } else if (lodash.isString(format)) {
+            return dataTransformer[format];
         } else {
-            return Formatters.dataFormatter[format.type];
+            return dataTransformer[format.type];
         }
-    };
+    }
 
     DataManager.getDataFormatter = getDataFormatter;
 
@@ -517,14 +517,14 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
         var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
 
         if (dataTransform.row === 'series') {
-            transformedData = _.map(_.pairs(data[0]), function (pair) {
+            transformedData = lodash.map(lodash.pairs(data[0]), function (pair) {
                 pair[0] = categoryTitleFormatter(pair[0], dataTransform.titleFormats.category.format);
                 return pair;
             });
         } else {
-            transformedData = _.map(data, function (row) {
+            transformedData = lodash.map(data, function (row) {
                 var title = row[dataTransform.nameColumn];
-                var value = _.values(_.omit(row, dataTransform.nameColumn))[0];
+                var value = lodash.values(lodash.omit(row, dataTransform.nameColumn))[0];
                 return { name: categoryTitleFormatter(title), y: parseFloat(value) };
             });
         }
@@ -545,7 +545,7 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     }
 
     function getDefaultColumnMetadata(col) {
-        return { name: col, displayName: _.startCase(col), type: 'STRING' };
+        return { name: col, displayName: lodash.startCase(col), type: 'STRING' };
     }
 
     /**
@@ -557,15 +557,15 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
     function geoMapDataTransformer(data, options) {
         var generateGeoJSONData = function generateGeoJSONData(geoRecs) {
             var returnGeoJSON = [];
-            _.each(geoRecs, function (geoRec) {
+            lodash.each(geoRecs, function (geoRec) {
                 var latitude = geoRec.latitude;
                 var longitude = geoRec.longitude;
-                if (!_.isNull(latitude) && !_.isNull(longitude)) {
+                if (!lodash.isNull(latitude) && !lodash.isNull(longitude)) {
                     var geoPoint = {};
                     geoPoint.type = 'Feature';
                     geoPoint.properties = {};
                     // Store the returned column values in the geoPoint for later use (in the tooltip)
-                    _.forEach(_.keys(geoRec), function (key) {
+                    lodash.forEach(lodash.keys(geoRec), function (key) {
                         geoPoint.properties[key] = geoRec[key];
                     });
                     geoPoint.geometry = {};
@@ -585,38 +585,38 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
 
     function getGradientColor(baseColor, percent) {
         var gradient = Math.round(180 * (1 - percent));
-        var step = _.padLeft(gradient.toString(16), 2, '0');
+        var step = lodash.padLeft(gradient.toString(16), 2, '0');
         return baseColor.replace(/00/g, step);
     }
 
     function heatmapChartDataTransformer(data, options) {
         var heatmapData = [];
 
-        if (!_.isEmpty(data)) {
+        if (!lodash.isEmpty(data)) {
             var dataTransform = options.dataTransform;
 
             var categoryXTitleFormatter = getDataFormatter(dataTransform.titleFormats.categoryX);
             var categoryYTitleFormatter = getDataFormatter(dataTransform.titleFormats.categoryY);
 
-            var categoriesX = _.map(_.keys(_.omit(data[0], dataTransform.nameColumn)), function (category) {
+            var categoriesX = lodash.map(lodash.keys(lodash.omit(data[0], dataTransform.nameColumn)), function (category) {
                 return category;
             });
 
-            var categoriesY = _.map(data, function (category) {
+            var categoriesY = lodash.map(data, function (category) {
                 return category[dataTransform.nameColumn];
             });
 
-            _.forEach(data, function (row, yIndex) {
-                _.forEach(row, function (value, key) {
-                    if (key != dataTransform.nameColumn) {
-                        var xIndex = _.indexOf(categoriesX, key);
+            lodash.forEach(data, function (row, yIndex) {
+                lodash.forEach(row, function (value, key) {
+                    if (key !== dataTransform.nameColumn) {
+                        var xIndex = lodash.indexOf(categoriesX, key);
                         if (!options.colorMap) {
                             heatmapData.push([xIndex, yIndex, value]);
                         } else {
                             var color;
                             if (options.colorMap.addGradientForRow) {
                                 var baseColor = options.colorMap[row[dataTransform.nameColumn]] || options.colorMap['default'];
-                                color = value == 0 ? options.colorMap['default'] : getGradientColor(baseColor, value);
+                                color = value === 0 ? options.colorMap['default'] : getGradientColor(baseColor, value);
                                 //                if (value === 0) {
                                 //                  color = "#636363";
                                 //                } else {
@@ -631,16 +631,16 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
                 });
             });
 
-            categoriesX = _.map(categoriesX, function (category) {
+            categoriesX = lodash.map(categoriesX, function (category) {
                 return categoryXTitleFormatter(category, dataTransform.titleFormats.categoryX.format);
             });
 
-            categoriesY = _.map(categoriesY, function (category) {
+            categoriesY = lodash.map(categoriesY, function (category) {
                 return categoryYTitleFormatter(category, dataTransform.titleFormats.categoryY.format);
             });
-        }
 
-        return { query: options.query, categories: { x: categoriesX, y: categoriesY }, data: heatmapData };
+            return { query: options.query, categories: { x: categoriesX, y: categoriesY }, data: heatmapData };
+        }
     }
 
     // Chart Paging
@@ -657,7 +657,7 @@ angular.module('core').factory('DataManager', function ($http, $q, Formatters) {
             var templateVariables = card.options.getTemplateVariables();
             // Set paging totals
             // Get the original query
-            var countQuery = _.cloneDeep(card.options.getCurrentViewOptions(card.currentSection).query);
+            var countQuery = lodash.cloneDeep(card.options.getCurrentViewOptions(card.currentSection).query);
             // Remove the paging clause from the query
             countQuery.json.expression = countQuery.json.expression.replace(templateVariables.cardFilter_pagingClause, '');
             // Wrap the query in a SELECT COUNT

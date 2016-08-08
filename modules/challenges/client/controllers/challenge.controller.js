@@ -19,7 +19,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             $scope.currRank = response.rank;
             $scope.challengerId = response.id;
 
-            Circuit().then(function(result) {
+            new Circuit().then(function(result) {
                 $scope.circuit = result.circuit($scope.currRank);
 
                 $scope.model = {
