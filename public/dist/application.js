@@ -4,7 +4,7 @@
 var ApplicationConfiguration = (function() {
   // Init module configuration options
   var applicationModuleName = 'seanjs';
-  var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload'];
+  var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngLodash', 'yaru22.angular-timeago'];
 
   // Add a new vertical module
   var registerModule = function(moduleName, dependencies) {
@@ -21,6 +21,7 @@ var ApplicationConfiguration = (function() {
     registerModule: registerModule
   };
 })();
+
 'use strict';
 
 //Start by defining the main module and adding the module dependencies
@@ -28,10 +29,23 @@ angular.module(ApplicationConfiguration.applicationModuleName, ApplicationConfig
 
 // Setting HTML5 Location Mode
 angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider', '$httpProvider',
-  function($locationProvider, $httpProvider) {
+  function($locationProvider, $httpProvider, $routeProvider) {
     $locationProvider.html5Mode(true).hashPrefix('!');
 
     $httpProvider.interceptors.push('authInterceptor');
+
+    // // configuring base url for deckster popouts
+    // var popoutRoute = Deckster.getPopoutRoute('/deckster/');
+    //
+    // // configuring the popout base template
+    // $routeProvider.when(popoutRoute.fullPath, {
+    //   templateUrl: 'partials/deckster-popout.html'
+    // });
+    //
+    // $routeProvider.when('/', {
+    //   templateUrl: 'partials/main.html',
+    //   controller: 'MainCtrl'
+    // });
   }
 ]);
 
@@ -108,9 +122,12 @@ ApplicationConfiguration.registerModule('challenge', ['core']);
 'use strict';
 
 // Use Applicaion configuration module to register a new module
-ApplicationConfiguration.registerModule('core');
+ApplicationConfiguration.registerModule('core', ['yaru22.angular-timeago']);
 ApplicationConfiguration.registerModule('core.admin', ['core']);
 ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
+
+ApplicationConfiguration.registerModule('news', ['core']);
+
 'use strict';
 
 // Use Applicaion configuration module to register a new module
@@ -178,39 +195,125 @@ angular.module('challenge').config(['$stateProvider',
 
 'use strict';
 
-angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges) {
+angular.module('challenge').controller('ChallengeController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges', 'Circuit',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges, Circuit) {
         $scope.authentication = Authentication;
         $scope.popoverMsg = PasswordValidator.getPopoverMsg();
         $scope.selectedTime = 'Now';
-
-        $scope.userId = -1;
-
-        $scope.model = {
-            opponentId: -1
-        };
-
-        $scope.run = function() {
-            console.log($scope.opponent.model);
-        };
-
-        Challenges.query(function(data) {
-            $scope.users = data;
-        });
+        $scope.message = "";
 
         // Variables saved for UserController
         $scope.challengeId = -1;
         $scope.challengerId = -1;
         $scope.challengeeId = -1;
+        
+        $scope.challenges = {};
+        $scope.challengesToday = [];
+        $scope.pastChallenges = [];
+        $scope.upcomingChallenges = [];
 
-        $scope.emailModal = function () {
-            console.log("making the email modal");
+        $scope.initPage = function () {
+            $scope.challenges = {};
+            $scope.challengesToday = [];
+            $scope.pastChallenges = [];
+            $scope.upcomingChallenges = [];
+
+            $http.get('/api/user').success(function (response) {
+                // If successful show success message and clear form
+                $scope.success = true;
+                $scope.currRank = response.rank;
+                $scope.challengerId = response.id;
+
+                new Circuit().then(function (result) {
+                    $scope.circuit = result.circuit($scope.currRank);
+
+                    $scope.model = {
+                        opponentId: -1
+                    };
+
+                    $scope.run = function () {
+                    };
+
+                    Challenges.query(function (data) {
+                        $scope.users = data;
+                        if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
+                            $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
+                        } else if ($scope.circuit !== "World Circuit" && $scope.currRank % result.cSize === 1) {
+                            $scope.message = "You are at the top of your circuit! Play the bottom player from the " + result.circuit($scope.currRank - result.cSize) + " to move up.";
+                        } else if ($scope.users.length < 1) {
+                            $scope.message = "Looks like you don't have anyone to challenge.";
+                        }
+                    });
+                    $scope.getChallenges();
+                    console.log("getting the user!!!");
+                });
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+        };
+
+        $scope.initPage();
+
+        $scope.editModal = function (challengeeUser, challengerUser, challengeId) {
+            console.log("making the edit modal");
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html', // todo
                 controller: 'ResultController', // todo
                 scope: $scope,
                 backdrop: false,
-                windowClass: 'minimal-modal'
+                windowClass: 'app-modal-window',
+                resolve: {
+                    challengerUser: function () {
+                        return challengerUser;
+                    },
+                    challengeeUser: function () {
+                        return challengeeUser;
+                    },
+                    challengeId: function () {
+                        return challengeId;
+                    }
+                }
+            });
+
+            modal.result.then(function(){
+                $scope.initPage();
+            });
+        };
+
+        $scope.cancelModal = function (challengeId) {
+            console.log("making the cancel modal");
+            console.log($scope.challengeId);
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
+                controller: 'DeleteController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'app-modal-window',
+                resolve: {
+                    challengeId: function () {
+                        return challengeId;
+                    }
+                }
+            });
+
+            modal.result.then(function(){
+                $scope.initPage();
+            });
+        };
+
+        $scope.createChallengeModal = function () {
+            console.log("making the cancel modal");
+            console.log($scope.challengeId);
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html', // todo
+                controller: 'ChallengeController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'app-modal-window'
+            });
+
+            modal.result.then(function(){
+                $scope.initPage();
             });
         };
 
@@ -218,42 +321,182 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             if($scope.model.opponentId === -1){
                 return;
             }
+            $scope.challengeeId = $scope.model.opponentId;
 
-            $http.get('/api/user').success(function (response) {
-                // If successful show success message and clear form
-                $scope.success = true;
-                $scope.challengerId = response.id;
-                $scope.challengeeId = $scope.model.opponentId;
-                
-                var challengObj = {
-                    scheduledTime: '2012-04-23T18:25:43.511Z',
-                    challengerUserId: response.id,
-                    challengeeUserId: $scope.model.opponentId,
-                    winnerUserId: null
-                };
+            var challengObj = {
+                scheduledTime: $scope.dt,
+                challengerUserId: $scope.challengerId,
+                challengeeUserId: $scope.model.opponentId,
+                winnerUserId: null
+            };
 
-                $http.post('/api/challenge/create', challengObj)
-                    .success(function (response) {
-                        $scope.challengeId = response.id;
-                        $scope.emailModal();
-                    })
-                    .error(function (response) {
-                        $scope.error = response.message;
-                    });
+            $http.post('/api/challenge/create', challengObj)
+                .success(function (response) {
+                    $scope.challengeId = response.id;
+                })
+                .error(function (response) {
+                    $scope.error = response.message;
+                });
 
-            }).error(function (response) {
-                $scope.error = response.message;
-            });
+            $http.post('/api/emails/challengeCreated', challengObj);
 
-
+            $scope.$close(true);
+            // Display a success toast, with a title
+            toastr.success('Challenge created','Success');
         };
-        
+
 
         $scope.getChallenges = function() {
-            $http.get('/api/challenge/getall').success(function(response) {
-                console.log(response);
+            console.log("challenger Id: " + $scope.challengerId);
+            var params = {
+                userId: $scope.challengerId
+            };
+
+            $http.post('/api/challenge/mychallenges', params).success(function(response) {
+                $scope.challenges = response;
+                angular.forEach($scope.challenges,function(value,index){
+
+                    $http.post('/api/user/getUserById', { userId: value.challengerUserId })
+                        .success(function (data) {
+                            value.challengerUser = data;
+                        });
+
+                    $http.post('/api/user/getUserById', { userId: value.challengeeUserId })
+                        .success(function (data) {
+                            value.challengeeUser = data;
+                        });
+                });
+                $scope.filterChallenges();
             });
+
         };
+
+        $scope.deleteChallenge = function(challengeId) {
+            console.log($scope);
+            var params = {
+                id: challengeId
+            };
+            console.log("deleting challenge with id " + $scope.challengeId);
+            $http.post('/api/challenge/delete', params)
+                .success(function (data) {
+                    console.log("success");
+                });
+            $scope.$dismiss();
+        };
+
+        $scope.dismiss = function() {
+            $scope.$dismiss();
+        };
+
+        //filters all a user's challenges into the ones happening today
+        $scope.filterChallenges = function() {
+            var minTimeToday = new Date();
+            minTimeToday.setHours(0);
+            minTimeToday.setMinutes(0);
+            
+            var maxTimeToday = new Date();
+            maxTimeToday.setHours(23);
+            maxTimeToday.setMinutes(59);
+            
+            angular.forEach($scope.challenges,function(value,index){
+                var scheduledDate = new Date(value.scheduledTime);
+                if(scheduledDate>minTimeToday && scheduledDate<maxTimeToday) {
+                    console.log("adding challenge to today: " + value);
+                    $scope.challengesToday.push(value);
+                } else if(scheduledDate<minTimeToday) {
+                    console.log("adding challenge to past challenges: " + value);
+                    $scope.pastChallenges.push(value);
+                } else if(scheduledDate>maxTimeToday) {
+                    console.log("adding challenge to upcoming: " + value);
+                    $scope.upcomingChallenges.push(value);
+                }
+            });
+            console.log("the final count" + $scope.challenges);
+        };
+
+        // TODO: would probably be good to break the modal logic below out into its own controller
+        
+        $scope.min = null;
+        $scope.max = null;
+        $scope.dt = null;
+
+        $scope.initTimePicker = function(selectedDate) {
+            var min = new Date(selectedDate.getTime());
+            min.setHours(0);
+            min.setMinutes(0);
+            $scope.min = min;
+
+            var max = new Date(selectedDate.getTime());
+            max.setHours(24);
+            max.setMinutes(0);
+            $scope.max = max;
+        };
+
+        $scope.init = function() {
+            $scope.dt = new Date();
+            $scope.dt.setHours(12);
+            $scope.dt.setMinutes(0);
+            $scope.dt.setMilliseconds(0);
+            $scope.initTimePicker($scope.dt);
+        };
+        $scope.init();
+
+        $scope.clear = function() {
+            $scope.dt = null;
+        };
+
+        $scope.open = function() {
+            $scope.popup.opened = true;
+        };
+
+
+        $scope.popup = {
+            opened: false
+        };
+
+        $scope.dateChange = function() {
+            $scope.initTimePicker($scope.dt);
+        };
+    }
+]);
+
+'use strict';
+
+angular.module('challenge').controller('DeleteController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges', 'Circuit','challengeId',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges, Circuit, challengeId) {
+        $scope.authentication = Authentication;
+        $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+        $scope.selectedTime = 'Now';
+        $scope.message = "";
+
+        // Variables saved for UserController
+        $scope.challengeId = -1;
+        $scope.challengerId = -1;
+        $scope.challengeeId = -1;
+
+        $scope.challenges = {};
+        $scope.challengesToday = [];
+        $scope.pastChallenges = [];
+        $scope.upcomingChallenges = [];
+
+        $scope.deleteChallenge = function() {
+            console.log($scope);
+            var params = {
+                id: challengeId
+            };
+            console.log("deleting challenge with id " + challengeId);
+            $http.post('/api/challenge/delete', params)
+                .success(function (data) {
+                    console.log("success");
+                    toastr.success('Challenge Deleted','Success');
+                });
+            $scope.$close(true);
+        };
+
+        $scope.dismiss = function() {
+            $scope.$close(true);
+        };
+        
     }
 ]);
 
@@ -263,8 +506,20 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 'use strict';
 
-angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModalInstance',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, $uibModalInstance) {
+angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http','Authentication','challengerUser', 'challengeeUser','challengeId',
+    function($scope, $state, $http, Authentication, challengerUser, challengeeUser, challengeId) {
+
+        $scope.model = {
+            Id: -1
+        };
+
+        $scope.challengerUser = challengerUser;
+        $scope.challengeeUser = challengeeUser;
+        $scope.challengeId = challengeId;
+
+        $scope.opponent = $scope.users.filter(function( obj ) {
+            return obj.id === $scope.challengeeId;
+        })[0];
 
         $scope.Won = function() {
             // Update challenge
@@ -279,14 +534,12 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
 
             // Updating rankings
             var rankingObject = {
-                challenger: $scope.challengerId,
-                challengee: $scope.challengeeId
+                challenger: $scope.challengerUser.id,
+                challengee: $scope.challengeeUser.id
             };
             $http.post('/api/rankings/update', rankingObject).error(function(response) {
                 $scope.error = response.message;
             });
-
-            $state.go('home');
         };
 
 
@@ -298,11 +551,98 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;
-            });
-            
-            // No changes to rankings necessary
 
-            $state.go('home');
+            });
+
+
+            //create news
+            var newsObj = {
+                challenger: $scope.challengerId,
+                challengee: $scope.challengeeId
+            };
+
+            $http.post('/api/news/createChallengeLost', newsObj).success(function(response) {
+
+
+            });
+        };
+
+        $scope.getSelectedChallenge = function() {
+
+            var challengObj = {
+                id: $scope.challengeId
+            };
+            $http.post('/api/challenge/get', challengObj)
+                .success(function (response) {
+                    console.log(response);
+                    $scope.dt = response.scheduledTime;
+                    $scope.dt = new Date(response.scheduledTime);
+                    $scope.initTimePicker($scope.dt);
+                })
+                .error(function (response) {
+                    console.log(response);
+                });
+        };
+
+        $scope.getSelectedChallenge();
+
+        $scope.Submit = function() {
+            console.log($scope);
+            if($scope.model.Id===$scope.challengerUser.id) {
+                $scope.Won();
+            } else if($scope.model.Id===$scope.challengeeUser.id) {
+                $scope.Lost();
+            }
+            $scope.dismiss();
+        };
+
+        $scope.dismiss = function() {
+            console.log($scope);
+            $scope.$close(true);
+        };
+
+
+        // TODO: would probably be good to break the modal logic below out into its own controller
+
+        $scope.min = null;
+        $scope.max = null;
+        $scope.dt = null;
+
+        $scope.initTimePicker = function(selectedDate) {
+            var min = new Date(selectedDate.getTime());
+            min.setHours(0);
+            min.setMinutes(0);
+            $scope.min = min;
+
+            var max = new Date(selectedDate.getTime());
+            max.setHours(24);
+            max.setMinutes(0);
+            $scope.max = max;
+        };
+
+        $scope.init = function() {
+            $scope.dt = new Date();
+            $scope.dt.setHours(12);
+            $scope.dt.setMinutes(0);
+            $scope.dt.setMilliseconds(0);
+            $scope.initTimePicker($scope.dt);
+        };
+
+        $scope.clear = function() {
+            $scope.dt = null;
+        };
+
+        $scope.open = function() {
+            $scope.popup.opened = true;
+        };
+
+
+        $scope.popup = {
+            opened: false
+        };
+
+        $scope.dateChange = function() {
+            $scope.initTimePicker($scope.dt);
         };
 
     }
@@ -326,7 +666,7 @@ angular.module('challenge').factory('User', ['$resource',
 
 angular.module('challenge').factory('Challenges', ['$resource',
     function($resource) {
-        return $resource('api/rankings/user/:userId', {
+        return $resource('api/rankings/challengees', {
             userId: '@_id'
         }, {
             query: {
@@ -431,6 +771,125 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
   }
 ]);
 
+/**
+ * Created by breed on 8/3/16.
+ */
+'use strict';
+
+angular.module('core').controller('ChallengesCardController', ['$scope', '$timeout', '$window', 'Authentication', 'Circuit', '$http',
+    function($scope, $timeout, $window, Authentication, Circuit, $http) {
+        $scope.user = Authentication.user;
+        $scope.imageURL = $scope.user.profileImageURL;
+        $scope.displayRank = "Unknown";
+        $scope.circuit = "Unknown";
+
+        $http.get('/api/user').success(function (response) {
+            $scope.circuit = Circuit.circuit(response.rank);
+            $scope.displayRank = Circuit.displayRank(response.rank);
+
+        }).error(function (response) {
+            $scope.error = response.message;
+        });
+    }
+]);
+
+'use strict';
+
+angular.module('news').controller('NewsCardController', ['$scope', '$filter', '$http',
+    function($scope, $filter, $http) {
+
+        $scope.newsList = [];
+
+        $http.post("/api/news/getNews").success(function(response) {
+
+            $scope.newsList = response;
+
+        }).error(function(err) {
+            console.log(err);
+        });
+
+    }
+]);
+
+/**
+ * Created by breed on 8/3/16.
+ */
+'use strict';
+
+angular.module('core').controller('ProfileCardController', ['$scope', '$timeout', '$window', 'Authentication', 'Circuit', '$http',
+    function($scope, $timeout, $window, Authentication, Circuit, $http) {
+        $scope.user = Authentication.user;
+        $scope.imageURL = $scope.user.profileImageURL;
+        $scope.displayRank = "Unknown";
+        $scope.circuit = "Unknown";
+
+        $http.get('/api/user').success(function (response) {
+            new Circuit().then(function(result) {
+                $scope.circuit = result.circuit(response.rank);
+                $scope.displayRank = result.displayRank(response.rank);
+            });
+        }).error(function (response) {
+            $scope.error = response.message;
+        });
+    }
+]);
+
+/**
+ * Created by breed on 8/5/16.
+ */
+
+'use strict';
+
+angular.module('rankings').controller('RankingCardController', ['$scope', '$filter', 'Rankings', 'Circuit',
+    function($scope, $filter, Rankings, Circuit) {
+        $scope.world = [];
+        $scope.major = [];
+        $scope.minor = [];
+        $scope.mosh = [];
+
+        Rankings.query(function(data) {
+            $scope.users = data;
+            $scope.buildPager();
+        });
+
+        $scope.figureOutItemsToDisplay = function() {
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+            var end = begin + $scope.itemsPerPage;
+
+            // Separate out by circuit
+            $scope.world = $scope.filter($scope.users.slice(0, $scope.cSize));
+            $scope.major = $scope.filter($scope.users.slice($scope.cSize, 2*$scope.cSize));
+            $scope.minor = $scope.filter($scope.users.slice(2*$scope.cSize, 3*$scope.cSize));
+            $scope.mosh = $scope.filter($scope.users.slice(3*$scope.cSize, end));
+
+        };
+
+        $scope.buildPager = function() {
+            $scope.pagedItems = [];
+            $scope.itemsPerPage = 100;
+            $scope.currentPage = 1;
+            new Circuit().then(function(result) {
+                $scope.cSize = result.cSize;
+                $scope.figureOutItemsToDisplay();
+            });
+        };
+
+        $scope.filter = function(users) {
+            $scope.filteredItems = $filter('filter')(users, {
+                $: $scope.search
+            });
+            $scope.filterLength = $scope.filteredItems.length;
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+            var end = begin + $scope.itemsPerPage;
+            return $scope.filteredItems.slice(begin, end);
+        };
+
+        $scope.pageChanged = function() {
+            $scope.figureOutItemsToDisplay();
+        };
+    }
+]);
+
 'use strict';
 
 angular.module('core').controller('ContactController', ['$scope', 'ContactForm',
@@ -481,8 +940,8 @@ angular.module('core').controller('ContactController', ['$scope', 'ContactForm',
 ]);
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus',
-  function($rootScope, $scope, $location, $state, Authentication, Menus) {
+angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window',
+  function($rootScope, $scope, $location, $state, Authentication, Menus, $window) {
     // Expose view variables
     $scope.$state = $state;
     $scope.authentication = Authentication;
@@ -502,31 +961,404 @@ angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '
       ga('send', 'pageview', $location.path());
     });
 
-  }
-]);
-'use strict';
+    // OAuth provider request
+    $scope.callOauthProvider = function(url) {
+      if ($state.previous && $state.previous.href) {
+        url += '?redirect_to=' + encodeURIComponent($state.previous.href);
+      }
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http',
-  function($scope, Authentication, $http) {
-    // This provides Authentication context.
-    $scope.authentication = Authentication;
-
-    $scope.sendChallengeNotification = function () {
-
-      var challengObj = {
-        id: 48,
-        challenger: 7,
-        challengee: 3
-      };
-
-      $http.post('/api/emails/challengeCreated', challengObj).error(function (response) {
-        $scope.error = response.message;
-      });
-
+      // Effectively call OAuth authentication route:
+      $window.location.href = url;
     };
 
   }
 ]);
+
+'use strict';
+
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout', 'Card', '$rootScope',
+  function($scope, Authentication, $http, $compile, $timeout, Card, $rootScope) {
+    // This provides Authentication context.
+    $scope.authentication = Authentication;
+    // says when it's okay to render the deck
+    $scope.initialized = false;
+    $scope.mainDeck = {
+      rootUrl: '#/deckster',
+      //settings for gridster
+      gridsterOpts: {
+        max_cols: 4,
+        widget_margins: [10, 10],
+        widget_base_dimensions: ['auto', 250],
+        responsive_breakpoint: 850
+      }
+    };
+
+    // examples Of how you can fetch content for cards
+    var getSummaryTemplate = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      $http.get('modules/core/client/views/testSummaryCard.html').success(function (html) {
+        if (cb) cb($compile(html)($scope));
+      });
+    };
+
+    var getDetailsTemplate = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      $http.get('modules/core/client/views/testDetailsCard.html').success(function (html) {
+        if (cb) cb($compile(html)($scope));
+      });
+    };
+
+    var viewRankings = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      if ($scope.authentication.user) {
+        $http.get('modules/core/client/views/cards/rankingsCard.client.view.html').success(function (html) {
+          if (cb) cb($compile(html)($scope));
+        });
+      }
+    };
+    
+    var viewProfile = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      if ($scope.authentication.user) {
+        $http.get('modules/core/client/views/cards/profile.client.view.html').success(function (html) {
+          if (cb) cb($compile(html)($scope));
+        });
+      }
+    };
+      
+    var viewNews = function(cardConfig, cb) {
+        if($scope.authentication.user) {
+            // Not using the cardConfig here but you could use it to make request
+            $http.get('modules/core/client/views/cards/news.client.view.html').success(function (html) {
+                return cb && cb($compile(html)($scope));
+            });
+        }
+    };
+          
+    var viewChallenges = function(cardConfig, cb) {
+        if($scope.authentication.user) {
+            // Not using the cardConfig here but you could use it to make request
+            $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
+                return cb && cb($compile(html)($scope));
+            });
+        }
+    };
+
+    // Define a static array of card configurations or load them from a server (ex: user defined cards)
+    $scope.mainDeck.cards = [
+      {
+        title: 'Rankings',
+        id: 'rankingsCard',
+        hasPopout: true,
+        summaryContentHtml: viewRankings,
+        detailsContentHtml: viewRankings,
+        position: {
+          size_x: 2,
+          size_y: 2,
+          col: 3,
+          row: 3
+        }
+      },
+      {
+        title: 'Your Profile',
+        id: 'profileCard',
+        summaryContentHtml: viewProfile,
+        detailsContentHtml: viewProfile,
+        position: {
+          size_x: 1,
+          size_y: 2,
+          col: 1,
+          row: 1
+        }
+      },
+        {
+
+            title: 'News Feed',
+            id: 'newsFeedCard',
+            summaryContentHtml: viewNews,
+            detailsContentHtml: viewNews,
+            position: {
+                size_x: 2,
+                size_y: 2,
+                col: 1,
+                row: 3
+            }
+        },
+        {   
+        title: 'My Challenges',
+        id: 'ChallengesCard',
+        summaryContentHtml: viewChallenges,
+        detailsContentHtml: viewChallenges,
+        position: {
+          size_x: 3,
+          size_y: 2,
+          col: 2,
+          row: 1
+        }
+      }
+      // {
+      //   title: 'Table Data',
+      //   id: 'tableCard',
+      //   summaryContentHtml: getSummaryTemplate,
+      //   detailsContentHtml: getDetailsTemplate,
+      //   position: {
+      //     size_x: 1,
+      //     size_y: 2,
+      //     col: 4,
+      //     row: 3
+      //   }
+      // },
+      // {
+      //   title: 'Timeline',
+      //   id: 'timelineCard',
+      //   summaryContentHtml: getSummaryTemplate,
+      //   detailsContentHtml: getDetailsTemplate,
+      //   position: {
+      //     size_x: 1,
+      //     size_y: 1,
+      //     col: 4,
+      //     row: 3
+      //   }
+      // }
+    ];
+
+    // Once the cards are loaded (could be done in a async call) initialize the deck
+    $timeout(function () {
+      $scope.initialized = true;
+    });
+
+
+  }
+]);
+
+/**
+ * Created by breed on 8/3/16.
+ */
+
+'use strict';
+
+/*globals $:false */
+
+angular.module('core')
+
+    .factory('Deckster', function () {
+        return window.Deckster;
+    })
+
+
+    .directive('decksterDeck', ["$parse", "$timeout", function ($parse, $timeout) {
+
+        var defaults = {
+            gridsterOpts: {
+                max_cols: 4,
+                widget_margins: [10, 10],
+                widget_base_dimensions: ['auto', 250],
+                responsive_breakpoint: 850
+            }
+        };
+
+        return {
+            restrict: 'EA',
+            replace: true,
+            templateUrl: 'modules/core/client/views/decksterDeck.html', // TODO
+            scope: {
+                deck: '=',
+                initialized: '='
+            },
+            controller: ["$scope", function($scope) {
+                $scope.deckInitialized = false;
+
+                $scope.$on('deckster:resize', function () {
+                    if ($scope.deckster) {
+                        $timeout(function () {
+                            $scope.deckster.$gridster.recalculate_faux_grid();
+                        });
+                    }
+                });
+
+                this.addCard = function (card, callback) {
+                    $scope.deckster.addCard(card, function (card) {
+                        if (callback) callback(card);
+                    });
+                };
+
+                this.init = function (element, opts) {
+                    $scope.deckster = $(element).deckster(opts).data('deckster');
+                    $scope.deckInitialized = true;
+                };
+            }],
+            link: function (scope, element, attrs, ctrl) {
+                var deckOptions = $.extend(true, {}, defaults, scope.deck);
+                var $deckEl = $(element).find('.deckster-deck');
+
+                scope.$watch('initialized', function(init) {
+                    if (init && !scope.deckInitialized) {
+                        ctrl.init($deckEl, deckOptions);
+                    }
+                });
+
+                scope.$on('$destroy', function() {
+                    scope.deckster.destroy();
+                    scope.deckInitialized = false;
+                });
+            }
+        };
+    }])
+
+    .directive('decksterCard', ["$parse", "$q", "$http", "$timeout", function ($parse, $q, $http, $timeout) {
+
+
+        return {
+            restrict: 'E',
+            require: ['^decksterDeck', 'decksterCard'],
+            controller: ["$scope", "$compile", function ($scope, $compile) {
+                // //Default summaryContentHtml function
+                // this.getSummaryContent = function (card, cb) {
+                //   $timeout(function() {
+                //     cb($compile('<div></div>')($scope));
+                //   });
+                // };
+                //
+                // // Default detailsContentHtml function
+                // this.getDetailsContent = function (card, cb) {
+                //   $timeout(function() {
+                //     cb($compile('<div></div>')($scope));
+                //   });
+                // };
+
+                // Default leftControlsHtml function
+                this.getLeftControlsContent = function (card, cb) {
+                    $timeout(function() {
+                        cb($compile('<div></div>')($scope));
+                    });
+                };
+
+                // Default rightControlsHtml function
+                this.getRightControlsContent = function (card, cb) {
+                    $timeout(function() {
+                        cb($compile('<div></div>')($scope));
+                    });
+                };
+
+                // Default centerControlsHtml function
+                this.getCenterControlsContent = function (card, cb) {
+                    $timeout(function() {
+                        cb($compile('<div></div>')($scope));
+                    });
+                };
+
+                this.onReload = function (card) {
+                    console.log('card reloaded', card);
+                };
+
+                this.onResize = function (card) {
+                    console.log('card resized', card);
+                };
+
+                this.onExpand = function (card)  {
+                    console.log('card expanded', card);
+                };
+
+                this.scrollToCard = function () {
+                    $scope.card.scrollToCard();
+                };
+
+                this.toggleCard = function () {
+                    // $scope.card.hidden ? $scope.card.showCard() : $scope.card.hideCard();
+                };
+
+                this.setUpCard = function (cardOpts) {
+                    if(!cardOpts.summaryViewType && !cardOpts.detailsViewType) {
+                        cardOpts.summaryContentHtml = cardOpts.summaryContentHtml || this.getSummaryContent;
+                        cardOpts.detailsContentHtml = cardOpts.detailsContentHtml || this.getDetailsContent;
+                        cardOpts.onResize = cardOpts.onResize || this.onResize;
+                        cardOpts.onReload = cardOpts.onReload || this.onReload;
+                    }
+
+                    cardOpts.showFooter = false;
+                    cardOpts.leftControlsHtml = this.getLeftControlsContent;
+                    cardOpts.rightControlsHtml = this.getRightControlsContent;
+                    cardOpts.centerControlsHtml = this.getCenterControlsContent;
+
+                    $scope.$on('deckster-card:scrollto-' + cardOpts.id, this.scrollToCard);
+                    $scope.$on('deckster-card:toggle-' + cardOpts.id, this.toggleCard);
+
+                    return cardOpts;
+                };
+
+            }],
+            link: function (scope, element, attrs, ctrls) {
+                var deckCtrl = ctrls[0];
+                var cardCtrl = ctrls[1];
+
+                var cardOpts = $parse(attrs.cardOptions || {})(scope);
+
+                scope.$watch('deckInitialized', function (initialized) {
+                    if (initialized) {
+                        deckCtrl.addCard(cardCtrl.setUpCard(cardOpts), function (card) {
+                            scope.card = card;
+
+                            // When the deck is resize resize this card as well
+                            scope.$on('deckster:resize', function () {
+                                // TODO code to resize cards
+                            });
+
+                            scope.$on('deckster:redraw', function () {
+                                $timeout(function () {
+                                    // TODO code to redraw cards
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+    }])
+
+    //deckster popout
+    .directive('decksterPopout', ['$injector', '$compile', '$http', 'Deckster', function($injector, $compile, $http, Deckster) {
+        return {
+            restrict: 'E',
+            link: function(scope, element) {
+                var cardId, section;
+
+                var $routeParams = $injector.get('$routeParams');
+                cardId = $routeParams.id;
+                section = $routeParams.section;
+
+
+                var getSummaryTemplate = function(cardConfig, cb) {
+                    // Not using the cardConfig here but you could use it to make request
+                    $http.get('partials/testSummaryCard.html').success(function(html) {
+                        if (cb) cb($compile(html)(scope));
+                    });
+                };
+
+                var getDetailsTemplate = function(cardConfig, cb) {
+                    // Not using the cardConfig here but you could use it to make request
+                    $http.get('partials/testDetailsCard.html').success(function (html) {
+                        if (cb) cb($compile(html)(scope));
+                    });
+                };
+
+                // Get card config from server or angular constants using cardId
+                var cardConfig =  {
+                    title: 'Photos',
+                    id: 'photoCard',
+                    summaryContentHtml: getSummaryTemplate,
+                    detailsContentHtml: getDetailsTemplate,
+                    position: {
+                        size_x: 1,
+                        size_y: 1,
+                        col: 1,
+                        row: 1
+                    }
+                };
+
+                Deckster.generatePopout(element, cardConfig, section);
+            }
+        };
+    }]);
 
 'use strict';
 
@@ -602,6 +1434,250 @@ angular.module('core')
       }
     };
   }]);
+/**
+ * Created by breed on 8/3/16.
+ */
+
+'use strict';
+
+angular.module('core').factory('Card', ["$http", "Deckster", "DataManager", "$filter", "lodash", function ($http, Deckster, DataManager, $filter, lodash) {
+        var Card = function (cardData) {
+            return this.setData(cardData);
+        };
+
+        Card.prototype.setData = function (cardData) {
+            angular.extend(this, cardData);
+            // this.onResize = DataManager.defaultOnResize;
+            // this.loadData = DataManager.defaultLoadData;
+            // this.reloadView = DataManager.defaultOnReload;
+            return this;
+        };
+
+        Card.prototype.onResize = function (card) {
+            card.resizeCardViews();
+        };
+
+        Card.prototype.loadData = function (card, callback) {
+            card.showSpinner();
+
+            var cardOptions = card.options.getCurrentViewOptions(card.currentSection);
+            var cardType = card.options.getCurrentViewType(card.currentSection);
+
+            if (cardType === 'drilldownView') {
+                cardType = cardOptions.viewType;
+            }
+
+            var loadData = function (data) {
+                var transformData = function (data) {
+                    data = DataManager.transformDataForCard(data, cardType, cardOptions);
+                    // setSeriesColors(card, data.series);
+                    if (callback) callback(data);
+                    card.hideSpinner();
+                };
+
+                if (cardOptions.preDataTransform) {
+                    cardOptions.preDataTransform(card, data, transformData);
+                } else {
+                    transformData(data);
+                }
+            };
+
+            if(cardType !== 'table') {
+                var filters = {};
+                $http.get(cardOptions.apiUrl, {
+                    params: filters
+                }).then(function (response) {
+                    loadData(response.data);
+                }).finally(function () {
+                    card.hideSpinner();
+                });
+            } else {
+                // callback && callback();
+                card.hideSpinner();
+            }
+        };
+
+        Card.prototype.reloadView = function (card) {
+            var view = Deckster.views[card.options.getCurrentViewType(card.currentSection)];
+            if (view.reload) {
+                view.reload(card, card.currentSection);
+            }
+        };
+
+        Card.prototype.isNew = function () {
+            return !angular.isDefined(this.id);
+        };
+
+        Card.prototype.getCurrentViewType = function (section) {
+            return this[section + 'ViewType'];
+        };
+
+        /**
+         * Get the view options of associated with the currentSection.
+         * If the view is a drilldownView it gets the view options associated with the
+         * active view.
+         *
+         * @param section
+         * @returns {*}
+         */
+        Card.prototype.getCurrentViewOptions = function (section) {
+            var viewOptions = this[section + 'ViewOptions'];
+            if (this.getCurrentViewType(section) === 'drilldownView') {
+                return viewOptions.views[viewOptions.activeView];
+            } else {
+                return viewOptions;
+            }
+        };
+        
+        Card.dataFormatter = {
+            'name': nameFormatter,
+            'date': dateFormatter,
+            'title': titleFormatter,
+            'titleKeepSymbols': titleKeepSymbolsFormatter,
+            'default': titleFormatter,
+            'caps': capsFormatter,
+            'capsNoCommas': capsNoCommasFormatter,
+            'currency': currencyFormatter,
+            'none': function(val) {return val;}
+        };
+
+        
+        function capsFormatter(val) {
+            return val.toUpperCase();
+        }
+        
+        function capsNoCommasFormatter(val) {
+            if (typeof val === 'string' || val instanceof String) {
+                val = val.replace(',', '');
+                return val.toUpperCase();
+            }
+            return val;
+        }
+        
+        // Used to title-ize values
+        function titleFormatter (val, unformat) {
+            if(unformat) {
+                return lodash.snakeCase(val);
+            } else {
+                return lodash.startCase(val);
+            }
+        }
+        
+        // Used to title-ize values without removing symbolic characters (other than _)
+        function titleKeepSymbolsFormatter (val) {
+            return lodash.map(lodash.words(val, /[^\s_]+/g), function(word){
+                return lodash.capitalize(word);
+            }).join(' ');
+        }
+        
+        // Used to format name values
+        function nameFormatter (val, unformat) {
+            var parts;
+        
+            // If it is comma separated assume that its in the form lastname, firstname
+            if (unformat){
+                if (val && val.match(/\s/g)) {
+                    parts = val.split(' ');
+                    return (parts[1].trim() + ', ' + parts[0].trim()).toLowerCase();
+                } else {
+                    return val.toLowerCase();
+                }
+            } else if (val === true || val === false) {
+                return val;
+            } else {
+                if (val && val.match(/.*,.*/g)) {
+                    parts = val.split(',');
+                    return lodash.startCase([parts[1].trim(), parts[0].trim()].join(' '));
+                } else {
+                    return lodash.startCase(val);
+                }
+            }
+        }
+        
+        function currencyFormatter(val, decimalPlaces) {
+            if(lodash.isFinite(val)) {
+                return $filter('currency')(val, '$', decimalPlaces || 0);
+            } else {
+                return val;
+            }
+        }
+        
+        // Used to format date values
+        function dateFormatter (date, format) {
+            //return moment(new Date(date)).format(format);
+            return date; // TODO
+        }
+        
+        Card.prototype.getDataFormatter = function (format) {
+            if (lodash.isEmpty(format)) {
+                return Card.dataFormatter['default'];
+            } else if (lodash.isString(format)) {
+                return Card.dataFormatter[format];
+            } else {
+                return Card.dataFormatter[format.type];
+            }
+        };
+
+        return Card;
+    }]);
+
+/**
+ * Created by breed on 8/4/16.
+ */
+
+'use strict';
+
+
+// Service to determine circuit and display rank from raw rank
+angular.module('core').factory('Circuit', ['$http', '$q',
+    function($http, $q) {
+
+        var circuits = function() {
+            var deferred = $q.defer();
+
+            var Circuit = {};
+
+            $http.get('/api/props').then(function (response) {
+                Circuit.cSize = response.data.circuitSize ? response.data.circuitSize : 10;
+                var cSize = Circuit.cSize;
+                Circuit.circuit = function (rank) {
+                    if (rank === null || rank > 3*cSize) {
+                        return "Mosh Pit";
+                    } else if (rank < (+cSize + 1)) {
+                        return "World Circuit";
+                    } else if (rank < 2 * +cSize + 1) {
+                        return "Major Circuit";
+                    } else if (rank < 3 * +cSize + 1) {
+                        return "Minor Circuit";
+                    } else {
+                        return "Circuit undetermined";
+                    }
+                };
+
+                Circuit.displayRank = function (rank) {
+                    if (rank === null || rank > 3*cSize) {
+                        return "Un"; // unranked
+                    } else if (rank % cSize === 0) {
+                        return cSize;
+                    } else {
+                        return rank % cSize;
+                    }
+                };
+
+                deferred.resolve(Circuit);
+
+            }, function (error) {
+                console.log("Error", error);
+            });
+
+            return deferred.promise;
+
+        };
+
+        return circuits;
+    }
+]);
+
 'use strict';
 
 //Contact form service
@@ -614,6 +1690,696 @@ angular.module('core').factory('ContactForm', ['$resource',
     });
   }
 ]);
+
+/**
+ * Created by breed on 8/3/16.
+ */
+
+'use strict';
+
+angular.module('core').factory('DataManager', ["$http", "$q", "Deckster", "lodash", function ($http, $q, Deckster, lodash) {
+
+    var DataManager = {};
+    DataManager.fiscalYearStart = new Date('4/4/2015'); // TODO: This needs to be pulled from a DB at some point.
+    DataManager.fiscalYearEnd = new Date('4/6/2016');
+    var dbColumnMetadata = null;
+
+    DataManager.colorMap = {
+        white: '#ffffff',
+        headcount: '#7cb5ec',
+        hires: '#8dce39',
+        vterminations: '#f7a35c',
+        iterminations: '#de546b'
+    };
+
+    DataManager.query = function (queryParams) {
+        var deferred = $q.defer();
+
+        $http.post('/api/data/query/', queryParams).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    };
+
+    var _query = function _query(queryParams, callback) {
+        DataManager.query(queryParams).then(function (jsonResultSet) {
+            callback(jsonResultSet || []);
+        }, function () {
+            callback([]);
+        });
+    };
+
+    DataManager.externalAPI = function (queryParams) {
+        var deferred = $q.defer();
+
+        $http.post('/api/data/externalAPI/', queryParams).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    };
+
+    DataManager.transformDataForCard = function (data, cardType, cardOptions) {
+        setDefaultTransformOptions(cardOptions);
+        // TODO: after setting defaults this might be a good place for validating the dataTransform options of the card json
+        var transform = cardOptions.customDataTransformer || dataTransformer[cardType];
+        return transform(data, cardOptions);
+    };
+
+    function setDefaultTransformOptions(options) {
+        options.dataTransform = lodash.merge({}, options.dataTransform);
+        options.dataTransform.titleFormats = lodash.merge({
+            category: 'default',
+            series: 'default',
+            categoryX: 'default',
+            categoryY: 'default'
+        }, options.dataTransform.titleFormats);
+    }
+
+    DataManager.generateAutocompleteConfig = function (apiUrl, nameColumn, valueColumn, titleName, formatter, selected, dependsOnFilters, dependedByFilters, selections, allowClear) {
+        return {
+            name: nameColumn,
+            titleName: titleName,
+            nameColumn: nameColumn,
+            valueColumn: valueColumn,
+            displayName: '<%= ' + nameColumn + ' %>',
+            displayNameFormatter: formatter,
+            selectedFilter: selected && selected[nameColumn] ? selected : null,
+            autocomplete: {
+                apiUrl: apiUrl
+            },
+            dependsOnFilters: dependsOnFilters,
+            dependedByFilters: dependedByFilters,
+            selections: selections,
+            allowClear: allowClear
+        };
+    };
+
+    // DataManager.getHistogramControls = function () {
+    //   return {
+    //     rightControlsContent: 'components/deckster/views/histogramChart/histogramChart-controls.html',
+    //     selectedFilter: 10,
+    //     selectedBinNumber: 10,
+    //     changeBinNumber: function (card, binNumber) {
+    //       var templateVariables = card.options.getTemplateVariables();
+    //       var viewOptions = card.options.getCurrentViewOptions(card.currentSection);
+    //       viewOptions.controls.selectedBinNumber = binNumber;
+    //       templateVariables.binClause = binNumber;
+    //       FilterService.createFilteredQuery(card, templateVariables);
+    //     }
+    //   }
+    // };
+
+    DataManager.getLayerManagerClauses = function (layerManCol, layerManName) {
+        return {
+            managerType: layerManCol,
+            managerClause: layerManCol + " ~ '" + layerManName + "'",
+            activeClause: "employment_status = 'active'"
+        };
+    };
+
+    var setSeriesColors = function setSeriesColors(card, series) {
+        var seriesColors = card.$deckster.options.seriesColorMap;
+        lodash.each(series, function (series) {
+            var seriesName = series.name;
+            if (lodash.contains(lodash.keys(seriesColors), seriesName)) {
+                series.color = seriesColors[seriesName];
+            }
+        });
+    };
+
+    DataManager.loadSummaryBarData = function (deck, callback) {
+        if (deck.summaryBar.apiUrl) {
+            var filters = deck.getSelectedFiltersJSON();
+
+            $http.get(deck.summaryBar.apiUrl, {
+                params: filters
+            }).then(function (response) {
+                var data = response.data;
+
+                if (deck.summaryBar.postQuery) {
+                    deck.summaryBar.postQuery(deck, data);
+                }
+
+                callback(data);
+            });
+        } else {
+            console.info("No endpoint found for card");
+        }
+    };
+
+    DataManager.defaultLoadData = function (card, callback) {
+        card.showSpinner();
+
+        // get current view metadata
+        var cardOptions = card.options.getCurrentViewOptions(card.currentSection);
+        var cardType = card.options.getCurrentViewType(card.currentSection);
+
+        //Adjust some property locations if this is a drillable card
+        if (cardType === 'drilldownView') {
+            cardType = cardOptions.viewType;
+        }
+
+        // create the initial query (passing in null for filters to set default values)
+        if (!cardOptions.query && cardOptions.queryTemplate) {
+            //setting date range on the filters
+            var date = {
+                start: card.$deckster.options.startDate,
+                end: card.$deckster.options.endDate,
+                maxEndDate: card.$deckster.options.maxEndDate
+            };
+
+            var selectedFilter = card.$deckster.options.getSelectedFiltersJSON();
+            selectedFilter.date_range = date;
+            // FilterService.createFilteredQuery(card, selectedFilter, {reloadContent: false});
+        }
+
+        // load card controls
+        //if(!lodash.isUndefined(cardOptions.controls) && lodash.isFunction(cardOptions.controls.loadControls)) {
+        //  cardOptions.controls.loadControls(card);
+        //}
+
+        var loadData = function loadData(data) {
+            var transformData = function transformData(data) {
+                data = DataManager.transformDataForCard(data, cardType, cardOptions);
+                setSeriesColors(card, data.series);
+                if (callback) callback(data);
+                card.hideSpinner();
+            };
+
+            if (cardOptions.preDataTransform) {
+                cardOptions.preDataTransform(card, data, transformData);
+            } else {
+                transformData(data);
+            }
+        };
+
+        if (cardOptions.query) {
+            _query(cardOptions.query, function (data) {
+                loadData(data);
+            }, function () {
+                card.hideSpinner();
+            });
+        } else if (cardOptions.apiUrl) {
+            if (cardType !== 'table') {
+                // var filters = angular.merge(card.$deckster.options.getSelectedFiltersJSON(), card.options.drilldownFilters || {});
+                var filters = {};
+                $http.get(cardOptions.apiUrl, {
+                    params: filters
+                }).then(function (response) {
+                    loadData(response.data);
+                }).finally(function () {
+                    card.hideSpinner();
+                });
+            } else {
+                if (callback) callback();
+                card.hideSpinner();
+            }
+        } else {
+            console.info("No endpoint found for card");
+        }
+    };
+
+    DataManager.defaultOnResize = function (card) {
+        card.resizeCardViews();
+    };
+
+    DataManager.defaultOnReload = function (card) {
+        var view = Deckster.views[card.options.getCurrentViewType(card.currentSection)];
+        if (view.reload) {
+            view.reload(card, card.currentSection);
+        }
+    };
+
+    DataManager.getLastUpdated = function (card, callback) {
+        $http.post('/api/data/lastUpdated/', card.lastUpdated || {}).then(function (response) {
+            var date = response.data;
+            //callback(date ? moment(date).toDate() : null);
+            callback(date ? date : null); // TODO
+        });
+    };
+    //
+    // DataManager.promise = $http.post('/api/data/queryColumnMetadata/').then(function (response) {
+    //   dbColumnMetadata = response.data;
+    // });
+
+    // DataManager.getPostgresDate = function (date) {
+    //   return DateUtils.getFormattedDateFromDate(date);
+    // };
+
+    var dataTransformer = {
+        'barChart': chartDataTransformer,
+        'columnChart': chartDataTransformer,
+        'columnRangeChart': columnRangeDataTransformer,
+        'lineChart': chartDataTransformer,
+        'splineChart': chartDataTransformer,
+        'areaChart': chartDataTransformer,
+        'pieChart': percentageChartDataTransformer,
+        'donutChart': percentageChartDataTransformer,
+        'geoMap': geoMapDataTransformer,
+        'table': tableDataTransformer,
+        'quadChart': quadChartDataTransformer,
+        'heatmapChart': heatmapChartDataTransformer,
+        'boxPlot': boxPlotDataTransformer,
+        'histogramChart': chartDataTransformer
+        //'scatterPlotChart': scatterPlotDataTransformer
+    };
+
+    // function scatterPlotDataTransformer(data, options) {
+    //     var dataTransform = options.dataTransform;
+    //     var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
+    //     var legends = lodash.uniq(lodash.map(data, function (point) {
+    //         return categoryTitleFormatter(point[dataTransform.legendPivot], dataTransform.titleFormats.category.format);
+    //     }));
+    //
+    //     var symbols = lodash.keys(Highcharts.SVGRenderer.prototype.symbols);
+    //     options.legendSymbols = {};
+    //     lodash.each(legends, function (legendItem, index) {
+    //         options.legendSymbols[legendItem] = symbols[index % symbols.length];
+    //     });
+    //
+    //     var myData = {};
+    //     lodash.each(data, function (point) {
+    //         var legendKey = categoryTitleFormatter(point[dataTransform.legendPivot], dataTransform.titleFormats.category.format);
+    //         var name = categoryTitleFormatter(point[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
+    //         myData[name] = myData[name] || { name: name, data: [], marker: { symbol: 'circle' } };
+    //         myData[name].data.push({
+    //             y: lodash.isNaN(point[dataTransform.yAxisColumn]) ? 0 : parseFloat(point[dataTransform.yAxisColumn]),
+    //             x: lodash.isNaN(point[dataTransform.xAxisColumn]) ? 0 : parseFloat(point[dataTransform.xAxisColumn]),
+    //             name: name,
+    //             marker: {
+    //                 symbol: options.legendSymbols[legendKey]
+    //             }
+    //         });
+    //     });
+    //
+    //     myData = lodash.values(myData);
+    //     return { query: options.query, series: myData };
+    // }
+
+    /**
+     * Transform data for injecting into a box plot
+     * @param data
+     * @param options
+     */
+
+    function boxPlotDataTransformer(data, options) {
+        var dataTransform = options.dataTransform;
+        var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
+        var categoryData;
+
+        if (dataTransform.row === 'category') {
+            categoryData = lodash.map(lodash.pluck(data, dataTransform.nameColumn), function (week) {
+                return categoryTitleFormatter(week, dataTransform.titleFormats.category.format);
+            });
+        } else {
+            categoryData = lodash.pluck(data, dataTransform.nameColumn);
+        }
+
+        var seriesData = lodash.map(data, function (row) {
+            var lowerLimit = parseFloat(row.lower_limit);
+            var upperLimit = parseFloat(row.upper_limit);
+
+            if (row.min <= lowerLimit) {
+                row.min = lowerLimit;
+            }
+            if (row.max >= upperLimit) {
+                row.max = upperLimit;
+            }
+            return lodash.map([row.min, row.q1, row.median, row.q3, row.max], parseFloat);
+        });
+
+        var meanData = lodash.map(data, function (meanValue) {
+
+            if (dataTransform.row === 'category') {
+                meanValue[dataTransform.nameColumn] = categoryTitleFormatter(meanValue[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
+            }
+
+            return lodash.map([categoryData.indexOf(meanValue[dataTransform.nameColumn]), parseFloat(meanValue.mean)]);
+        });
+        return {
+            name: 'Hourly Distribution By Week',
+            data: seriesData,
+            categories: categoryData,
+            mean: meanData
+        };
+    }
+
+    /**
+     *  Note: below is a way to inject various series attributes into the series object before processing. Simply make a
+     *  JSON object in the summaryViewOptions that looks like:
+     *  seriesOptions: {
+   *    name:{
+   *      'Data item name #1':
+   *        {seriesAttributeName: seriesAttributeValue (e.g.pointPadding: 0.3, pointPlacement: -0.15)},
+   *      'Data item name #2':
+   *        {seriesAttributeName: seriesAttributeValue}
+   *    }
+   *  }
+     * @param series
+     * @param options
+     */
+    var applySeriesOptions = function applySeriesOptions(series, options) {
+        if (options.seriesOptions) {
+            //Creates an array corresponding to what we want our series to look like. It is unsorted at this point
+            lodash.each(series, function (seriesItem) {
+                if (options.seriesOptions.name[seriesItem.name]) {
+                    seriesItem = lodash.merge(seriesItem, options.seriesOptions.name[seriesItem.name]);
+                    var names = lodash.map(lodash.keys(options.seriesOptions.name), function (key) {
+                        return key;
+                    });
+                    seriesItem.order = names.indexOf(seriesItem.name);
+                }
+                return seriesItem;
+            });
+
+            //This is to get the series into the order specified in the seriesOptions object
+            series.sort(function (a, b) {
+                if (a.order > b.order) {
+                    return 1;
+                }
+                if (a.order < b.order) {
+                    return -1;
+                }
+                // a must be equal to b
+                return 0;
+            });
+        }
+    };
+
+    /**
+     * Transform data for injecting into a basic chart (i.e. bar chart, line chart)
+     * @param data
+     * @param options
+     * @returns {{query: *, categories: *, series: *}}
+     */
+    function chartDataTransformer(data, options) {
+
+        var categories = [];
+        var series = [];
+
+        var dataTransform = options.dataTransform;
+
+        // if first row is empty data, then delete it from consideration
+        var firstRow = data[0];
+        data = dataTransform.emptyRow ? data.slice(1) : data;
+
+        // var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
+        // var seriesTitleFormatter = getDataFormatter(dataTransform.titleFormats.series);
+
+        var nameColumn = dataTransform.nameColumn;
+
+        if (dataTransform.row === 'series') {
+            categories = lodash.map(lodash.keys(lodash.omit(firstRow, dataTransform.nameColumn)), function (category) {
+                //return categoryTitleFormatter(category, dataTransform.titleFormats.category.format);
+                return category;
+            });
+            lodash.forEach(data, function (obj) {
+                series.push({
+                    //name: seriesTitleFormatter(obj[dataTransform.nameColumn], dataTransform.titleFormats.series.format),
+                    name: obj[dataTransform.nameColumn],
+                    data: lodash.map(lodash.values(lodash.omit(obj, dataTransform.nameColumn)), Number)
+                });
+            });
+        } else if (dataTransform.row === 'category') {
+            console.log(data);
+            categories = lodash.map(data, function (obj) {
+                //return categoryTitleFormatter(obj[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
+                return obj[nameColumn];
+            });
+            lodash.forOwn(firstRow, function (value, key) {
+                if (key !== nameColumn) {
+                    series.push({
+                        //name: seriesTitleFormatter(key, dataTransform.titleFormats.series.format),
+                        name: key,
+                        data: lodash.map(lodash.pluck(data, key), Number),
+                        visible: !lodash.includes(options.nonVisibleSeries, key)
+                    });
+                }
+            });
+        }
+
+        applySeriesOptions(series, options);
+
+        return {
+            query: options.query,
+            categories: categories,
+            series: series
+        };
+    }
+
+    /**
+     * Transform data for injecting into a quad chart
+     * @param data
+     * @param options
+     * @returns {{data: *}}
+     */
+    function quadChartDataTransformer(data, options) {
+
+        // TODO: fillin with whatever makes sense when it makes sense
+
+        return { data: data };
+    }
+
+    /**
+     * Transform data for injecting into a columnRange chart
+     * @param data
+     * @param options
+     * @returns {{query: *, categories: *, series: *}}
+     */
+    function columnRangeDataTransformer(data, options) {
+        var series = [];
+
+        var dataTransform = options.dataTransform;
+
+        var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
+        var seriesTitleFormatter = getDataFormatter(dataTransform.titleFormats.series);
+
+        var categories = lodash.map(data, function (obj) {
+            return categoryTitleFormatter(obj[dataTransform.nameColumn], dataTransform.titleFormats.category.format);
+        });
+
+        lodash.forEach(dataTransform.seriesMap, function (seriesInfo) {
+            var seriesName = seriesInfo.name;
+            series.push({
+                name: seriesTitleFormatter(seriesName, dataTransform.titleFormats.series.format),
+                data: lodash.map(data, function (row) {
+                    var returnData = [];
+                    // If only a single series column is defined, then store it individually.
+                    // This is needed for laying point data on top of the columnrange chart.
+                    if (!lodash.isUndefined(seriesInfo.seriesColumn)) {
+                        returnData = [row[seriesInfo.seriesColumn]];
+                    } else {
+                        returnData = [row[seriesInfo.minColumn], row[seriesInfo.maxColumn]];
+                    }
+                    return returnData;
+                })
+            });
+        });
+
+        applySeriesOptions(series, options);
+
+        return { query: options.query, categories: categories, series: series };
+    }
+
+    function getDataFormatter(format) {
+        if (lodash.isEmpty(format)) {
+            return dataTransformer['default'];
+        } else if (lodash.isString(format)) {
+            return dataTransformer[format];
+        } else {
+            return dataTransformer[format.type];
+        }
+    }
+
+    DataManager.getDataFormatter = getDataFormatter;
+
+    /**
+     * Transform data for injecting into a pergentage chart (i.e. donut chart, pie chart)
+     * @param data
+     * @param options
+     * @returns {{query: *, data: *}}
+     */
+    function percentageChartDataTransformer(data, options) {
+        var dataTransform = options.dataTransform;
+        var transformedData;
+
+        var categoryTitleFormatter = getDataFormatter(dataTransform.titleFormats.category);
+
+        if (dataTransform.row === 'series') {
+            transformedData = lodash.map(lodash.pairs(data[0]), function (pair) {
+                pair[0] = categoryTitleFormatter(pair[0], dataTransform.titleFormats.category.format);
+                return pair;
+            });
+        } else {
+            transformedData = lodash.map(data, function (row) {
+                var title = row[dataTransform.nameColumn];
+                var value = lodash.values(lodash.omit(row, dataTransform.nameColumn))[0];
+                return { name: categoryTitleFormatter(title), y: parseFloat(value) };
+            });
+        }
+
+        applySeriesOptions(transformedData, options);
+
+        return { query: options.query, data: transformedData };
+    }
+
+    /**
+     * Transform data for injecting into a table
+     * @param data
+     * @param options
+     */
+    function tableDataTransformer(data, options) {
+        //Table data transforms should be done in the table.js responseHandler
+        return data;
+    }
+
+    function getDefaultColumnMetadata(col) {
+        return { name: col, displayName: lodash.startCase(col), type: 'STRING' };
+    }
+
+    /**
+     * Transform data for injecting into a map
+     * @param data
+     * @param options
+     * @returns {*}
+     */
+    function geoMapDataTransformer(data, options) {
+        var generateGeoJSONData = function generateGeoJSONData(geoRecs) {
+            var returnGeoJSON = [];
+            lodash.each(geoRecs, function (geoRec) {
+                var latitude = geoRec.latitude;
+                var longitude = geoRec.longitude;
+                if (!lodash.isNull(latitude) && !lodash.isNull(longitude)) {
+                    var geoPoint = {};
+                    geoPoint.type = 'Feature';
+                    geoPoint.properties = {};
+                    // Store the returned column values in the geoPoint for later use (in the tooltip)
+                    lodash.forEach(lodash.keys(geoRec), function (key) {
+                        geoPoint.properties[key] = geoRec[key];
+                    });
+                    geoPoint.geometry = {};
+                    geoPoint.geometry.type = 'Point';
+                    //These are backwards due to the fact that markers require longitude first
+                    geoPoint.geometry.coordinates = [longitude, latitude];
+                    returnGeoJSON.push(geoPoint);
+                }
+            });
+
+            return returnGeoJSON;
+        };
+
+        var geoJSONData = generateGeoJSONData(data) || [];
+        return { query: options.query, geoJSONData: geoJSONData };
+    }
+
+    function getGradientColor(baseColor, percent) {
+        var gradient = Math.round(180 * (1 - percent));
+        var step = lodash.padLeft(gradient.toString(16), 2, '0');
+        return baseColor.replace(/00/g, step);
+    }
+
+    function heatmapChartDataTransformer(data, options) {
+        var heatmapData = [];
+
+        if (!lodash.isEmpty(data)) {
+            var dataTransform = options.dataTransform;
+
+            var categoryXTitleFormatter = getDataFormatter(dataTransform.titleFormats.categoryX);
+            var categoryYTitleFormatter = getDataFormatter(dataTransform.titleFormats.categoryY);
+
+            var categoriesX = lodash.map(lodash.keys(lodash.omit(data[0], dataTransform.nameColumn)), function (category) {
+                return category;
+            });
+
+            var categoriesY = lodash.map(data, function (category) {
+                return category[dataTransform.nameColumn];
+            });
+
+            lodash.forEach(data, function (row, yIndex) {
+                lodash.forEach(row, function (value, key) {
+                    if (key !== dataTransform.nameColumn) {
+                        var xIndex = lodash.indexOf(categoriesX, key);
+                        if (!options.colorMap) {
+                            heatmapData.push([xIndex, yIndex, value]);
+                        } else {
+                            var color;
+                            if (options.colorMap.addGradientForRow) {
+                                var baseColor = options.colorMap[row[dataTransform.nameColumn]] || options.colorMap['default'];
+                                color = value === 0 ? options.colorMap['default'] : getGradientColor(baseColor, value);
+                                //                if (value === 0) {
+                                //                  color = "#636363";
+                                //                } else {
+                                //                  color = getGradientColor(baseColor, value);
+                                //                }
+                            } else {
+                                color = options.colorMap[value] || options.colorMap['default'];
+                            }
+                            heatmapData.push({ x: xIndex, y: yIndex, value: value, color: color });
+                        }
+                    }
+                });
+            });
+
+            categoriesX = lodash.map(categoriesX, function (category) {
+                return categoryXTitleFormatter(category, dataTransform.titleFormats.categoryX.format);
+            });
+
+            categoriesY = lodash.map(categoriesY, function (category) {
+                return categoryYTitleFormatter(category, dataTransform.titleFormats.categoryY.format);
+            });
+
+            return { query: options.query, categories: { x: categoriesX, y: categoriesY }, data: heatmapData };
+        }
+    }
+
+    // Chart Paging
+
+    DataManager.chartPaging = {
+        getPagingValuesFromClause: function getPagingValuesFromClause(pagingClause) {
+            var pagingValues = {};
+            pagingValues.limit = parseInt(new RegExp(/(?:LIMIT\s)(\d+)/g).exec(pagingClause)[1]);
+            pagingValues.offset = parseInt(new RegExp(/(?:OFFSET\s)(\d+)/g).exec(pagingClause)[1]);
+            return pagingValues;
+        },
+
+        getRecTotal: function getRecTotal(card, callback) {
+            var templateVariables = card.options.getTemplateVariables();
+            // Set paging totals
+            // Get the original query
+            var countQuery = lodash.cloneDeep(card.options.getCurrentViewOptions(card.currentSection).query);
+            // Remove the paging clause from the query
+            countQuery.json.expression = countQuery.json.expression.replace(templateVariables.cardFilter_pagingClause, '');
+            // Wrap the query in a SELECT COUNT
+            countQuery.json.expression = "SELECT COUNT(*) FROM (" + countQuery.json.expression + ") as countQuery";
+            // Set the total records to the result
+            DataManager.query(countQuery).then(function (jsonResultSet) {
+                callback(parseInt(jsonResultSet[0].count));
+            }, function () {
+                callback(0);
+            });
+        },
+
+        getPageCount: function getPageCount(card) {
+            var templateVariables = card.options.getTemplateVariables();
+            var pagingClauseValues = this.getPagingValuesFromClause(templateVariables.cardFilter_pagingClause);
+            return Math.ceil(templateVariables.cardFilter_pagingRecTotal / pagingClauseValues.limit);
+        },
+
+        getCurrentPage: function getCurrentPage(card) {
+            var templateVariables = card.options.getTemplateVariables();
+            var pagingClauseValues = this.getPagingValuesFromClause(templateVariables.cardFilter_pagingClause);
+            return pagingClauseValues.offset / pagingClauseValues.limit + 1;
+        }
+
+    };
+
+    return DataManager;
+}]);
+//# sourceMappingURL=DataManager.service.js.map
 
 'use strict';
 
@@ -964,31 +2730,48 @@ angular.module('rankings').controller('UserController', ['$scope', '$state', 'Au
 
 'use strict';
 
-angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings',
-    function($scope, $filter, Rankings) {
+angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings', 'Circuit',
+    function($scope, $filter, Rankings, Circuit) {
+        $scope.world = [];
+        $scope.major = [];
+        $scope.minor = [];
+        $scope.mosh = [];
 
         Rankings.query(function(data) {
-            console.log("hello from the other side");
-            console.log(data);
             $scope.users = data;
             $scope.buildPager();
         });
 
-        $scope.buildPager = function() {
-            $scope.pagedItems = [];
-            $scope.itemsPerPage = 15;
-            $scope.currentPage = 1;
-            $scope.figureOutItemsToDisplay();
+        $scope.figureOutItemsToDisplay = function() {
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+            var end = begin + $scope.itemsPerPage;
+
+            // Separate out by circuit
+            $scope.world = $scope.filter($scope.users.slice(0, $scope.cSize));
+            $scope.major = $scope.filter($scope.users.slice($scope.cSize, 2*$scope.cSize));
+            $scope.minor = $scope.filter($scope.users.slice(2*$scope.cSize, 3*$scope.cSize));
+            $scope.mosh = $scope.filter($scope.users.slice(3*$scope.cSize, end));
+
         };
 
-        $scope.figureOutItemsToDisplay = function() {
-            $scope.filteredItems = $filter('filter')($scope.users, {
+        $scope.buildPager = function() {
+            $scope.pagedItems = [];
+            $scope.itemsPerPage = 100;
+            $scope.currentPage = 1;
+            new Circuit().then(function(result) {
+                $scope.cSize = result.cSize;
+                $scope.figureOutItemsToDisplay();
+            });
+        };
+
+        $scope.filter = function(users) {
+            $scope.filteredItems = $filter('filter')(users, {
                 $: $scope.search
             });
             $scope.filterLength = $scope.filteredItems.length;
             var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
             var end = begin + $scope.itemsPerPage;
-            $scope.pagedItems = $scope.filteredItems.slice(begin, end);
+            return $scope.filteredItems.slice(begin, end);
         };
 
         $scope.pageChanged = function() {
@@ -1174,6 +2957,10 @@ angular.module('user').config(['$stateProvider',
         url: '/invalid',
         templateUrl: 'modules/users/client/views/password/reset-password-invalid.client.view.html'
       })
+      .state('authentication.invalid', {
+        url: '/invalidemail',
+        templateUrl: 'modules/users/client/views/email-invalid.client.view.html'
+      })
       .state('password.reset.success', {
         url: '/success',
         templateUrl: 'modules/users/client/views/password/reset-password-success.client.view.html'
@@ -1191,7 +2978,6 @@ angular.module('user.admin').controller('UserListController', ['$scope', '$filte
   function($scope, $filter, Admin) {
 
     Admin.query(function(data) {
-      console.log(data);
       $scope.users = data;
       $scope.buildPager();
     });
@@ -1456,18 +3242,20 @@ angular.module('user').controller('ChangeProfilePictureController', ['$scope', '
     $scope.uploader.onSuccessItem = function(fileItem, response, status, headers) {
       var user = new User($scope.user);
 
-      user.$update(function(response) {
-        $scope.imageURL = user.profileImageURL;
+      $scope.imageURL = user.profileImageURL;
+      $scope.$broadcast('show-errors-reset', 'updatePicture');
 
-        $scope.$broadcast('show-errors-reset', 'updatePicture');
+      // Show success message
+      $scope.success = true;
 
-        // Show success message
-        $scope.success = true;
-
+      $http.get('api/user/me').success(function (data) {
         // Populate user object
-        Authentication.user = response;
-      }, function(response) {
-        $scope.error = response.data.message;
+        Authentication.user = data;
+        $scope.imageURL = Authentication.user.profileImageURL;
+
+        if (!$scope.$$phase) { // check if digest already in progress
+          $scope.$apply(); // launch digest;
+        }
       });
 
       // Clear upload buttons
