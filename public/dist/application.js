@@ -137,7 +137,7 @@ ApplicationConfiguration.registerModule('user.admin.routes', ['core.admin.routes
 //             })
 //             .state('challenge-result', {
 //                 url: 'challenge/result',
-//                 templateUrl: 'modules/challenges/client/views/result.client.view.html'
+//                 templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html'
 //             });
 //     }
 // ]);
@@ -206,7 +206,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.emailModal = function () {
             console.log("making the email modal");
             var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/result.client.view.html', // todo
+                templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html', // todo
                 controller: 'ResultController', // todo
                 scope: $scope,
                 backdrop: false,

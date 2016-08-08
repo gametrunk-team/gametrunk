@@ -1,4 +1,4 @@
-<div>
+<div ng-controller="ChallengeController">
   <div class="jumbotron text-center">
     <h2>Create a Challenge</h2>
     <br>
@@ -45,6 +45,7 @@
       <td class="form-group" show-errors>
         <label></label>
         <input class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
+        <input class="btn btn-primary" type="submit" class="form-control" ng-click="dismiss()" value="Cancel" />
       </td>
     </form>
 

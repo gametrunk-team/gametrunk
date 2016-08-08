@@ -163,3 +163,9 @@ body {
 
 .news {
   font-family: "Times New Roman", Georgia, Serif; }
+
+.vcenter {
+  vertical-align: middle; }
+
+.btn-space {
+  margin-bottom: 3px; }
