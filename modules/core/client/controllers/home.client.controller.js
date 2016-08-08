@@ -53,7 +53,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     var viewChallenges = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request
       $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
-        cb && cb($compile(html)($scope));
+        return cb && cb($compile(html)($scope));
       });
     };
 
