@@ -17,7 +17,13 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.pastChallenges = [];
         $scope.upcomingChallenges = [];
 
-        $http.get('/api/user').success(function (response) {
+        $scope.initPage = function () {
+            $scope.challenges = {};
+            $scope.challengesToday = [];
+            $scope.pastChallenges = [];
+            $scope.upcomingChallenges = [];
+
+            $http.get('/api/user').success(function (response) {
                 console.log("this is a second test");
                 // If successful show success message and clear form
                 $scope.success = true;
@@ -51,30 +57,70 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 console.log("response: " + response);
                 $scope.error = response.message;
             });
+        };
 
-        $scope.editModal = function () {
+        $scope.initPage();
+
+        $scope.editModal = function (challengeeUser, challengerUser, challengeId) {
             console.log("making the edit modal");
-            console.log($scope);
             var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
+                templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html', // todo
                 controller: 'ResultController', // todo
                 scope: $scope,
                 backdrop: false,
-                windowClass: 'app-modal-window'
+                windowClass: 'app-modal-window',
+                resolve: {
+                    challengerUser: function () {
+                        return challengerUser;
+                    },
+                    challengeeUser: function () {
+                        return challengeeUser;
+                    },
+                    challengeId: function () {
+                        return challengeId;
+                    }
+                }
+            });
+
+            modal.result.then(function(){
+                $scope.initPage();
             });
         };
 
-        $scope.cancelModal = function (id) {
+        $scope.cancelModal = function (challengeId) {
             console.log("making the cancel modal");
-            console.log(id);
-            $scope.challengeId = id;
             console.log($scope.challengeId);
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
+                controller: 'DeleteController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'app-modal-window',
+                resolve: {
+                    challengeId: function () {
+                        return challengeId;
+                    }
+                }
+            });
+
+            modal.result.then(function(){
+                $scope.initPage();
+            });
+        };
+
+        $scope.createChallengeModal = function () {
+            console.log("making the cancel modal");
+            console.log($scope.challengeId);
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html', // todo
                 controller: 'ChallengeController', // todo
                 scope: $scope,
                 backdrop: false,
                 windowClass: 'app-modal-window'
+            });
+
+            modal.result.then(function(){
+                $scope.initPage();
             });
         };
 
@@ -102,6 +148,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             console.log("sending challenge email");
             $http.post('/api/emails/challengeCreated', challengObj);
 
+            $scope.$close(true);
+            // Display a success toast, with a title
+            toastr.success('Challenge created','Success');
         };
 
 
@@ -130,10 +179,10 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         };
 
-        $scope.deleteChallenge = function() {
+        $scope.deleteChallenge = function(challengeId) {
             console.log($scope);
             var params = {
-                id: $scope.challengeId
+                id: challengeId
             };
             console.log("deleting challenge with id " + $scope.challengeId);
             $http.post('/api/challenge/delete', params)
@@ -144,13 +193,11 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         $scope.dismiss = function() {
-            console.log($scope);
             $scope.$dismiss();
         };
 
         //filters all a user's challenges into the ones happening today
         $scope.filterChallenges = function() {
-            console.log($scope.challenges);
             var minTimeToday = new Date();
             minTimeToday.setHours(0);
             minTimeToday.setMinutes(0);
@@ -172,12 +219,10 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     $scope.upcomingChallenges.push(value);
                 }
             });
+            console.log("the final count" + $scope.challenges);
         };
 
         // TODO: would probably be good to break the modal logic below out into its own controller
-        $scope.deleteChallenge = function(id) {
-            $http.post('/api/emails/challengeCreated', id);
-        };
         
         $scope.min = null;
         $scope.max = null;

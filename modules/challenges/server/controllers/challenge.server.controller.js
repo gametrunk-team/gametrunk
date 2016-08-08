@@ -38,6 +38,7 @@ exports.deleteChallenge = function(req, res) {
  Get A Challenge
  */
 exports.getChallenge = function(req, res) {
+    console.log(req.body.id);
     if(req.body.id) {
         Challenge.findById(req.body.id).then(function (challenge) {
             return res.json(challenge);
@@ -62,8 +63,8 @@ exports.getChallenge = function(req, res) {
                 message: errorHandler.getErrorMessage(err)
             });
         });
-    } else if(req.body.chalengee) {
-        Challenge.findOne({where: {chalengee: req.body.chalengee}}).then(function (challenge) {
+    } else if(req.body.challengee) {
+        Challenge.findOne({where: {chalengee: req.body.challengee}}).then(function (challenge) {
             return res.json(challenge);
         }).catch(function(err) {
             return res.status(400).send({

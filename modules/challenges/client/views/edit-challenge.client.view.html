@@ -2,7 +2,6 @@
   <div class="jumbotron text-center">
     <h2>Edit Challenge</h2>
 
-    <form novalidate class="simple-form">
       <label>Edit Time</label>
       <div class="row">
         <div>
@@ -18,42 +17,40 @@
       </div>
       <br>
 
-      <div align="center" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
+      <div align="center col-md-6" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
 
       <p class="alert alert-info">Schedule for: {{dt | date:'EEEE, MMMM d' }} at {{dt | date:'hh:mm a' }}</p>
-    </form>
-    <form novalidate class="simple-form">
         <label>Outcome of Challenge</label>
 
       <div>
-        <div class="list-group-item row" ng-class="{selected: me.id==model.Id, deselected: me.id!=model.Id}" ng-click="model.Id=me.id">
-          <span ng-if="me.profileImageURL" class="">
-            <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_25,h_25,c_fill/{{me.profileImageURL}}' alt='{{me.displayName}}'/>
+        <div class="list-group-item row" ng-class="{selected: challengerUser.id==model.Id, deselected: challengerUser.id!=model.Id}" ng-click="model.Id=challengerUser.id">
+          <span ng-if="challengerUser.profileImageURL" class="">
+            <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_25,h_25,c_fill/{{challengerUser.profileImageURL}}' alt='{{challengerUser.displayName}}'/>
           </span>
-          <span ng-if="!me.profileImageURL" class="">
-            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{me.displayName}}" width="25px"/>
+          <span ng-if="!challengerUser.profileImageURL" class="">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challengerUser.displayName}}" width="25px"/>
           </span>
           <span class="">
-            <h4 ng-bind="me.displayName"></h4>
+            <h4 ng-bind="challengerUser.displayName"></h4>
           </span>
-          <h4 ng-if="me.id==model.Id" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h4>
+          <h4 ng-if="challengerUser.id==model.Id" class="col-md-4 col-4 pull-right glyphicon glyphicon-ok" style="color:palegreen"></h4>
         </div>
-        <div class="list-group-item row" ng-class="{selected: opponent.id==model.Id, deselected: opponent.id!=model.Id}" ng-click="model.Id=opponent.id">
-          <span ng-if="opponent.profileImageURL" class="">
-             <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_25,h_25,c_fill/{{opponent.profileImageURL}}' alt='{{opponent.displayName}}'/>
+        <div class="list-group-item row" ng-class="{selected: challengeeUser.id==model.Id, deselected: challengeeUser.id!=model.Id}" ng-click="model.Id=challengeeUser.id">
+          <span ng-if="challengeeUser.profileImageURL" class="">
+             <img ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_25,h_25,c_fill/{{challengeeUser.profileImageURL}}' alt='{{challengeeUser.displayName}}'/>
           </span>
-          <span ng-if="!opponent.profileImageURL" class="">
-            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{opponent.displayName}}" width="25px"/>
+          <span ng-if="!challengeeUser.profileImageURL" class="">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challengeeUser.displayName}}" width="25px"/>
           </span>
           <span class="">
-          <h4 ng-bind="opponent.displayName"></h4>
+          <h4 ng-bind="challengeeUser.displayName"></h4>
           </span>
-          <h4 ng-if="opponent.id==model.Id" class="col-md-4 col-4 glyphicon glyphicon-ok" style="color:palegreen"></h4>
+          <h4 ng-if="challengeeUser.id==model.Id" class="col-md-4 col-4 glyphicon glyphicon-ok" style="color:palegreen"></h4>
         </div>
         </div>
 
         <input class="btn btn-primary" type="submit" class="form-control" ng-click="Submit()" value="Submit" />
+      <input class="btn btn-primary" type="submit" class="form-control" ng-click="dismiss()" value="Cancel" />
       </td>
-    </form>
   </div>
 </div>

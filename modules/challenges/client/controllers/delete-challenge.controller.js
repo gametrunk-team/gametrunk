@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('challenge').controller('DeleteController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges', 'Circuit',
-    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges, Circuit) {
+angular.module('challenge').controller('DeleteController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator','Admin', '$uibModal', 'Challenges', 'Circuit','challengeId',
+    function($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Admin, $uibModal, Challenges, Circuit, challengeId) {
         $scope.authentication = Authentication;
         $scope.popoverMsg = PasswordValidator.getPopoverMsg();
         $scope.selectedTime = 'Now';
@@ -20,19 +20,19 @@ angular.module('challenge').controller('DeleteController', ['$scope', '$state', 
         $scope.deleteChallenge = function() {
             console.log($scope);
             var params = {
-                id: $scope.challengeId
+                id: challengeId
             };
-            console.log("deleting challenge with id " + $scope.challengeId);
+            console.log("deleting challenge with id " + challengeId);
             $http.post('/api/challenge/delete', params)
                 .success(function (data) {
                     console.log("success");
+                    toastr.success('Challenge Deleted','Success');
                 });
-            $scope.$dismiss();
+            $scope.$close(true);
         };
 
         $scope.dismiss = function() {
-            console.log($scope);
-            $scope.$dismiss();
+            $scope.$close(true);
         };
         
     }
