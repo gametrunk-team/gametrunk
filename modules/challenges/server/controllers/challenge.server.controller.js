@@ -7,6 +7,7 @@ var
     path = require('path'),
     db = require(path.resolve('./config/lib/sequelize')).models,
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    Sequelize = require('sequelize'),
     Challenge = db.challenge;
 
 /*
@@ -28,7 +29,7 @@ exports.createChallenge = function(req, res) {
  Delete Challenge
  */
 exports.deleteChallenge = function(req, res) {
-
+    console.log("DELETING " + req.body.id);
     Challenge.destroy({where: {id: req.body.id}});
     res.status(200).send();
 };
@@ -37,6 +38,7 @@ exports.deleteChallenge = function(req, res) {
  Get A Challenge
  */
 exports.getChallenge = function(req, res) {
+    console.log(req.body.id);
     if(req.body.id) {
         Challenge.findById(req.body.id).then(function (challenge) {
             return res.json(challenge);
@@ -61,8 +63,8 @@ exports.getChallenge = function(req, res) {
                 message: errorHandler.getErrorMessage(err)
             });
         });
-    } else if(req.body.chalengee) {
-        Challenge.findOne({where: {chalengee: req.body.chalengee}}).then(function (challenge) {
+    } else if(req.body.challengee) {
+        Challenge.findOne({where: {chalengee: req.body.challengee}}).then(function (challenge) {
             return res.json(challenge);
         }).catch(function(err) {
             return res.status(400).send({
@@ -101,6 +103,30 @@ exports.getAllChallenges = function(req, res) {
     });
 };
 
+/*
+ Get All Challenges
+ */
+exports.getMyChallenges = function(req, res) {
+    Challenge.findAll({
+        order: [
+            ['createdAt', 'DESC']
+        ],
+        where: Sequelize.or(
+            { challengerUserId : req.body.userId },
+            { challengeeUserId: req.body.userId }
+        )
+    }).then(function(challenges) {
+        if (!challenges) {
+            return res.status(400).send({
+                message: 'Unable to get list of challenges'
+            });
+        } else {
+            res.json(challenges);
+        }
+    }).catch(function(err) {
+        res.jsonp(err);
+    });
+};
 
 /*
  Update Challenge

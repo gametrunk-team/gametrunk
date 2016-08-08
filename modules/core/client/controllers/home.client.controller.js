@@ -50,6 +50,13 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       }
     };
 
+    var viewChallenges = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
+        return cb && cb($compile(html)($scope));
+      });
+    };
+
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
     $scope.mainDeck.cards = [
       {
@@ -78,15 +85,15 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         }
       },
       {
-        title: 'Geospatial',
-        id: 'mapCard',
-        summaryContentHtml: getSummaryTemplate,
-        detailsContentHtml: getDetailsTemplate,
+        title: 'My Challenges',
+        id: 'ChallengesCard',
+        summaryContentHtml: viewChallenges,
+        detailsContentHtml: viewChallenges,
         position: {
-          size_x: 1,
-          size_y: 1,
-          col: 4,
-          row: 3
+          size_x: 3,
+          size_y: 2,
+          col: 2,
+          row: 1
         }
       },
       {
@@ -98,7 +105,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
           size_x: 1,
           size_y: 2,
           col: 4,
-          row: 1
+          row: 3
         }
       },
       {
@@ -110,7 +117,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
           size_x: 2,
           size_y: 1,
           col: 2,
-          row: 1
+          row: 4
         }
       }
     ];

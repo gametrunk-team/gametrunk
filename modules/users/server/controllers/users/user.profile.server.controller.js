@@ -17,8 +17,8 @@ var _ = require('lodash'),
  Get A User By Id
  */
 exports.getUserById = function(req, res) {
-  if (req.body.id) {
-    User.findById(req.body.id).then(function (user) {
+  if (req.body.userId) {
+    User.findById(req.body.userId).then(function (user) {
       return res.json(user);
     }).catch(function (err) {
       return res.status(400).send({

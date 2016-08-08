@@ -17,7 +17,8 @@
     "io": true,
     "ApplicationConfiguration": true,
     "ga": true,
-    "grecaptcha": true
+    "grecaptcha": true,
+    "toastr": true
   },
   "predef": [ // Extra globals.
     "inject",
