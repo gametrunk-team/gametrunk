@@ -32,7 +32,7 @@ angular.module('rankings').controller('RankingController', ['$scope', '$filter',
             $scope.pagedItems = [];
             $scope.itemsPerPage = 100;
             $scope.currentPage = 1;
-            Circuit().then(function(result) {
+            new Circuit().then(function(result) {
                 $scope.cSize = result.cSize;
                 $scope.figureOutItemsToDisplay();
             });

@@ -18,7 +18,7 @@ angular.module('core').factory('Circuit', ['$http', '$q',
                 Circuit.cSize = response.data.circuitSize ? response.data.circuitSize : 10;
                 var cSize = Circuit.cSize;
                 Circuit.circuit = function (rank) {
-                    if (rank === null) {
+                    if (rank === null || rank > 3*cSize) {
                         return "Mosh Pit";
                     } else if (rank < (+cSize + 1)) {
                         return "World Circuit";
@@ -32,12 +32,12 @@ angular.module('core').factory('Circuit', ['$http', '$q',
                 };
 
                 Circuit.displayRank = function (rank) {
-                    if (rank === null) {
+                    if (rank === null || rank > 3*cSize) {
                         return "Un"; // unranked
                     } else if (rank % cSize === 0) {
                         return cSize;
                     } else {
-                        return rank % cSize
+                        return rank % cSize;
                     }
                 };
 

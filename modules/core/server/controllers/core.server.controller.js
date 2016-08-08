@@ -6,13 +6,13 @@ var path = require('path'),
   async = require('async'),
   nodemailer = require('nodemailer'),
     PropertiesReader = require('properties-reader'),
-    properties = PropertiesReader('./config/properties.ini');
+    properties = new PropertiesReader('./config/properties.ini');
 
 var smtpTransport = nodemailer.createTransport(config.mailer.options);
 
 
 exports.properties = function(req, res, next) {
-  res.json(properties.getAllProperties())
+  res.json(properties.getAllProperties());
 };
 
 
