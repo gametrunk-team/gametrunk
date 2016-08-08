@@ -10,7 +10,8 @@ var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   passport = require('passport'),
   db = require(path.resolve('./config/lib/sequelize')).models,
-  User = db.user;
+  User = db.user,
+    _ = require('lodash');
 
 // URLs for which user can't be redirected on signin
 var noReturnUrls = [
@@ -20,6 +21,8 @@ var noReturnUrls = [
 
 var cloudinary = require('cloudinary');
 
+var PropertiesReader = require('properties-reader');
+var properties = new PropertiesReader('./config/properties.ini');
 
 /**
  * Signup
@@ -121,7 +124,7 @@ exports.oauthCallback = function(strategy) {
 
     passport.authenticate(strategy, function(err, user, redirectURL) {
       if (err) {
-        return res.redirect('/authentication/signin?err=' + encodeURIComponent(errorHandler.getErrorMessage(err)));
+        return res.redirect('/authentication/invalidemail');
       }
       if (!user) {
         return res.redirect('/authentication/signin');
@@ -141,7 +144,7 @@ exports.oauthCallback = function(strategy) {
  * Helper function to save or update a OAuth user profile
  */
 exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
-  if(providerUserProfile.email.endsWith('42six.com')) {
+  if(_.endsWith(providerUserProfile.email, properties.get('emailDomain'))) {
     if (!req.user) {
 
       //check if the email exists, add the provider data to it and login
@@ -327,31 +330,56 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
                       newUser.provider = providerUserProfile.provider;
                       newUser.providerData = providerUserProfile.providerData;
 
-                      //Create the user
-                      User.create(newUser).then(function (user) {
-                        if (!user) {
-                          return done(false, user);
-                        } else {
-                          // Upload the profile image to cloudinary
-                          cloudinary.uploader.upload(providerUserProfile.providerData.image.url, function (result) {
-                            console.log(result);
-                          }, {public_id: user.dataValues.profileImageURL.split('.')[0]});
-
-                          //Login the user
-                          req.login(user, function (err) {
-                            if (err)
-                              return done(new Error(err), user);
-                            return done(false, user);
-                          });
+                      // Auto-assign rank
+                      User.count({
+                        where: {
+                            rank: {
+                                $not: null
+                            }
                         }
+                      }).then(function (count) {
+                            var newRank = count + 1;
+                            User.find({
+                              where: {
+                                rank: newRank
+                              }
+                            }).then(function (conflict) {
+
+                              if (conflict) {
+                                console.log("Conflict, setting rank as null");
+                                newUser.rank = null;
+                              } else {
+                                newUser.rank = newRank;
+                              }
+
+                              // Create the user
+                              User.create(newUser).then(function (user) {
+                                if (!user) {
+                                  return done(false, user);
+                                } else {
+                                  // Upload the profile image to cloudinary
+                                  cloudinary.uploader.upload(providerUserProfile.providerData.image.url, function (result) {
+                                    console.log(result);
+                                  }, {public_id: user.dataValues.profileImageURL.split('.')[0]});
+
+                                  //Login the user
+                                  req.login(user, function (err) {
+                                    if (err)
+                                      return done(new Error(err), user);
+                                    return done(false, user);
+                                  });
+                                }
+                              }).catch(function (err) {
+                                return done(false, err);
+                              });
+                            }).catch(function (err) {
+                              return done(false, err);
+                            });
                       }).catch(function (err) {
                         return done(false, err);
                       });
-
                     });
-
               });
-
             }
           }).catch(function (err) {
             return done(false, err);

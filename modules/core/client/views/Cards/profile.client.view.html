@@ -1,0 +1,17 @@
+<div>
+  <!--<p>Profile card!</p>-->
+  <section ng-controller="ProfileCardController">
+    <div style="text-align: center">
+      <span ng-if="authentication.user.profileImageURL">
+        <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/h_150/{{authentication.user.profileImageURL}}' alt='{{authentication.user.displayName}}'/>
+      </span>
+
+      <span ng-if="!authentication.user.profileImageURL">
+        <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{authentication.user.displayName}}" class="header-profile-image-default" />
+      </span>
+
+      <h4 ng-bind="authentication.user.displayName"></h4>
+      <h4>#{{displayRank}} in the {{circuit}}</h4>
+    </div>
+</section>
+</div>s

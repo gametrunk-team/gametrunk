@@ -116,8 +116,6 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
 
                 sendEmail(data, cb);
                 callback();
-            } else {
-                cb("NULL RESULTS");
             }
 
         }, function (err) {
@@ -159,11 +157,9 @@ exports.sendChallengeCreatedNotification = function(req, res) {
 
             createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + locals.challengedName + " on gametrunk!", 'challenge-created', locals, false, function(err) {
                 if(err) {
-                    console.log("ERROR: ", err);
-                    //res.status(400).send(err);
+                    res.status(400).end(err);
                 } else {
-                    console.log("SUCCESSFUL");
-                    //res.status(200).send();
+                    res.status(200).end();
                 }
             });
         });

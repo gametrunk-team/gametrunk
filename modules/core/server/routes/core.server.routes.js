@@ -4,6 +4,9 @@ module.exports = function(app) {
   // Root routing
   var core = require('../controllers/core.server.controller');
 
+  // Get app properties from properties file
+  app.route('/api/props').get(core.properties);
+
   // Define error pages
   app.route('/server-error').get(core.renderServerError);
 

@@ -1,0 +1,95 @@
+<section ng-controller="RankingCardController">
+  <style>
+    .row {margin-right: 0px;  margin-left: 0px;}
+  </style>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2 ng-show="world.length > 0">World Circuit</h2>
+      <h2 ng-hide="world.length > 0 || major.length > 0 || minor.length > 0 || mosh.length > 0">No results found</h2>
+    </div>
+    <div class="col-md-4" style="margin-top: 1em;margin-bottom: 2em">
+      <input class="form-control col-md-3" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
+    </div>
+  </div>
+
+
+  <div class="list-group">
+    <a ng-repeat="user in world | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+        <span class="col-sm-1">
+           <span ng-if="user.profileImageURL">
+             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+          </span>
+
+          <span ng-if="!user.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+          </span>
+        </span>
+        <span class="col-sm-9" style="margin:auto">
+          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+        </span>
+    </a>
+  </div>
+  <h2 ng-show="major.length > 0">Major Circuit</h2>
+  <div class="list-group">
+    <a ng-repeat="user in major | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+        <span class="col-sm-1">
+           <span ng-if="user.profileImageURL">
+             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+          </span>
+
+          <span ng-if="!user.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+          </span>
+        </span>
+        <span class="col-sm-9" style="margin:auto">
+          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+        </span>
+    </a>
+  </div>
+  <h2 ng-show="minor.length > 0">Minor Circuit</h2>
+  <div class="list-group">
+    <a ng-repeat="user in minor | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+        <span class="col-sm-1">
+           <span ng-if="user.profileImageURL">
+             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+          </span>
+
+          <span ng-if="!user.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+          </span>
+        </span>
+        <span class="col-sm-9" style="margin:auto">
+          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+        </span>
+    </a>
+  </div>
+  <h2 ng-show="mosh.length > 0">Mosh Pit</h2>
+  <div class="list-group">
+    <a ng-repeat="user in mosh | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+        <span class="col-sm-1">
+           <span ng-if="user.profileImageURL">
+             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+          </span>
+
+          <span ng-if="!user.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+          </span>
+        </span>
+        <span class="col-sm-9" style="margin:auto">
+          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+        </span>
+    </a>
+  </div>
+
+
+  <pagination boundary-links="true" max-size="8" items-per-page="itemsPerPage" total-items="filterLength" ng-model="currentPage" ng-change="pageChanged()"></pagination>
+</section>

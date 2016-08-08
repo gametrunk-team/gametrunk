@@ -33,16 +33,26 @@
 
   <!-- Application CSS Files -->
   {% for cssFile in cssFiles %}<link rel="stylesheet" href="{{cssFile}}">{% endfor %}
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
 </head>
 
 <body class="ng-cloak">
-  <header ng-include="'/modules/core/client/views/header.client.view.html'" class="navbar navbar-fixed-top navbar-seanjs"></header>
-  <section class="content">
-    <section class="container">
-      {% block content %}{% endblock %}
+  <div id="container">
+    <div id="header">
+    <header ng-include="'/modules/core/client/views/header.client.view.html'" class="navbar navbar-fixed-top navbar-seanjs"></header>
+    </div>
+    <div id="body">
+    <section class="content">
+      <!--<section class="container">-->
+        {% block content %}{% endblock %}
+      <!--</section>-->
     </section>
-  </section>
-  <footer ng-include="'/modules/core/client/views/footer.client.view.html'"></footer>
+      </div>
+    <div id="footer">
+    <footer ng-include="'/modules/core/client/views/footer.client.view.html'"></footer>
+    </div>
+  </div>
 
   <!--Embedding The User Object-->
   <script type="text/javascript">
@@ -74,6 +84,8 @@
   </script>
   <!-- End Google Analytics -->
   {% endif %}
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
 </body>
 

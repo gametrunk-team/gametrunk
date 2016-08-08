@@ -4,9 +4,16 @@ var path = require('path'),
   config = require(path.resolve('./config/config')),
   reCaptcha = require(path.resolve('./config/lib/reCaptcha')),
   async = require('async'),
-  nodemailer = require('nodemailer');
+  nodemailer = require('nodemailer'),
+    PropertiesReader = require('properties-reader'),
+    properties = new PropertiesReader('./config/properties.ini');
 
 var smtpTransport = nodemailer.createTransport(config.mailer.options);
+
+
+exports.properties = function(req, res, next) {
+  res.json(properties.getAllProperties());
+};
 
 
 /**
@@ -104,3 +111,4 @@ exports.contact = function(req, res, next) {
 
 
 };
+

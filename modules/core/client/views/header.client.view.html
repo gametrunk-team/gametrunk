@@ -24,7 +24,9 @@
     <ul class="nav navbar-nav navbar-right" ng-hide="authentication.user">
       <li class="divider-vertical"></li>
       <li ui-sref-active="active">
-        <a ui-sref="authentication.signin">Sign In</a>
+        <a ng-click="callOauthProvider('/api/auth/google')">
+          <img ng-src="/modules/users/client/img/buttons/google.png" class="img-responsive" width="125">
+        </a>
       </li>
     </ul>
     <ul class="nav navbar-nav navbar-right" ng-show="authentication.user">

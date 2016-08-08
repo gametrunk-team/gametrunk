@@ -22,7 +22,7 @@ module.exports = {
     host: process.env.REDIS_HOST || "localhost",
     port: process.env.REDIS_PORT || 6379,
     database: parseInt(process.env.REDIS_DATABASE) || 0,
-    password: process.env.REDIS_PASSWORD || "",
+    password: process.env.REDIS_PASSWORD || ""
   },
   log: {
     // Can specify one of 'combined', 'common', 'dev', 'short', 'tiny'

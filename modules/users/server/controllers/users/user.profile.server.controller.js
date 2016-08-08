@@ -12,6 +12,26 @@ var _ = require('lodash'),
   User = db.user, 
     cloudinary = require('cloudinary');
 
+
+/*
+ Get A User By Id
+ */
+exports.getUserById = function(req, res) {
+  if (req.body.userId) {
+    User.findById(req.body.userId).then(function (user) {
+      return res.json(user);
+    }).catch(function (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    });
+  } else {
+    return res.status(400).send({
+      message: "No User ID provided"
+    });
+  }
+};
+
 /*
 Get all users
  */
@@ -209,7 +229,7 @@ exports.changeProfilePicture = function(req, res) {
 
 exports.getProfile = function(req, res) {
   User.findOne({
-    attributes: ['id', 'firstName', 'lastName', 'email', 'username', 'profileImageURL'],
+    attributes: ['id', 'firstName', 'lastName', 'email', 'username', 'profileImageURL', 'rank'],
     where: {
       id: req.user.id
     }

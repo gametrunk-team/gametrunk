@@ -1,0 +1,28 @@
+<section ng-controller="NewsCardController">
+  <style>
+    .row {margin-right: 0px;  margin-left: 0px;}
+  </style>
+
+  <div class="news-title news">
+    <img class="displayed" style="display: block; margin: 0 auto; padding-top: 3px;" src="modules/core/client/img/news/newsbanner.png" width="400">
+  </div>
+  <hr>
+
+  <div class="list-group news" ng-if="newsList[0]">
+    <a ng-repeat="news in newsList" class="list-group-item row news">
+      <span class="col-sm-2">
+        <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_70,h_70,c_fill,e_grayscale/{{news.photoUrl}}'/>
+      </span>
+        <span class="col-lg-8" style="margin:auto; display: table;">
+          <h4 class="text-center" style="margin:auto; padding-top: 22px; padding-bottom: 22px; font-size: 1.2em"><i class="fa {{news.iconClass}}"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{news.text}}</h4>
+        </span>
+      <p class="list-group-item-text" style="margin:auto;font-size: 0.9em"><time-ago from-time={{news.createdAt}}></time-ago></p>
+    </a>
+  </div>
+
+  <div class="text-center news" ng-if="!newsList[0]" style="color: dimgray; padding-top: 2px;">
+    <h2>No news to report!</h2>
+
+  </div>
+
+</section>

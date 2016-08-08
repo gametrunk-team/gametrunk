@@ -12,7 +12,7 @@
 //             })
 //             .state('challenge-result', {
 //                 url: 'challenge/result',
-//                 templateUrl: 'modules/challenges/client/views/result.client.view.html'
+//                 templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html'
 //             });
 //     }
 // ]);

@@ -4,31 +4,48 @@
 
 'use strict';
 
-angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings',
-    function($scope, $filter, Rankings) {
+angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings', 'Circuit',
+    function($scope, $filter, Rankings, Circuit) {
+        $scope.world = [];
+        $scope.major = [];
+        $scope.minor = [];
+        $scope.mosh = [];
 
         Rankings.query(function(data) {
-            console.log("hello from the other side");
-            console.log(data);
             $scope.users = data;
             $scope.buildPager();
         });
 
-        $scope.buildPager = function() {
-            $scope.pagedItems = [];
-            $scope.itemsPerPage = 15;
-            $scope.currentPage = 1;
-            $scope.figureOutItemsToDisplay();
+        $scope.figureOutItemsToDisplay = function() {
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+            var end = begin + $scope.itemsPerPage;
+
+            // Separate out by circuit
+            $scope.world = $scope.filter($scope.users.slice(0, $scope.cSize));
+            $scope.major = $scope.filter($scope.users.slice($scope.cSize, 2*$scope.cSize));
+            $scope.minor = $scope.filter($scope.users.slice(2*$scope.cSize, 3*$scope.cSize));
+            $scope.mosh = $scope.filter($scope.users.slice(3*$scope.cSize, end));
+
         };
 
-        $scope.figureOutItemsToDisplay = function() {
-            $scope.filteredItems = $filter('filter')($scope.users, {
+        $scope.buildPager = function() {
+            $scope.pagedItems = [];
+            $scope.itemsPerPage = 100;
+            $scope.currentPage = 1;
+            new Circuit().then(function(result) {
+                $scope.cSize = result.cSize;
+                $scope.figureOutItemsToDisplay();
+            });
+        };
+
+        $scope.filter = function(users) {
+            $scope.filteredItems = $filter('filter')(users, {
                 $: $scope.search
             });
             $scope.filterLength = $scope.filteredItems.length;
             var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
             var end = begin + $scope.itemsPerPage;
-            $scope.pagedItems = $scope.filteredItems.slice(begin, end);
+            return $scope.filteredItems.slice(begin, end);
         };
 
         $scope.pageChanged = function() {

@@ -60,6 +60,10 @@ angular.module('user').config(['$stateProvider',
         url: '/invalid',
         templateUrl: 'modules/users/client/views/password/reset-password-invalid.client.view.html'
       })
+      .state('authentication.invalid', {
+        url: '/invalidemail',
+        templateUrl: 'modules/users/client/views/email-invalid.client.view.html'
+      })
       .state('password.reset.success', {
         url: '/success',
         templateUrl: 'modules/users/client/views/password/reset-password-success.client.view.html'
