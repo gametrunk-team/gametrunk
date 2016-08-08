@@ -4,6 +4,8 @@
 
 'use strict';
 
+/*globals $:false */
+
 angular.module('core')
 
     .factory('Deckster', function () {
@@ -43,7 +45,7 @@ angular.module('core')
 
                 this.addCard = function (card, callback) {
                     $scope.deckster.addCard(card, function (card) {
-                        callback && callback(card);
+                        if (callback) callback(card);
                     });
                 };
 
@@ -195,14 +197,14 @@ angular.module('core')
                 var getSummaryTemplate = function(cardConfig, cb) {
                     // Not using the cardConfig here but you could use it to make request
                     $http.get('partials/testSummaryCard.html').success(function(html) {
-                        cb && cb($compile(html)(scope));
+                        if (cb) cb($compile(html)(scope));
                     });
                 };
 
                 var getDetailsTemplate = function(cardConfig, cb) {
                     // Not using the cardConfig here but you could use it to make request
                     $http.get('partials/testDetailsCard.html').success(function (html) {
-                        cb && cb($compile(html)(scope));
+                        if (cb) cb($compile(html)(scope));
                     });
                 };
 

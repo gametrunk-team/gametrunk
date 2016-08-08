@@ -11,7 +11,7 @@ angular.module('core').controller('ProfileCardController', ['$scope', '$timeout'
         $scope.circuit = "Unknown";
 
         $http.get('/api/user').success(function (response) {
-            Circuit().then(function(result) {
+            new Circuit().then(function(result) {
                 $scope.circuit = result.circuit(response.rank);
                 $scope.displayRank = result.displayRank(response.rank);
             });

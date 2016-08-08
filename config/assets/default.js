@@ -26,7 +26,8 @@ module.exports = {
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
         'public/lib/angular-timeago/dist/angular-timeago.js',
         'https://www.google.com/recaptcha/api.js',
-        'public/lib/decksterjs/dist/jquery.deckster.js'
+        'public/lib/decksterjs/dist/jquery.deckster.js',
+        'public/lib/ng-lodash/build/ng-lodash.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
