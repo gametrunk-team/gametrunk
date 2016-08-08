@@ -34,16 +34,20 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
     var viewRankings = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request
-      $http.get('modules/core/client/views/cards/rankingsCard.client.view.html').success(function (html) {
-        if (cb) cb($compile(html)($scope));
-      });
+      if ($scope.authentication.user) {
+        $http.get('modules/core/client/views/cards/rankingsCard.client.view.html').success(function (html) {
+          if (cb) cb($compile(html)($scope));
+        });
+      }
     };
     
     var viewProfile = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request
-      $http.get('modules/core/client/views/cards/profile.client.view.html').success(function (html) {
-        if (cb) cb($compile(html)($scope));
-      });
+      if ($scope.authentication.user) {
+        $http.get('modules/core/client/views/cards/profile.client.view.html').success(function (html) {
+          if (cb) cb($compile(html)($scope));
+        });
+      }
     };
 
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
