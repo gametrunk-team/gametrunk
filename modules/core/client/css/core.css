@@ -160,3 +160,6 @@ body {
   height: 80px;
   /* Height of the footer */
   background: #cbcbcb; }
+
+.news {
+  font-family: "Times New Roman", Georgia, Serif; }

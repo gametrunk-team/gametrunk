@@ -46,6 +46,13 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       });
     };
 
+    var viewNews = function(cardConfig, cb) {
+      // Not using the cardConfig here but you could use it to make request
+      $http.get('modules/core/client/views/cards/news.client.view.html').success(function (html) {
+        cb && cb($compile(html)($scope));
+      });
+    };
+
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
     $scope.mainDeck.cards = [
       {
@@ -74,15 +81,15 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         }
       },
       {
-        title: 'Geospatial',
-        id: 'mapCard',
-        summaryContentHtml: getSummaryTemplate,
-        detailsContentHtml: getDetailsTemplate,
+        title: 'News Feed',
+        id: 'newsFeedCard',
+        summaryContentHtml: viewNews,
+        detailsContentHtml: viewNews,
         position: {
-          size_x: 1,
+          size_x: 2,
           size_y: 1,
-          col: 4,
-          row: 3
+          col: 2,
+          row: 1
         }
       },
       {
@@ -103,10 +110,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         summaryContentHtml: getSummaryTemplate,
         detailsContentHtml: getDetailsTemplate,
         position: {
-          size_x: 2,
+          size_x: 1,
           size_y: 1,
-          col: 2,
-          row: 1
+          col: 4,
+          row: 3
         }
       }
     ];
