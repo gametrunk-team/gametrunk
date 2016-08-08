@@ -4,9 +4,7 @@
 
 'use strict';
 
-angular.module('core').factory('Card', function ($http, Deckster) {
-        console.log("deckster factory");
-
+angular.module('core').factory('Card', function ($http, Deckster, DataManager, $filter, lodash) {
         var Card = function (cardData) {
             return this.setData(cardData);
         };
@@ -36,8 +34,8 @@ angular.module('core').factory('Card', function ($http, Deckster) {
             var loadData = function (data) {
                 var transformData = function (data) {
                     data = DataManager.transformDataForCard(data, cardType, cardOptions);
-                    setSeriesColors(card, data.series);
-                    callback && callback(data);
+                    // setSeriesColors(card, data.series);
+                    if (callback) callback(data);
                     card.hideSpinner();
                 };
 
@@ -123,16 +121,16 @@ angular.module('core').factory('Card', function ($http, Deckster) {
         // Used to title-ize values
         function titleFormatter (val, unformat) {
             if(unformat) {
-                return _.snakeCase(val);
+                return lodash.snakeCase(val);
             } else {
-                return _.startCase(val);
+                return lodash.startCase(val);
             }
         }
         
         // Used to title-ize values without removing symbolic characters (other than _)
         function titleKeepSymbolsFormatter (val) {
-            return _.map(_.words(val, /[^\s_]+/g), function(word){
-                return _.capitalize(word);
+            return lodash.map(lodash.words(val, /[^\s_]+/g), function(word){
+                return lodash.capitalize(word);
             }).join(' ');
         }
         
@@ -153,15 +151,15 @@ angular.module('core').factory('Card', function ($http, Deckster) {
             } else {
                 if (val && val.match(/.*,.*/g)) {
                     parts = val.split(',');
-                    return _.startCase([parts[1].trim(), parts[0].trim()].join(' '));
+                    return lodash.startCase([parts[1].trim(), parts[0].trim()].join(' '));
                 } else {
-                    return _.startCase(val);
+                    return lodash.startCase(val);
                 }
             }
         }
         
         function currencyFormatter(val, decimalPlaces) {
-            if(_.isFinite(val)) {
+            if(lodash.isFinite(val)) {
                 return $filter('currency')(val, '$', decimalPlaces || 0);
             } else {
                 return val;
@@ -170,13 +168,14 @@ angular.module('core').factory('Card', function ($http, Deckster) {
         
         // Used to format date values
         function dateFormatter (date, format) {
-            return moment(new Date(date)).format(format);
+            //return moment(new Date(date)).format(format);
+            return date; // TODO
         }
         
         Card.prototype.getDataFormatter = function (format) {
-            if (_.isEmpty(format)) {
+            if (lodash.isEmpty(format)) {
                 return Card.dataFormatter['default'];
-            } else if (_.isString(format)) {
+            } else if (lodash.isString(format)) {
                 return Card.dataFormatter[format];
             } else {
                 return Card.dataFormatter[format.type];

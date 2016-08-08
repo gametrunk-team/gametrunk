@@ -11,9 +11,10 @@ angular.module('core').controller('ProfileCardController', ['$scope', '$timeout'
         $scope.circuit = "Unknown";
 
         $http.get('/api/user').success(function (response) {
-            $scope.circuit = Circuit.circuit(response.rank);
-            $scope.displayRank = Circuit.displayRank(response.rank);
-
+            new Circuit().then(function(result) {
+                $scope.circuit = result.circuit(response.rank);
+                $scope.displayRank = result.displayRank(response.rank);
+            });
         }).error(function (response) {
             $scope.error = response.message;
         });

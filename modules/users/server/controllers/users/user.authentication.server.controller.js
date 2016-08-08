@@ -330,31 +330,56 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
                       newUser.provider = providerUserProfile.provider;
                       newUser.providerData = providerUserProfile.providerData;
 
-                      //Create the user
-                      User.create(newUser).then(function (user) {
-                        if (!user) {
-                          return done(false, user);
-                        } else {
-                          // Upload the profile image to cloudinary
-                          cloudinary.uploader.upload(providerUserProfile.providerData.image.url, function (result) {
-                            console.log(result);
-                          }, {public_id: user.dataValues.profileImageURL.split('.')[0]});
-
-                          //Login the user
-                          req.login(user, function (err) {
-                            if (err)
-                              return done(new Error(err), user);
-                            return done(false, user);
-                          });
+                      // Auto-assign rank
+                      User.count({
+                        where: {
+                            rank: {
+                                $not: null
+                            }
                         }
+                      }).then(function (count) {
+                            var newRank = count + 1;
+                            User.find({
+                              where: {
+                                rank: newRank
+                              }
+                            }).then(function (conflict) {
+
+                              if (conflict) {
+                                console.log("Conflict, setting rank as null");
+                                newUser.rank = null;
+                              } else {
+                                newUser.rank = newRank;
+                              }
+
+                              // Create the user
+                              User.create(newUser).then(function (user) {
+                                if (!user) {
+                                  return done(false, user);
+                                } else {
+                                  // Upload the profile image to cloudinary
+                                  cloudinary.uploader.upload(providerUserProfile.providerData.image.url, function (result) {
+                                    console.log(result);
+                                  }, {public_id: user.dataValues.profileImageURL.split('.')[0]});
+
+                                  //Login the user
+                                  req.login(user, function (err) {
+                                    if (err)
+                                      return done(new Error(err), user);
+                                    return done(false, user);
+                                  });
+                                }
+                              }).catch(function (err) {
+                                return done(false, err);
+                              });
+                            }).catch(function (err) {
+                              return done(false, err);
+                            });
                       }).catch(function (err) {
                         return done(false, err);
                       });
-
                     });
-
               });
-
             }
           }).catch(function (err) {
             return done(false, err);

@@ -1,10 +1,10 @@
 /**
- * Created by breed on 7/21/16.
+ * Created by breed on 8/5/16.
  */
 
 'use strict';
 
-angular.module('rankings').controller('RankingController', ['$scope', '$filter', 'Rankings', 'Circuit',
+angular.module('rankings').controller('RankingCardController', ['$scope', '$filter', 'Rankings', 'Circuit',
     function($scope, $filter, Rankings, Circuit) {
         $scope.world = [];
         $scope.major = [];

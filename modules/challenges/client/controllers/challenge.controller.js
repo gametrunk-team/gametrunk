@@ -17,6 +17,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.pastChallenges = [];
         $scope.upcomingChallenges = [];
 
+<<<<<<< HEAD
         $scope.initPage = function () {
             $scope.challenges = {};
             $scope.challengesToday = [];
@@ -30,11 +31,22 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 $scope.currRank = response.rank;
                 $scope.challengerId = response.id;
                 $scope.circuit = Circuit.circuit($scope.currRank);
+=======
+        $http.get('/api/user').success(function (response) {
+            // If successful show success message and clear form
+            $scope.success = true;
+            $scope.currRank = response.rank;
+            $scope.challengerId = response.id;
+
+            new Circuit().then(function(result) {
+                $scope.circuit = result.circuit($scope.currRank);
+>>>>>>> b2d35431dcae4899c9dd6bd157f84838bacd3977
 
                 $scope.model = {
                     opponentId: -1
                 };
 
+<<<<<<< HEAD
                 $scope.run = function () {
                     console.log($scope.opponent.model);
                 };
@@ -46,10 +58,22 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
                     } else if ($scope.circuit !== "World Circuit" && $scope.currRank % 10 === 1) {
                         $scope.message = "You are at the top of your circuit! Play the bottom player from the " + $scope.determineCircuit($scope.currRank - 10) + " to move up.";
+=======
+                $scope.run = function() {
+                };
+
+                Challenges.query(function(data) {
+                    $scope.users = data;
+                    if ($scope.circuit === "World Circuit" && $scope.users.length < 1) {
+                        $scope.message = "Looks like you are in position #1! Wait until someone else challenges you.";
+                    } else if ($scope.circuit !== "World Circuit" && $scope.currRank % result.cSize === 1) {
+                        $scope.message = "You are at the top of your circuit! Play the bottom player from the " + result.circuit($scope.currRank - result.cSize) + " to move up.";
+>>>>>>> b2d35431dcae4899c9dd6bd157f84838bacd3977
                     } else if ($scope.users.length < 1) {
                         $scope.message = "Looks like you don't have anyone to challenge.";
                     }
                 });
+<<<<<<< HEAD
                 $scope.getChallenges();
                 console.log("getting the user!!!");
 
@@ -80,6 +104,8 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         return challengeId;
                     }
                 }
+=======
+>>>>>>> b2d35431dcae4899c9dd6bd157f84838bacd3977
             });
 
             modal.result.then(function(){
@@ -108,9 +134,13 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             });
         };
 
+<<<<<<< HEAD
         $scope.createChallengeModal = function () {
             console.log("making the cancel modal");
             console.log($scope.challengeId);
+=======
+        $scope.emailModal = function () {
+>>>>>>> b2d35431dcae4899c9dd6bd157f84838bacd3977
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html', // todo
                 controller: 'ChallengeController', // todo
@@ -145,7 +175,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     $scope.error = response.message;
                 });
 
-            console.log("sending challenge email");
             $http.post('/api/emails/challengeCreated', challengObj);
 
             $scope.$close(true);
@@ -155,6 +184,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.getChallenges = function() {
+<<<<<<< HEAD
             console.log("challenger Id: " + $scope.challengerId);
             var params = {
                 userId: $scope.challengerId
@@ -218,6 +248,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                     console.log("adding challenge to upcoming: " + value);
                     $scope.upcomingChallenges.push(value);
                 }
+=======
+            $http.get('/api/challenge/getall').success(function(response) {
+>>>>>>> b2d35431dcae4899c9dd6bd157f84838bacd3977
             });
             console.log("the final count" + $scope.challenges);
         };

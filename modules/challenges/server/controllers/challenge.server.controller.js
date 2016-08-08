@@ -164,7 +164,6 @@ exports.updateChallenge = function(req, res) {
             where: { id : req.body.id }
         })
         .then(function (result) {
-            console.log("UPDATING: ", updatedChallenge);
             res.status(200).send();
         }, function(err){
             res.status(400).send({
