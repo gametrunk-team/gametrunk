@@ -7,8 +7,13 @@ var
     path = require('path'),
     db = require(path.resolve('./config/lib/sequelize')).models,
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    emails = require(path.resolve('./modules/emails/server/controllers/email.server.controller')),
+    rankings = require(path.resolve('./modules/rankings/server/controllers/rankings.server.controller')),
     Sequelize = require('sequelize'),
-    Challenge = db.challenge;
+    sequelizeFile = require(path.resolve('./config/lib/sequelize.js')),
+    sequelize = sequelizeFile.sequelize,
+    Challenge = db.challenge,
+    User = db.user;
 
 /*
 Create Challenge
@@ -101,6 +106,76 @@ exports.getAllChallenges = function(req, res) {
     }).catch(function(err) {
         res.jsonp(err);
     });
+};
+
+/*
+  Respond to challenge from Email
+ */
+exports.respondToChallenge = function(req, res) {
+
+    var challengerName = null;
+    var query = null;
+    var accept = req.query.accept;
+
+    if(req.isAuthenticated() && req.query.id && req.query.userid) {
+
+        var correctUser = (req.query.userid === req.user.id);
+
+        if(correctUser) {
+            
+            req.body.accept = accept;
+
+            Challenge.findById(req.query.id).then(function (challenge) {
+
+                req.body.challengeObj = challenge;
+
+                User.findById(challenge.challengerUserId).then(function (user) {
+
+                    var challengerName = user.firstName;
+                    
+                    if(accept)
+                        query = "UPDATE challenges SET accepted = true WHERE id = " + req.query.id;
+                    else
+                        query = "UPDATE challenges SET (accepted, winnerUserId) = (false, " + challenge.challengerUserId + ") WHERE id = " + req.query.id;
+
+                        sequelize.query(query).then(function (response) {
+                            
+                            req.body.challenger = challenge.challengerUserId;
+                            req.body.challengee = challenge.challengeeUserId;
+                            
+                            rankings.updateRanking(req, res);
+
+                            emails.sendChallengeResponseNotification(req, res);
+
+                            res.render(path.resolve('./modules/challenges/server/views/acceptChallenge'), {
+                                challenge: req.query.id,
+                                challengerName: challengerName,
+                                accept: accept,
+                                correctUser: correctUser
+                            });
+
+                        }).error(function (err) {
+
+                            console.log(err);
+
+                        });
+                });
+            });
+        } else {
+
+            res.render(path.resolve('./modules/challenges/server/views/acceptChallenge'), {
+                challenge: req.query.id,
+                challengerName: challengerName,
+                correctUser: correctUser
+            });
+            
+        }
+
+    } else {
+
+        res.redirect('/api/auth/google');
+
+    }
 };
 
 /*

@@ -10,11 +10,9 @@ var path = require('path'),
 
 var smtpTransport = nodemailer.createTransport(config.mailer.options);
 
-
 exports.properties = function(req, res, next) {
   res.json(properties.getAllProperties());
 };
-
 
 /**
  * Render the main application page
