@@ -8,6 +8,7 @@ var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
     User = db.user,
+    Challenge = db.challenge,
     _ = require('lodash');
 
 const http = require('http');
@@ -255,7 +256,7 @@ exports.drUsers = function(req, res) {
             if (parsed.ip === drIp) {
                 User.findAll({
                     order: [
-                        ['rank', 'ASC']
+                        ['lastName', 'ASC']
                     ]
                 }).then(function (users) {
                     if (!users) {
@@ -272,5 +273,43 @@ exports.drUsers = function(req, res) {
                 res.jsonp("IP address does not match display room");
             }
         });
+    })
+};
+
+exports.drChallenges = function(req, res) {
+    console.log("drChallenges");
+    http.get({
+        host: 'ipinfo.io',
+        path: '/'
+    }, function(result) {
+        var body = '';
+        result.on('data', function(d) {
+            body += d;
+        });
+        result.on('end', function() {
+            var parsed = JSON.parse(body);
+            if (parsed.ip === drIp) {
+                Challenge.findAll({
+                    // order: [
+                    //     ['rank', 'ASC']
+                    // ]
+                }).then(function(challenges) {
+                    if (!challenges) {
+                        console.log("no users");
+                        return res.status(400).send({
+                            message: 'Unable to get list of users'
+                        });
+                    } else {
+                        res.json(challenges);
+                    }
+                }).catch(function(err) {
+                    res.jsonp(err);
+                });
+            } else {
+                res.jsonp("IP address does not match display room");
+            }
+
+        });
+
     })
 };

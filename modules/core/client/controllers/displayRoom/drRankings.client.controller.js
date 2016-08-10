@@ -2,7 +2,7 @@
  * Created by breed on 8/10/16.
  */
 
-angular.module('rankings').controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit',
+angular.module('core').controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit',
     function($scope, $filter, DrRankings, Circuit) {
         $scope.world = [];
         $scope.major = [];

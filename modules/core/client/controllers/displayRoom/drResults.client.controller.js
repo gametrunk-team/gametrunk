@@ -4,8 +4,8 @@
 
 'use strict';
 
-angular.module('core').controller('DisplayRoomController', ['$scope', '$http',
-    function($scope, $http) {
+angular.module('core').controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults',
+    function($scope, $http, $uibModal, DrResults) {
         $scope.selectedTime = 'Now';
         $scope.message = "";
 
@@ -18,15 +18,6 @@ angular.module('core').controller('DisplayRoomController', ['$scope', '$http',
         $scope.challengesToday = [];
         $scope.pastChallenges = [];
         $scope.upcomingChallenges = [];
-
-        $scope.initPage = function () {
-            $scope.challenges = {};
-            $scope.challengesToday = [];
-            $scope.pastChallenges = [];
-            $scope.upcomingChallenges = [];
-        };
-
-        $scope.initPage();
 
         $scope.editModal = function (challengeeUser, challengerUser, challengeId) {
             console.log("making the edit modal");
@@ -76,49 +67,19 @@ angular.module('core').controller('DisplayRoomController', ['$scope', '$http',
         };
 
         $scope.createChallengeModal = function () {
-            console.log("making the cancel modal");
-            console.log($scope.challengeId);
             var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html', // todo
-                controller: 'ChallengeController', // todo
+                templateUrl: 'modules/core/client/views/displayRoom/drCreate.client.view.html', // todo
+                controller: 'DrCreateController', // todo
                 scope: $scope,
-                backdrop: false,
+                size: 'lg',
                 windowClass: 'app-modal-window'
             });
 
             modal.result.then(function(){
+                console.log("modal result");
                 $scope.initPage();
             });
         };
-
-        $scope.createChallenge = function() {
-            if($scope.model.opponentId === -1){
-                return;
-            }
-            $scope.challengeeId = $scope.model.opponentId;
-
-            var challengObj = {
-                scheduledTime: $scope.dt,
-                challengerUserId: $scope.challengerId,
-                challengeeUserId: $scope.model.opponentId,
-                winnerUserId: null
-            };
-
-            $http.post('/api/challenge/create', challengObj)
-                .success(function (response) {
-                    $scope.challengeId = response.id;
-                })
-                .error(function (response) {
-                    $scope.error = response.message;
-                });
-
-            $http.post('/api/emails/challengeCreated', challengObj);
-
-            $scope.$close(true);
-            // Display a success toast, with a title
-            toastr.success('Challenge created','Success');
-        };
-
 
         $scope.getChallenges = function() {
             console.log("challenger Id: " + $scope.challengerId);
@@ -126,9 +87,10 @@ angular.module('core').controller('DisplayRoomController', ['$scope', '$http',
                 userId: $scope.challengerId
             };
 
-            $http.post('/api/challenge/mychallenges', params).success(function(response) {
+            DrResults.query(function(response) {
+                console.log("querying dr results");
                 $scope.challenges = response;
-                angular.forEach($scope.challenges,function(value,index){
+                angular.forEach($scope.challenges, function(value, index) {
 
                     $http.post('/api/user/getUserById', { userId: value.challengerUserId })
                         .success(function (data) {
@@ -140,10 +102,20 @@ angular.module('core').controller('DisplayRoomController', ['$scope', '$http',
                             value.challengeeUser = data;
                         });
                 });
+                console.log("$scope.challenges", $scope.challenges);
                 $scope.filterChallenges();
             });
-
         };
+
+        $scope.initPage = function () {
+            $scope.challenges = {};
+            $scope.challengesToday = [];
+            $scope.pastChallenges = [];
+            $scope.upcomingChallenges = [];
+            $scope.getChallenges();
+        };
+
+        $scope.initPage();
 
         $scope.deleteChallenge = function(challengeId) {
             console.log($scope);
@@ -171,6 +143,8 @@ angular.module('core').controller('DisplayRoomController', ['$scope', '$http',
             var maxTimeToday = new Date();
             maxTimeToday.setHours(23);
             maxTimeToday.setMinutes(59);
+
+            console.log($scope.challenges);
 
             angular.forEach($scope.challenges,function(value,index){
                 var scheduledDate = new Date(value.scheduledTime);

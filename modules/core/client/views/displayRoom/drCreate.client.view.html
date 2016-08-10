@@ -1,0 +1,44 @@
+<section ng-controller="DrCreateController">
+
+  <style>
+    .sel {
+      background-color: cornflowerblue;
+    }
+  </style>
+
+  <!--<p>Hello world! Check out these rankings</p>-->
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Select the Players</h1>
+      </div>
+      <div class="col-md-4" style="margin-top: 2em">
+        <input class="form-control col-md-3" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
+      </div>
+      <td class="form-group col-md-4" show-errors>
+        <input ng-show="creatable" class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge"/>
+      </td>
+    </div>
+  </div>
+  <div>
+    <a ng-repeat="user in pagedItems"  class="list-group-item row" ng-class="{sel: isSelected(user.id)}" ng-click="addPlayer(user);">
+      <!--<a ng-repeat="user in pagedItems"  class="list-group-item row" ng-class="{sel: selected === user.id}" ng-click="addPlayer(user.id); selected = user.id;">-->
+      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+        <span class="col-sm-1">
+           <span ng-if="user.profileImageURL">
+             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+          </span>
+
+          <span ng-if="!user.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+          </span>
+        </span>
+        <span class="col-sm-8" style="margin:auto">
+          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName"  style="margin:auto"></h4>
+          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+        </span>
+      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+    </a>
+  </div>
+  <pagination boundary-links="true" max-size="8" items-per-page="itemsPerPage" total-items="filterLength" ng-model="currentPage" ng-change="pageChanged()"></pagination>
+</section>

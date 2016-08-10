@@ -24,6 +24,7 @@ module.exports = function(app) {
     
     // Display room route (only return data if ip matches)
     app.route('/api/rankings/drRankings').get(rankings.drRankings);
+    app.route('/api/rankings/drResults').get(rankings.drChallenges);
     app.route('/api/rankings/drUsers').get(rankings.drUsers);
 
     app.param('userId', rankings.userByID);

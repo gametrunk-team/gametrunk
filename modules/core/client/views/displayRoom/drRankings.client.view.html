@@ -55,7 +55,7 @@
   </div>
   <h2 ng-show="minor.length > 0">Minor Circuit</h2>
   <div class="list-group container">
-    <a ng-repeat="user in minor | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+    <a ng-repeat="user in minor | orderBy:'rank'" class="list-group-item row">
       <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
       <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
         <span class="col-sm-1">
