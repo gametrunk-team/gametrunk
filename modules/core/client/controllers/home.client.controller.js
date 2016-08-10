@@ -1,7 +1,9 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout', 'Card', '$rootScope',
-  function($scope, Authentication, $http, $compile, $timeout, Card, $rootScope) {
+/*globals $:false */
+
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout',
+  function($scope, Authentication, $http, $compile, $timeout) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
     // says when it's okay to render the deck
@@ -16,7 +18,18 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         responsive_breakpoint: 850
       }
     };
-
+    
+    $http.get('/api/props').success(function (props) {
+      console.log("getting props", props);
+      $.get("http://ipinfo.io", function(response) {
+        console.log("getting ip", response);
+        if (props.adminIp === response.ip) {
+          console.log("equal");
+          $scope.displayRoom = true;
+        }
+      }, "jsonp");
+    });
+    
     // examples Of how you can fetch content for cards
     var getSummaryTemplate = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request

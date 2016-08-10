@@ -1,6 +1,16 @@
 <section ng-controller="HomeController">
   <body>
-  <div ng-hide="authentication.user" class="jumbotron text-center">
+  <div ng-show="displayRoom">
+    <uib-tabset active="active">
+        <uib-tab heading="View Rankings">
+          <rankings-display></rankings-display>
+        </uib-tab>
+        <uib-tab heading="Add Results">
+          <add-results></add-results>
+        </uib-tab>
+      </uib-tabset>
+  </div>
+  <div ng-hide="authentication.user || displayRoom" class="jumbotron text-center">
     <div>
       <div class="row">
         <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3 col-xs-12">
@@ -14,6 +24,6 @@
       </div>
     </div>
   </div>
-  <deckster-deck ng-show="authentication.user" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
+  <deckster-deck ng-show="authentication.user && !displayRoom" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
   </body>
 </section>

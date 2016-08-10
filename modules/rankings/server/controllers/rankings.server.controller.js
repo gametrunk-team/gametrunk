@@ -10,9 +10,12 @@ var path = require('path'),
     User = db.user,
     _ = require('lodash');
 
+const http = require('http');
+
 var PropertiesReader = require('properties-reader');
 var properties = new PropertiesReader('./config/properties.ini');
 var cSize = properties.get('circuitSize') ? properties.get('circuitSize') : 10;
+var drIp = properties.get('adminIp') ? properties.get('adminIp') : null;
 
 exports.read = function(req, res) {
     res.json(req.model);
@@ -182,6 +185,92 @@ exports.updateRanking = function(req, res) {
             });
         });
     });
+};
 
+// Sends rankings to the display room
+exports.drRankings = function(req, res) {
+    http.get({
+        host: 'ipinfo.io',
+        path: '/'
+    }, function(result) {
+        var body = '';
+        result.on('data', function(d) {
+            body += d;
+        });
+        result.on('end', function() {
+            var parsed = JSON.parse(body);
+            if (parsed.ip === drIp) {
+                User.findAll({
+                    order: [
+                        ['rank', 'ASC']
+                    ]
+                }).then(function(users) {
+                    if (!users) {
+                        console.log("no users");
+                        return res.status(400).send({
+                            message: 'Unable to get list of users'
+                        });
+                    } else {
+                        // Define display rank
+                        users = _.map(users, function(user) {
+                            if (user.dataValues.rank === null) {
+                                user.dataValues.displayRank = "Un";
+                            } else if (user.dataValues.rank < cSize + 1) {
+                                user.dataValues.displayRank = user.dataValues.rank;
+                            } else if (user.dataValues.rank < 2*cSize + 1) {
+                                user.dataValues.displayRank = user.dataValues.rank - cSize;
+                            } else if (user.dataValues.rank < 3*cSize + 1) {
+                                user.dataValues.displayRank = user.dataValues.rank - 2*cSize;
+                            } else {
+                                user.dataValues.displayRank = "Un";
+                            }
+                            return user;
+                        });
+                        res.json(users);
+                    }
+                }).catch(function(err) {
+                    res.jsonp(err);
+                });
+            } else {
+                res.jsonp("IP address does not match display room");
+            }
 
+        });
+
+    })
+};
+
+exports.drUsers = function(req, res) {
+    console.log("getting drUsers");
+    http.get({
+        host: 'ipinfo.io',
+        path: '/'
+    }, function(result) {
+        var body = '';
+        result.on('data', function(d) {
+            body += d;
+        });
+        result.on('end', function() {
+            var parsed = JSON.parse(body);
+            if (parsed.ip === drIp) {
+                User.findAll({
+                    order: [
+                        ['rank', 'ASC']
+                    ]
+                }).then(function (users) {
+                    if (!users) {
+                        return res.status(400).send({
+                            message: 'Unable to get list of users'
+                        });
+                    } else {
+                        res.json(users);
+                    }
+                }).catch(function (err) {
+                    res.jsonp(err);
+                });
+            } else {
+                res.jsonp("IP address does not match display room");
+            }
+        });
+    })
 };
