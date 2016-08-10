@@ -1,5 +1,5 @@
 {% extends '../../../core/server/views/layout.server.view.html' %} {% block content %}
-<section ng-show="correctUser && accept">
+<section ng-show="correctUser && (accept === 'true')">
 <h1>Challenge Accepted</h1>
 <div class="alert alert-success" role="alert">
   <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
@@ -17,7 +17,7 @@
   </div>
 </section>
 
-<section ng-show="correctUser && !accept">
+<section ng-show="correctUser && (accept === 'false')">
   <h1>Challenge Declined</h1>
   <div class="alert alert-success" role="alert">
     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>

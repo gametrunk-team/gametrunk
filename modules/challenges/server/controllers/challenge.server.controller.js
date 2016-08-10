@@ -119,7 +119,7 @@ exports.respondToChallenge = function(req, res) {
 
     if(req.isAuthenticated() && req.query.id && req.query.userid) {
 
-        var correctUser = (req.query.userid === req.user.id);
+        var correctUser = (String.parseInt(req.query.userid) === req.user.id);
 
         if(correctUser) {
             
@@ -133,9 +133,9 @@ exports.respondToChallenge = function(req, res) {
 
                     var challengerName = user.firstName;
                     
-                    if(accept)
+                    if(accept === 'true')
                         query = "UPDATE challenges SET accepted = true WHERE id = " + req.query.id;
-                    else
+                    else if(accept === 'false')
                         query = "UPDATE challenges SET (accepted, winnerUserId) = (false, " + challenge.challengerUserId + ") WHERE id = " + req.query.id;
 
                         sequelize.query(query).then(function (response) {
