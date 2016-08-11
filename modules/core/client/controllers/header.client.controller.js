@@ -1,5 +1,7 @@
 'use strict';
 
+/*globals $:false */
+
 angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window', '$http',
   function($rootScope, $scope, $location, $state, Authentication, Menus, $window, $http) {
     $http.get('/api/props').success(function (props) {
