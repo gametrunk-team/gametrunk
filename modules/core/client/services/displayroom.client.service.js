@@ -2,6 +2,8 @@
  * Created by breed on 8/10/16.
  */
 
+'use strict';
+
 angular.module('core').factory('DrRankings', ['$resource',
     function($resource) {
         return $resource('api/rankings/drRankings', {

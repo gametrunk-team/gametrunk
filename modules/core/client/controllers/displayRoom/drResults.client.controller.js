@@ -20,7 +20,6 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
         $scope.upcomingChallenges = [];
 
         $scope.editModal = function (challengeeUser, challengerUser, challengeId) {
-            console.log("making the edit modal");
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html', // todo
                 controller: 'ResultController', // todo
@@ -46,8 +45,6 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
         };
 
         $scope.cancelModal = function (challengeId) {
-            console.log("making the cancel modal");
-            console.log($scope.challengeId);
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
                 controller: 'DeleteController', // todo
@@ -76,19 +73,16 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             });
 
             modal.result.then(function(){
-                console.log("modal result");
                 $scope.initPage();
             });
         };
 
         $scope.getChallenges = function() {
-            console.log("challenger Id: " + $scope.challengerId);
             var params = {
                 userId: $scope.challengerId
             };
 
             DrResults.query(function(response) {
-                console.log("querying dr results");
                 $scope.challenges = response;
                 angular.forEach($scope.challenges, function(value, index) {
 
@@ -102,7 +96,6 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
                             value.challengeeUser = data;
                         });
                 });
-                console.log("$scope.challenges", $scope.challenges);
                 $scope.filterChallenges();
             });
         };
@@ -118,14 +111,11 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
         $scope.initPage();
 
         $scope.deleteChallenge = function(challengeId) {
-            console.log($scope);
             var params = {
                 id: challengeId
             };
-            console.log("deleting challenge with id " + $scope.challengeId);
             $http.post('/api/challenge/delete', params)
                 .success(function (data) {
-                    console.log("success");
                 });
             $scope.$dismiss();
         };
@@ -144,22 +134,16 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             maxTimeToday.setHours(23);
             maxTimeToday.setMinutes(59);
 
-            console.log($scope.challenges);
-
             angular.forEach($scope.challenges,function(value,index){
                 var scheduledDate = new Date(value.scheduledTime);
                 if(scheduledDate>minTimeToday && scheduledDate<maxTimeToday) {
-                    console.log("adding challenge to today: " + value);
                     $scope.challengesToday.push(value);
                 } else if(scheduledDate<minTimeToday) {
-                    console.log("adding challenge to past challenges: " + value);
                     $scope.pastChallenges.push(value);
                 } else if(scheduledDate>maxTimeToday) {
-                    console.log("adding challenge to upcoming: " + value);
                     $scope.upcomingChallenges.push(value);
                 }
             });
-            console.log("the final count" + $scope.challenges);
         };
 
         // TODO: would probably be good to break the modal logic below out into its own controller

@@ -20,11 +20,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     };
     
     $http.get('/api/props').success(function (props) {
-      console.log("getting props", props);
       $.get("http://ipinfo.io", function(response) {
-        console.log("getting ip", response);
         if (props.adminIp === response.ip) {
-          console.log("equal");
           $scope.displayRoom = true;
         }
       }, "jsonp");

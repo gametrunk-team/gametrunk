@@ -23,7 +23,7 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
             // Update challenge
             var challengObj = {
                 id: $scope.challengeId,
-                winnerUserId: $scope.challengerId
+                winnerUserId: $scope.challengerUser.id
             };
             $http.post('/api/challenge/update', challengObj).error(function (response) {
                 $scope.error = response.message;

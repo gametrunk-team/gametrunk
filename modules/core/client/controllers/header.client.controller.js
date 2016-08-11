@@ -1,7 +1,15 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window',
-  function($rootScope, $scope, $location, $state, Authentication, Menus, $window) {
+angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window', '$http',
+  function($rootScope, $scope, $location, $state, Authentication, Menus, $window, $http) {
+    $http.get('/api/props').success(function (props) {
+      $.get("http://ipinfo.io", function(response) {
+        if (props.adminIp === response.ip) {
+          $scope.displayRoom = true;
+        }
+      }, "jsonp");
+    });
+    
     // Expose view variables
     $scope.$state = $state;
     $scope.authentication = Authentication;

@@ -7,7 +7,7 @@
 angular.module('core').directive('addResults', function() {
     return {
         restrict: 'E',
-        templateUrl: '/modules/core/client/views/addResults.client.view.html',
+        templateUrl: '/modules/core/client/views/displayRoom/drResults.client.view.html',
         controller: 'DrResultsController'
     };
 });

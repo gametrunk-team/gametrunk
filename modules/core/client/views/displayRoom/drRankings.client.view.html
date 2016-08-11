@@ -1,4 +1,4 @@
-<section ng-controller="DrRankingController" class="container">
+<section ng-controller="DrRankingController">
 
   <!--<p>Hello world! Check out these rankings</p>-->
   <div class="page-header">
@@ -11,75 +11,84 @@
       </div>
     </div>
   </div>
-  <h2 ng-show="world.length > 0">World Circuit</h2>
-  <div class="list-group container">
-    <a ng-repeat="user in world | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
-      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
-      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
-        <span class="col-sm-1">
-           <span ng-if="user.profileImageURL">
-             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
-          </span>
 
-          <span ng-if="!user.profileImageURL">
-            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
-          </span>
-        </span>
-        <span class="col-sm-9" style="margin:auto">
-          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
-          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
-        </span>
-      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
-    </a>
-  </div>
-  <h2 ng-show="major.length > 0">Major Circuit</h2>
-  <div class="list-group container">
-    <a ng-repeat="user in major | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
-      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
-      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
-        <span class="col-sm-1">
-           <span ng-if="user.profileImageURL">
-             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
-          </span>
+  <div class="row">
+    <div class="col-md-4">
+      <h2 ng-show="world.length > 0">World Circuit</h2>
+      <div class="list-group">
+        <a ng-repeat="user in world | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+          <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+          <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+          <span class="col-sm-2">
+            <span ng-if="user.profileImageURL">
+              <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+            </span>
 
-          <span ng-if="!user.profileImageURL">
-            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
-          </span>
-        </span>
-        <span class="col-sm-9" style="margin:auto">
-          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
-          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
-        </span>
-      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
-    </a>
-  </div>
-  <h2 ng-show="minor.length > 0">Minor Circuit</h2>
-  <div class="list-group container">
-    <a ng-repeat="user in minor | orderBy:'rank'" class="list-group-item row">
-      <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
-      <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
-        <span class="col-sm-1">
-           <span ng-if="user.profileImageURL">
-             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
-          </span>
+            <span ng-if="!user.profileImageURL">
+              <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+            </span>
+            </span>
+            <span class="col-sm-9" style="margin:auto">
+              <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+              <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+            </span>
+          <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+        </a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <h2 ng-show="major.length > 0">Major Circuit</h2>
+      <div class="list-group">
+        <a ng-repeat="user in major | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
+          <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+          <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+            <span class="col-sm-2">
+               <span ng-if="user.profileImageURL">
+                 <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+              </span>
 
-          <span ng-if="!user.profileImageURL">
-            <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+              <span ng-if="!user.profileImageURL">
+                <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+              </span>
+            </span>
+            <span class="col-sm-9" style="margin:auto">
+              <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+              <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+            </span>
+          <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+        </a>
+      </div>
+    </div>
+    <div class="col-md-4">
+    <h2 ng-show="minor.length > 0">Minor Circuit</h2>
+    <div class="list-group">
+      <a ng-repeat="user in minor | orderBy:'rank'" class="list-group-item row">
+        <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
+        <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
+          <span class="col-sm-2">
+             <span ng-if="user.profileImageURL">
+               <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
+            </span>
+
+            <span ng-if="!user.profileImageURL">
+              <img ng-src="/modules/core/client/img/brand/favicon.png" class= "img-circle" alt="{{user.displayName}}" width="75px"/>
+            </span>
           </span>
-        </span>
-        <span class="col-sm-9" style="margin:auto">
-          <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
-          <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
-        </span>
-      <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
-    </a>
+          <span class="col-sm-9" style="margin:auto">
+            <h4 class="list-group-item-text col-sm-4" ng-bind="user.displayName" style="margin:auto"></h4>
+            <p class="list-group-item-text" ng-bind="user.email" style="margin:auto"></p>
+          </span>
+        <!--<p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>-->
+      </a>
+    </div>
   </div>
+  </div>
+  <div class="list-group container">
   <h2 ng-show="mosh.length > 0">Mosh Pit</h2>
-  <div class="list-group container">
     <a ng-repeat="user in mosh | orderBy:'rank'" ui-sref="rankings.user({userId: user.id})" class="list-group-item row">
       <!--<a ng-repeat="user in pagedItems | orderBy:'rank'" class="list-group-item row">-->
       <span class="col-sm-1"><h1 ng-bind="user.displayRank"></h1></span>
-        <span class="col-sm-1">
+        <span class="col-sm-2">
            <span ng-if="user.profileImageURL">
              <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_75,h_75,c_fill/{{user.profileImageURL}}' alt='{{user.displayName}}'/>
           </span>

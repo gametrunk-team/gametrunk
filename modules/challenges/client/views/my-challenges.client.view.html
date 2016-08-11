@@ -1,8 +1,11 @@
 <section ng-controller="ChallengeController">
-  <div class="list-group-item row">
-  <h2><span class="col-md-3 label label-default">Today's Challenges</span></h2>
-  <div class="pull-right"><a class="btn btn-default btn-lg" ui-sref-active="active" ng-click="createChallengeModal()">Create a Challenge</a></div>
+  <div class="row" style="padding-top:15px; padding-bottom:10px">
+    <h2 style="display:inline"><span class="label label-default" >Today's Challenges</span></h2>
+    <div class="pull-right"><a class="btn btn-primary btn-lg" ui-sref-active="active" ng-click="createChallengeModal()" style="display:inline">Create a Challenge</a></div>
   </div>
+
+  <div ng-hide="challengesToday.length > 0" class="list-group-item row"><h5>No challenges today! Click Create a Challenge to add one!</h5></div>
+
     <div class="list-group-item row center" ng-repeat="challenge in challengesToday">
     <div class="col-sm-8">
     <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
@@ -39,7 +42,7 @@
     </div>
   </div>
 
-  <h2><span class="label label-default">Upcoming Challenges</span></h2>
+  <h2><span class="label label-default" ng-show="upcomingChallenges.length > 0">Upcoming Challenges</span></h2>
   <div class="list-group-item row center" ng-repeat="challenge in upcomingChallenges">
     <div class="col-sm-8">
       <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
@@ -76,7 +79,7 @@
     </div>
   </div>
 
-  <h2><span class="label label-default">Past Challenges</span></h2>
+  <h2><span class="label label-default" ng-show="pastChallenges.length > 0">Past Challenges</span></h2>
   <div class="list-group-item row center" ng-repeat="challenge in pastChallenges">
     <div class="col-sm-8">
       <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>

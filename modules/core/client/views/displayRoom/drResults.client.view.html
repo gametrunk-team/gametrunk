@@ -1,1 +1,118 @@
+<section ng-controller="DrResultsController">
+  <div class="row" style="padding-top:15px; padding-bottom:10px">
+    <h2 style="display:inline"><span class="label label-default" >Today's Challenges</span></h2>
+    <div class="pull-right"><a class="btn btn-primary btn-lg" ui-sref-active="active" ng-click="createChallengeModal()" style="display:inline">Create a Challenge</a></div>
+  </div>
 
+  <div ng-hide="challengesToday.length > 0" class="list-group-item row"><h5>No challenges today! Click Create a Challenge to add one!</h5></div>
+
+  <div class="list-group-item row center" ng-repeat="challenge in challengesToday">
+    <div class="col-sm-8">
+      <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
+      {{challenge.scheduledTime | date:'dd.MM.y' }}
+    </div>
+    <div class="col-sm-4">
+      <div class="row">
+        <div class="col-md-3 text-center thumbnail">
+          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <div ng-if="challenge.challengerUser.profileImageURL">
+            <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
+          </div>
+          <div ng-if="!challenge.challengerUser.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengerUser.displayName}}" width="50px"/>
+          </div>
+          <p>{{challenge.challengerUser.firstName}}</p>
+        </div>
+        <h3 class="col-md-3 text-center vcenter">vs</h3>
+        <div class="col-md-3 text-center thumbnail">
+          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <div ng-if="challenge.challengeeUser.profileImageURL">
+            <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
+          </div>
+          <div ng-if="!challenge.challengeeUser.profileImageURL">
+            <img ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengeeUser.displayName}}" width="50px"/>
+          </div>
+          <p>{{challenge.challengeeUser.firstName}}</p>
+        </div>
+        <div class="col-md-3 text-center" ng-if="challenge.winnerUserId===null">
+          <div class="btn btn-default glyphicon glyphicon-pencil btn-space" ng-click="editModal(challenge.challengeeUser,challenge.challengerUser, challenge.id)"></div>
+          <div class="btn btn-default glyphicon glyphicon-trash" ng-click="cancelModal(challenge.id)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2><span class="label label-default" ng-show="upcomingChallenges.length > 0">Upcoming Challenges</span></h2>
+  <div class="list-group-item row center" ng-repeat="challenge in upcomingChallenges">
+    <div class="col-sm-8">
+      <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
+      {{challenge.scheduledTime | date:'dd.MM.y' }}
+    </div>
+    <div class="col-sm-4">
+      <div class="row">
+        <div class="col-md-3 text-center thumbnail">
+          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <div ng-if="challenge.challengerUser.profileImageURL">
+            <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
+          </div>
+          <div ng-if="!challenge.challengerUser.profileImageURL">
+            <img class="img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengerUser.displayName}}" width="50px"/>
+          </div>
+          <p>{{challenge.challengerUser.firstName}}</p>
+        </div>
+        <h3 class="col-md-3 text-center vcenter">vs</h3>
+        <div class="col-md-3 text-center thumbnail">
+          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <div ng-if="challenge.challengeeUser.profileImageURL">
+            <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
+          </div>
+          <div ng-if="!challenge.challengeeUser.profileImageURL">
+            <img class="img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengeeUser.displayName}}" width="50px"/>
+          </div>
+          <p>{{challenge.challengeeUser.firstName}}</p>
+        </div>
+        <div class="col-md-3 text-center" ng-if="challenge.winnerUserId===null">
+          <div class="btn btn-default glyphicon glyphicon-pencil btn-space" ng-click="editModal(challenge.challengeeUser,challenge.challengerUser, challenge.id)"></div>
+          <div class="btn btn-default glyphicon glyphicon-trash" ng-click="cancelModal(challenge.id)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2><span class="label label-default" ng-show="pastChallenges.length > 0">Past Challenges</span></h2>
+  <div class="list-group-item row center" ng-repeat="challenge in pastChallenges">
+    <div class="col-sm-8">
+      <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
+      {{challenge.scheduledTime | date:'dd.MM.y' }}
+    </div>
+    <div class="col-sm-4">
+      <div class="row">
+        <div class="col-md-3 text-center thumbnail">
+          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <div ng-if="challenge.challengerUser.profileImageURL">
+            <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
+          </div>
+          <div ng-if="!challenge.challengerUser.profileImageURL">
+            <img class="img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengerUser.displayName}}" width="50px"/>
+          </div>
+          <p>{{challenge.challengerUser.firstName}}</p>
+        </div>
+        <h3 class="col-md-3 text-center vcenter">vs</h3>
+        <div class="col-md-3 text-center thumbnail">
+          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <div ng-if="challenge.challengeeUser.profileImageURL">
+            <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
+          </div>
+          <div ng-if="!challenge.challengeeUser.profileImageURL">
+            <img class="img-circle" ng-src="/modules/core/client/img/brand/favicon.png" alt="{{challenge.challengeeUser.displayName}}" width="50px"/>
+          </div>
+          <p>{{challenge.challengeeUser.firstName}}</p>
+        </div>
+        <div class="col-md-3 text-center" ng-if="challenge.winnerUserId===null">
+          <div class="btn btn-default glyphicon glyphicon-pencil btn-space" ng-click="editModal(challenge.challengeeUser,challenge.challengerUser, challenge.id)"></div>
+          <div class="btn btn-default glyphicon glyphicon-trash" ng-click="cancelModal(challenge.id)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

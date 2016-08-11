@@ -4,20 +4,24 @@
     .sel {
       background-color: cornflowerblue;
     }
+
+    .list-group-item.sel:hover {
+       background-color: lightblue;
+    }
   </style>
 
   <!--<p>Hello world! Check out these rankings</p>-->
   <div class="page-header">
     <div class="row">
-      <div class="col-md-4">
-        <h1>Select the Players</h1>
+      <div class="col-md-5" style="margin-bottom: 10px">
+        <h2>Select Two Players</h2>
       </div>
-      <div class="col-md-4" style="margin-top: 2em">
+      <div class="col-md-4" style="margin-top: 1em">
         <input class="form-control col-md-3" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
       </div>
-      <td class="form-group col-md-4" show-errors>
+      <div class="col-md-3" style="margin-top: 1em">
         <input ng-show="creatable" class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge"/>
-      </td>
+      </div>
     </div>
   </div>
   <div>

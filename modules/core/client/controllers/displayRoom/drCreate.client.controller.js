@@ -2,6 +2,8 @@
  * Created by breed on 8/10/16.
  */
 
+'use strict';
+
 angular.module('core').controller('DrCreateController', ['$scope', '$filter', 'DrRankings', '$http',
     function($scope, $filter, DrRankings, $http) {
         $scope.users = [];
@@ -22,8 +24,10 @@ angular.module('core').controller('DrCreateController', ['$scope', '$filter', 'D
                 $scope.selected.splice(index, 1);
                 $scope.players.splice(index, 1);
             } else {
-                $scope.selected.push(user.id);
-                $scope.players.push(user);
+                if ($scope.selected.length < 2) {
+                    $scope.selected.push(user.id);
+                    $scope.players.push(user);
+                }
             }
             $scope.creatable = $scope.selected.length === 2;
         };
@@ -59,6 +63,8 @@ angular.module('core').controller('DrCreateController', ['$scope', '$filter', 'D
             var challengerId = 0;
             var challengeeId = 0;
 
+            console.log($scope.players[0].rank, $scope.players[1].rank);
+            
             if ($scope.players[0].rank > $scope.players[1].rank) {
                 challengerId = $scope.players[0].id;
                 challengeeId = $scope.players[1].id;
@@ -66,6 +72,8 @@ angular.module('core').controller('DrCreateController', ['$scope', '$filter', 'D
                 challengerId = $scope.players[1].id;
                 challengeeId = $scope.players[0].id;
             }
+            
+            console.log(challengerId, challengeeId);
 
             var challengObj = {
                 scheduledTime: new Date(),

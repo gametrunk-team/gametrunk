@@ -146,6 +146,7 @@ exports.userByID = function(req, res, next, id) {
  Update User ranking
  */
 exports.updateRanking = function(req, res) {
+    console.log("updating ranking");
     if (!req.body.challenger || !req.body.challengee) {
         return;
     }
@@ -238,11 +239,10 @@ exports.drRankings = function(req, res) {
 
         });
 
-    })
+    });
 };
 
 exports.drUsers = function(req, res) {
-    console.log("getting drUsers");
     http.get({
         host: 'ipinfo.io',
         path: '/'
@@ -273,11 +273,10 @@ exports.drUsers = function(req, res) {
                 res.jsonp("IP address does not match display room");
             }
         });
-    })
+    });
 };
 
 exports.drChallenges = function(req, res) {
-    console.log("drChallenges");
     http.get({
         host: 'ipinfo.io',
         path: '/'
@@ -290,12 +289,11 @@ exports.drChallenges = function(req, res) {
             var parsed = JSON.parse(body);
             if (parsed.ip === drIp) {
                 Challenge.findAll({
-                    // order: [
-                    //     ['rank', 'ASC']
-                    // ]
+                    where: {
+                        'winnerUserId': null
+                    }
                 }).then(function(challenges) {
                     if (!challenges) {
-                        console.log("no users");
                         return res.status(400).send({
                             message: 'Unable to get list of users'
                         });
@@ -310,6 +308,5 @@ exports.drChallenges = function(req, res) {
             }
 
         });
-
-    })
+    });
 };

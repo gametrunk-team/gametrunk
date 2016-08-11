@@ -2,6 +2,8 @@
  * Created by breed on 8/10/16.
  */
 
+'use strict';
+
 angular.module('core').controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit',
     function($scope, $filter, DrRankings, Circuit) {
         $scope.world = [];
@@ -9,10 +11,7 @@ angular.module('core').controller('DrRankingController', ['$scope', '$filter', '
         $scope.minor = [];
         $scope.mosh = [];
 
-        console.log("in the dr ranking controller");
-        
         DrRankings.query(function(data) {
-            console.log("querying dr rankings");
             $scope.users = data;
             $scope.buildPager();
         });
