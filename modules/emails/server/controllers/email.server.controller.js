@@ -177,7 +177,7 @@ exports.sendChallengeResponseNotification = function(req, res) {
     var responseText;
     var summaryText;
     
-    if(req.body.accept) {
+    if(req.body.accept === 1) {
         responseText = "accepted";
         summaryText = "You can change the details of this challenge on the My Challenges card on your gametrunk dashboard.";
     } else {
@@ -202,7 +202,39 @@ exports.sendChallengeResponseNotification = function(req, res) {
 
             var emails = [challenger.email];
 
-            createEmailJob(mailerConfig.auth.user, emails, locals.challengeeName + responseText + " your challenge on Gametrunk!", 'challenge-response', locals, false, function(err) {
+            createEmailJob(mailerConfig.auth.user, emails, locals.challengeeName + " " + responseText + " your challenge on Gametrunk!", 'challenge-response', locals, false, function(err) {
+                if(err) {
+                    res.status(400).end(err);
+                } else {
+                    res.status(200).end();
+                }
+            });
+        });
+    });
+};
+
+
+exports.sendChallengeTimeChangedNotification = function(req, res) {
+
+    var changedTimeUser;
+    var otherUser;
+
+    User.findById(req.body.changedTimeUserId).then(function(changedTimeUserObj) {
+        changedTimeUser = changedTimeUserObj;
+
+        User.findById(req.body.otherUserId).then(function(otherUserObj) {
+            otherUser = otherUserObj;
+
+            var locals = {
+                changedTimeName : changedTimeUser.firstName,
+                challengeId: req.body.challengeObj.challengeId,
+                timeString: moment(req.body.challengeObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                subject: "Default Subject"
+            };
+
+            var emails = [otherUser.email];
+
+            createEmailJob(mailerConfig.auth.user, emails, locals.changedTimeName + " changed the time of your challenge on Gametrunk!", 'challenge-time-changed', locals, false, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {
