@@ -158,7 +158,7 @@ exports.updateRanking = function(req, res) {
                     newRankObj, {where: {rank: oldRank}})
                     .then(function (result) {
                     }).error(function (err) {
-                    res.status(400).send({
+                    res.status(400).end({
                         message: errorHandler.getErrorMessage(err)
                     });
                 });
@@ -174,9 +174,9 @@ exports.updateRanking = function(req, res) {
                 {rank: challengee.rank}, {where: {id: challenger.id}})
                 .then(function (result) {
                     req.user.rank = challengee.rank;
-                    res.status(200).send();
+                    res.status(200).end();
                 }).error(function (err) {
-                res.status(400).send({
+                res.status(400).end({
                     message: errorHandler.getErrorMessage(err)
                 });
             });
