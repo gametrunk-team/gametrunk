@@ -457,35 +457,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         $scope.dateChange = function() {
             $scope.initTimePicker($scope.dt);
         };
-
-        $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-        $scope.series = ['Series A', 'Series B'];
-        $scope.data = [
-            [65, 59, 80, 81, 56, 55, 40],
-            [28, 48, 40, 19, 86, 27, 90]
-        ];
-        $scope.onClick = function (points, evt) {
-            console.log(points, evt);
-        };
-        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
-        $scope.options = {
-            scales: {
-                yAxes: [
-                    {
-                        id: 'y-axis-1',
-                        type: 'linear',
-                        display: true,
-                        position: 'left'
-                    },
-                    {
-                        id: 'y-axis-2',
-                        type: 'linear',
-                        display: true,
-                        position: 'right'
-                    }
-                ]
-            }
-        };
     }
 ]);
 
@@ -919,6 +890,92 @@ angular.module('rankings').controller('RankingCardController', ['$scope', '$filt
 
 'use strict';
 
+angular.module('core').controller('StatsCardController', ['$scope', '$timeout', '$window', 'Authentication', 'Circuit', '$http','Rankings','Challenges',
+    function($scope, $timeout, $window, Authentication, Circuit, $http, Rankings, Challenges) {
+
+        Rankings.query(function(data) {
+            $scope.users = data;
+            $http.get('/api/user').success(function (response) {
+                $scope.currentUserId = response.id;
+
+                $http.get('/api/challenge/getall').success(function (data) {
+                    $scope.stats = [];
+                    $scope.labels = [];
+                    $scope.colors = [];
+                    $scope.challenges = data;
+
+                    angular.forEach($scope.users, function (user, index) {
+                        //get # of games player for this user and set this variable
+                        var games = 0;
+                        var wins = 0.0;
+                        var losses = 0.0;
+                        angular.forEach($scope.challenges, function (challenge, index) {
+                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id) {
+                                games++;
+                                if (challenge.winnerUserId === user.id) {
+                                    wins++;
+                                } else if (challenge.winnerUserId === challenge.challengeeUserId) {
+                                    losses++;
+                                }
+                            }
+                        });
+                        user.gamesPlayed = games;
+                        if (losses === 0) {
+                            user.winLossRatio = 0;
+                        } else {
+                            user.winLossRatio = wins / losses;
+                        }
+                    });
+
+                    angular.forEach($scope.users, function (value, index) {
+                        var obj = [{
+                            x: value.gamesPlayed,
+                            y: value.rank,
+                            r: value.winLossRatio * 10.0,
+                            label: 'this is a test'
+                        }];
+                        $scope.stats.push(obj);
+                        if ($scope.currentUserId===value.id)
+                        {
+                            $scope.labels.push('me');
+                            $scope.colors.push('#ff0000');
+                        } else {
+                            $scope.labels.push(value.displayName);
+                            $scope.colors.push('');
+                        }
+                    });
+                });
+            });
+        });
+
+        $scope.options = {
+            tooltips: {
+                enabled: false
+            },
+            yAxisLabel: "My Y Axis Label",
+            xAxisLabel: "My Y Axis Label",
+            responsive: true,
+            title: {
+                display: true,
+            },
+            scales: {
+                xAxes: [{}],
+                yAxes: [{
+                    ticks: {
+                        reverse: true
+                    }
+                }]
+            },
+            legend: {
+                display: true,
+                position: 'bottom'
+            }
+        };
+    }
+]);
+
+'use strict';
+
 angular.module('core').controller('ContactController', ['$scope', 'ContactForm',
   function($scope, ContactForm) {
 
@@ -1063,12 +1120,21 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     };
           
     var viewChallenges = function(cardConfig, cb) {
-        if($scope.authentication.user) {
-            // Not using the cardConfig here but you could use it to make request
-            $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
-                return cb && cb($compile(html)($scope));
-            });
-        }
+      if($scope.authentication.user) {
+        // Not using the cardConfig here but you could use it to make request
+        $http.get('modules/challenges/client/views/my-challenges.client.view.html').success(function (html) {
+          return cb && cb($compile(html)($scope));
+        });
+      }
+    };
+
+    var viewStats = function(cardConfig, cb) {
+      if($scope.authentication.user) {
+        // Not using the cardConfig here but you could use it to make request
+        $http.get('modules/core/client/views/Cards/statsCard.client.view.html').success(function (html) {
+          return cb && cb($compile(html)($scope));
+        });
+      }
     };
 
     // Define a static array of card configurations or load them from a server (ex: user defined cards)
@@ -1082,7 +1148,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         position: {
           size_x: 2,
           size_y: 2,
-          col: 3,
+          col: 1,
           row: 3
         }
       },
@@ -1105,10 +1171,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             summaryContentHtml: viewNews,
             detailsContentHtml: viewNews,
             position: {
-                size_x: 2,
+                size_x: 1,
                 size_y: 2,
-                col: 1,
-                row: 3
+                col: 4,
+                row: 1
             }
         },
         {   
@@ -1117,24 +1183,24 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         summaryContentHtml: viewChallenges,
         detailsContentHtml: viewChallenges,
         position: {
-          size_x: 3,
+          size_x: 2,
           size_y: 2,
           col: 2,
           row: 1
         }
+      },
+      {
+        title: 'My Stats',
+        id: 'StatsCard',
+        summaryContentHtml: viewStats,
+        detailsContentHtml: viewStats,
+        position: {
+          size_x: 2,
+          size_y: 2,
+          col: 3,
+          row: 3
+        }
       }
-      // {
-      //   title: 'Table Data',
-      //   id: 'tableCard',
-      //   summaryContentHtml: getSummaryTemplate,
-      //   detailsContentHtml: getDetailsTemplate,
-      //   position: {
-      //     size_x: 1,
-      //     size_y: 2,
-      //     col: 4,
-      //     row: 3
-      //   }
-      // },
       // {
       //   title: 'Timeline',
       //   id: 'timelineCard',
