@@ -18,4 +18,6 @@ module.exports = function(app) {
 
   //Submit contact form data
   app.route('/api/contact').post(core.contact);
+  
+  
 };
