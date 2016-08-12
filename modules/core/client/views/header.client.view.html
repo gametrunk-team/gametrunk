@@ -21,9 +21,9 @@
         <a ng-switch-default ui-sref="{{item.state}}" ng-bind="item.title"></a>
       </li>
     </ul>
-    <ul class="nav navbar-nav navbar-right" ng-hide="authentication.user">
+    <ul class="nav navbar-nav navbar-right" >
       <li class="divider-vertical"></li>
-      <li ui-sref-active="active">
+      <li ui-sref-active="active" ng-hide="authentication.user || displayRoom">
         <a ng-click="callOauthProvider('/api/auth/google')">
           <img ng-src="/modules/users/client/img/buttons/google.png" class="img-responsive" width="125">
         </a>
