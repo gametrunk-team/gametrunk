@@ -25,7 +25,6 @@ angular.module('challenge').controller('DeleteController', ['$scope', '$state', 
             console.log("deleting challenge with id " + challengeId);
             $http.post('/api/challenge/delete', params)
                 .success(function (data) {
-                    console.log("success");
                     toastr.success('Challenge Deleted','Success');
                 });
             $scope.$close(true);
