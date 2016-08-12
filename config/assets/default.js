@@ -30,7 +30,9 @@ module.exports = {
         'public/lib/moment/min/moment-with-locales.js',
         'https://www.google.com/recaptcha/api.js',
         'public/lib/decksterjs/dist/jquery.deckster.js',
-        'public/lib/ng-lodash/build/ng-lodash.js'
+        'public/lib/ng-lodash/build/ng-lodash.js',
+        'public/lib/Chart.js/dist/Chart.min.js',
+        'public/lib/angular-chart.js/dist/angular-chart.min.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
