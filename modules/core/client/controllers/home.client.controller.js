@@ -32,6 +32,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     $scope.setUserView = function() {
       $scope.userView = true;
     };
+    
+    $scope.desetUserView = function() {
+      $scope.userView = false;
+    };
 
     // examples Of how you can fetch content for cards
     var getSummaryTemplate = function(cardConfig, cb) {

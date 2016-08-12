@@ -7,10 +7,10 @@
 
   <div ng-show="displayRoom">
     <uib-tabset active="active">
-        <uib-tab heading="View Rankings" style="color: rgba(255, 255, 255, 0.5)">
+        <uib-tab heading="View Rankings" style="color: rgba(255, 255, 255, 0.5)" select="desetUserView()">
           <rankings-display></rankings-display>
         </uib-tab>
-        <uib-tab heading="Add Results">
+        <uib-tab heading="Add Results" select="desetUserView()">
           <add-results></add-results>
         </uib-tab>
       <uib-tab heading="User View" select="setUserView()"></uib-tab>
