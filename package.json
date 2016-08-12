@@ -76,6 +76,7 @@
     "winston": "^2.1.0"
   },
   "devDependencies": {
+    "bower-npm-resolver": "^0.4.0",
     "coveralls": "^2.11.6",
     "grunt": "0.4.5",
     "grunt-cli": "^0.1.13",
