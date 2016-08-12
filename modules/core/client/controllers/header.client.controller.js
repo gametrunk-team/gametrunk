@@ -7,7 +7,7 @@ angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '
     $http.get('/api/props').success(function (props) {
       $.get("http://ipinfo.io", function(response) {
         if (props.adminIp === response.ip) {
-          $scope.displayRoom = true;
+          $scope.network = true;
         }
       }, "jsonp");
     });
@@ -40,6 +40,7 @@ angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
+    
 
   }
 ]);

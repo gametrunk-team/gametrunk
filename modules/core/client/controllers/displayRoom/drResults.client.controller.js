@@ -4,8 +4,8 @@
 
 'use strict';
 
-angular.module('core').controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults',
-    function($scope, $http, $uibModal, DrResults) {
+angular.module('core').controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults', '$rootScope',
+    function($scope, $http, $uibModal, DrResults, $rootScope) {
         $scope.selectedTime = 'Now';
         $scope.message = "";
 
@@ -100,13 +100,15 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             });
         };
 
-        $scope.initPage = function () {
-            $scope.challenges = {};
-            $scope.challengesToday = [];
-            $scope.pastChallenges = [];
-            $scope.upcomingChallenges = [];
-            $scope.getChallenges();
-        };
+        if ($rootScope.displayRoom) {
+            $scope.initPage = function () {
+                $scope.challenges = {};
+                $scope.challengesToday = [];
+                $scope.pastChallenges = [];
+                $scope.upcomingChallenges = [];
+                $scope.getChallenges();
+            };
+        }
 
         $scope.initPage();
 

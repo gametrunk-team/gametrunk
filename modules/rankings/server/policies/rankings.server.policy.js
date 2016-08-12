@@ -36,24 +36,36 @@ acl = new acl(new acl.memoryBackend());
  * Invoke User Permissions to view and update rankings
  */
 exports.invokeRolesPolicies = function() {
-    acl.allow([{
-        roles: ['user'],
-        allows: [{
-            resources: '/api/rankings/user',
-            permissions: '*'
+    acl.allow(
+        [{
+            roles: ['user'],
+            allows: [{
+                resources: '/api/rankings/user',
+                permissions: '*'
+            }, {
+                resources: '/api/rankings/user/:userId',
+                permissions: '*'
+            }, {
+                resources: '/api/rankings/update',
+                permissions: '*'
+            }, {
+                resources: '/api/rankings/challengees',
+                permissions: '*'
+            }]
         }, {
-            resources: '/api/rankings/user/:userId',
-            permissions: '*'
-        }, {
-            resources: '/api/rankings/update',
-            permissions: '*'
-        }, {
-            resources: '/api/rankings/challengees',
-            permissions: '*'
-        }
-        ]
-
-    }]);
+            roles: ['admin'],
+            allows: [{
+                resources: '/api/rankings/drRankings',
+                permissions: '*'
+            }, {
+                resources: '/api/rankings/drUsers',
+                permissions: '*'
+            }, {
+                resources: '/api/rankings/drResults',
+                permissions: '*'
+            }]
+        }]
+    );
 };
 
 /**

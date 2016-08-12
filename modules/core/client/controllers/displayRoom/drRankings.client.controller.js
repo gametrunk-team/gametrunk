@@ -4,17 +4,19 @@
 
 'use strict';
 
-angular.module('core').controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit',
-    function($scope, $filter, DrRankings, Circuit) {
+angular.module('core').controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit', '$rootScope',
+    function($scope, $filter, DrRankings, Circuit, $rootScope) {
         $scope.world = [];
         $scope.major = [];
         $scope.minor = [];
         $scope.mosh = [];
 
-        DrRankings.query(function(data) {
-            $scope.users = data;
-            $scope.buildPager();
-        });
+        if ($rootScope.displayRoom) {
+            DrRankings.query(function (data) {
+                $scope.users = data;
+                $scope.buildPager();
+            });
+        }
 
         $scope.figureOutItemsToDisplay = function() {
             var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);

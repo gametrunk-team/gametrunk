@@ -2,10 +2,11 @@
 
 /*globals $:false */
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout',
-  function($scope, Authentication, $http, $compile, $timeout) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout', '$rootScope',
+  function($scope, Authentication, $http, $compile, $timeout, $rootScope) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+    $scope.isAdmin = $scope.authentication.user.roles[0] === 'admin';
     // says when it's okay to render the deck
     $scope.initialized = false;
     $scope.mainDeck = {
@@ -19,14 +20,13 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       }
     };
     
-    $http.get('/api/props').success(function (props) {
-      $.get("http://ipinfo.io", function(response) {
-        if (props.adminIp === response.ip) {
-          $scope.displayRoom = true;
-        }
-      }, "jsonp");
-    });
+    $scope.displayRoom = $scope.isAdmin;
+    $rootScope.displayRoom = $scope.displayRoom;
     
+    $scope.setUserView = function() {
+      $scope.userView = true;
+    };
+
     // examples Of how you can fetch content for cards
     var getSummaryTemplate = function(cardConfig, cb) {
       // Not using the cardConfig here but you could use it to make request

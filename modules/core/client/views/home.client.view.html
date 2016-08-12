@@ -7,12 +7,14 @@
 
   <div ng-show="displayRoom">
     <uib-tabset active="active">
-        <uib-tab heading="View Rankings">
+        <uib-tab heading="View Rankings" style="color: rgba(255, 255, 255, 0.5)">
           <rankings-display></rankings-display>
         </uib-tab>
         <uib-tab heading="Add Results">
           <add-results></add-results>
         </uib-tab>
+      <uib-tab heading="User View" select="setUserView()"></uib-tab>
+        <!--Deckster Deck does not display correctly when placed in a tab-->
       </uib-tabset>
   </div>
   <div ng-hide="authentication.user || displayRoom" class="jumbotron text-center">
@@ -29,6 +31,6 @@
       </div>
     </div>
   </div>
-  <deckster-deck ng-show="authentication.user && !displayRoom" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
+  <deckster-deck ng-show="authentication.user && userView" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
   </body>
 </section>

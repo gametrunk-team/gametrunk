@@ -191,17 +191,6 @@ exports.updateRanking = function(req, res) {
 
 // Sends rankings to the display room
 exports.drRankings = function(req, res) {
-    http.get({
-        host: 'ipinfo.io',
-        path: '/'
-    }, function(result) {
-        var body = '';
-        result.on('data', function(d) {
-            body += d;
-        });
-        result.on('end', function() {
-            var parsed = JSON.parse(body);
-            if (parsed.ip === drIp) {
                 User.findAll({
                     order: [
                         ['rank', 'ASC']
@@ -233,61 +222,27 @@ exports.drRankings = function(req, res) {
                 }).catch(function(err) {
                     res.jsonp(err);
                 });
-            } else {
-                res.jsonp("IP address does not match display room");
-            }
-
-        });
-
-    });
 };
 
 exports.drUsers = function(req, res) {
-    http.get({
-        host: 'ipinfo.io',
-        path: '/'
-    }, function(result) {
-        var body = '';
-        result.on('data', function(d) {
-            body += d;
-        });
-        result.on('end', function() {
-            var parsed = JSON.parse(body);
-            if (parsed.ip === drIp) {
-                User.findAll({
-                    order: [
-                        ['lastName', 'ASC']
-                    ]
-                }).then(function (users) {
-                    if (!users) {
-                        return res.status(400).send({
-                            message: 'Unable to get list of users'
-                        });
-                    } else {
-                        res.json(users);
-                    }
-                }).catch(function (err) {
-                    res.jsonp(err);
-                });
-            } else {
-                res.jsonp("IP address does not match display room");
-            }
-        });
+    User.findAll({
+        order: [
+            ['lastName', 'ASC']
+        ]
+    }).then(function (users) {
+        if (!users) {
+            return res.status(400).send({
+                message: 'Unable to get list of users'
+            });
+        } else {
+            res.json(users);
+        }
+    }).catch(function (err) {
+        res.jsonp(err);
     });
 };
 
 exports.drChallenges = function(req, res) {
-    http.get({
-        host: 'ipinfo.io',
-        path: '/'
-    }, function(result) {
-        var body = '';
-        result.on('data', function(d) {
-            body += d;
-        });
-        result.on('end', function() {
-            var parsed = JSON.parse(body);
-            if (parsed.ip === drIp) {
                 Challenge.findAll({
                     where: {
                         'winnerUserId': null
@@ -303,10 +258,4 @@ exports.drChallenges = function(req, res) {
                 }).catch(function(err) {
                     res.jsonp(err);
                 });
-            } else {
-                res.jsonp("IP address does not match display room");
-            }
-
-        });
-    });
 };

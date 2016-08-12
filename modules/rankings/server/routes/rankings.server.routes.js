@@ -23,9 +23,9 @@ module.exports = function(app) {
     app.route('/api/rankings/challengees').get(rankingsPolicy.isAllowed, rankings.getChallengees);
     
     // Display room route (only return data if ip matches)
-    app.route('/api/rankings/drRankings').get(rankings.drRankings);
-    app.route('/api/rankings/drResults').get(rankings.drChallenges);
-    app.route('/api/rankings/drUsers').get(rankings.drUsers);
+    app.route('/api/rankings/drRankings').get(rankingsPolicy.isAllowed, rankings.drRankings);
+    app.route('/api/rankings/drResults').get(rankingsPolicy.isAllowed, rankings.drChallenges);
+    app.route('/api/rankings/drUsers').get(rankingsPolicy.isAllowed, rankings.drUsers);
 
     app.param('userId', rankings.userByID);
 };
