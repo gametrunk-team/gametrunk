@@ -10,8 +10,10 @@ module.exports = function(app) {
     app.route('/api/challenge/update').post(challenge.updateChallenge);
     app.route('/api/challenge/get').post(challenge.getChallenge);
     app.route('/api/challenge/getall').get(challenge.getAllChallenges);
-    app.route('/api/challenge/response').get(challenge.respondToChallenge);
     app.route('/api/challenge/mychallenges').post(challenge.getMyChallenges);
+    app.route('/api/challenge/accept').post(challenge.acceptChallenge);
+    app.route('/api/challenge/decline').post(challenge.declineChallenge);
+    app.route('/api/challenge/response').get(challenge.respondToChallenge);
 
     // Finish by binding the user middleware
     app.param('userId', challenge.getMyChallenges);

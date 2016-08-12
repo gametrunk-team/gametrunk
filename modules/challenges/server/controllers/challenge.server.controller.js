@@ -88,6 +88,55 @@ exports.getChallenge = function(req, res) {
 };
 
 /*
+ Accept a challenge
+ */
+exports.acceptChallenge = function(req, res) {
+    sequelize.transaction(function (t) {
+        return sequelize.query("UPDATE challenges SET accepted = true WHERE id = " + req.body.challengeObj.challengeId + " AND accepted IS NULL", {transaction: t});
+    }).then(function () {
+
+        req.body.accept = 1;
+        emails.sendChallengeResponseNotification(req, res);
+
+        return res.status(200).send();
+    }).catch(function(err) {
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
+    });
+};
+
+/*
+ Decline a challenge
+ */
+exports.declineChallenge = function(req, res) {
+    sequelize.transaction(function (t) {
+        return sequelize.query("UPDATE challenges SET accepted = false WHERE id = " + req.body.challengeObj.challengeId + " AND accepted IS NULL", {transaction: t}).then(function() {
+          return sequelize.query('UPDATE challenges SET "winnerUserId" = ' + req.body.challengeObj.challengerUserId + ' WHERE id = ' + req.body.challengeObj.challengeId , {transaction: t});
+        });
+    }).then(function () {
+
+        req.body.challengee = req.body.challengeObj.challengeeUserId;
+        req.body.challenger = req.body.challengeObj.challengerUserId;
+
+        rankings.updateRanking(req, res);
+
+        Challenge.destroy({where: {id: req.body.challengeObj.challengeId}});
+
+        req.body.accept = 0;
+        emails.sendChallengeResponseNotification(req, res);
+
+        return res.status(200).send();
+    }).catch(function(err) {
+        console.log(err);
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
+    });
+};
+
+
+/*
  Get All Challenges
  */
 exports.getAllChallenges = function(req, res) {
@@ -213,7 +262,8 @@ exports.getMyChallenges = function(req, res) {
         where: Sequelize.or(
             { challengerUserId : req.body.userId },
             { challengeeUserId: req.body.userId }
-        )
+        ),
+        paranoid: req.body.paranoid
     }).then(function(challenges) {
         if (!challenges) {
             return res.status(400).send({

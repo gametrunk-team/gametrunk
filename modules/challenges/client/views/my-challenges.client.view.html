@@ -7,14 +7,27 @@
   <div ng-hide="challengesToday.length > 0" class="list-group-item row"><h5>No challenges today! Click Create a Challenge to add one!</h5></div>
 
     <div class="list-group-item row center" ng-repeat="challenge in challengesToday">
-    <div class="col-sm-8">
+    <div class="col-sm-4">
     <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
     {{challenge.scheduledTime | date:'dd.MM.y' }}
+      </div>
+      <div class="col-sm-4" style="padding: 20px">
+        <section style="padding-top: 5px;" ng-show="authentication.user.id === challenge.challengeeUserId && challenge.accepted == null">
+        <h1 style="margin-left: 64px; font-size: 12px;" class="label label-default">PENDING</h1>
+          <br>&nbsp;
+          <div class="buttons" style="padding: 15px; margin: 0 auto; float: left">
+        <a class="btn btn-success" ng-click="acceptChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)" align="center"><i class="fa fa-check"></i> Accept</a>
+          <a class="btn btn-danger" ng-click="declineChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)"><i class="fa fa-times"></i> Decline</a>
+            </div>
+        </section>
+        <section ng-show="challenge.accepted == true">
+          <h1 style="width: 100%" class="label label-success">ACCEPTED</h1>
+        </section>
       </div>
     <div class="col-sm-4">
       <div class="row">
     <div class="col-md-3 text-center thumbnail">
-      <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+      <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">WINNER</h1>
       <div ng-if="challenge.challengerUser.profileImageURL">
          <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
       </div>
@@ -25,7 +38,7 @@
     </div>
       <h3 class="col-md-3 text-center vcenter">vs</h3>
     <div class="col-md-3 text-center thumbnail">
-      <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+      <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">WINNER</h1>
       <div ng-if="challenge.challengeeUser.profileImageURL">
         <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
       </div>
@@ -44,14 +57,27 @@
 
   <h2><span class="label label-default" ng-show="upcomingChallenges.length > 0">Upcoming Challenges</span></h2>
   <div class="list-group-item row center" ng-repeat="challenge in upcomingChallenges">
-    <div class="col-sm-8">
+    <div class="col-sm-4">
       <h4>{{challenge.scheduledTime | date:'h:mm a' }}</h4>
       {{challenge.scheduledTime | date:'dd.MM.y' }}
+    </div>
+    <div class="col-sm-4" style="padding: 20px">
+      <section style="padding-top: 5px;" ng-show="authentication.user.id === challenge.challengeeUserId && challenge.accepted == null">
+        <h1 style="margin-left: 64px; font-size: 12px;" class="label label-default">PENDING</h1>
+        <br>&nbsp;
+        <div class="buttons" style="padding: 15px; margin: 0 auto; float: left">
+          <a class="btn btn-success" ng-click="acceptChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)" align="center"><i class="fa fa-check"></i> Accept</a>
+          <a class="btn btn-danger" ng-click="declineChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)"><i class="fa fa-times"></i> Decline</a>
+        </div>
+      </section>
+      <section ng-show="challenge.accepted == true">
+        <h1 style="width: 100%" class="label label-success">ACCEPTED</h1>
+      </section>
     </div>
     <div class="col-sm-4">
       <div class="row">
         <div class="col-md-3 text-center thumbnail">
-          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">WINNER</h1>
           <div ng-if="challenge.challengerUser.profileImageURL">
             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
           </div>
@@ -62,7 +88,7 @@
         </div>
         <h3 class="col-md-3 text-center vcenter">vs</h3>
         <div class="col-md-3 text-center thumbnail">
-          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">WINNER</h1>
           <div ng-if="challenge.challengeeUser.profileImageURL">
             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
           </div>
@@ -88,7 +114,7 @@
     <div class="col-sm-4">
       <div class="row">
         <div class="col-md-3 text-center thumbnail">
-          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <h1 ng-if="challenge.challengerUser.id===challenge.winnerUserId" class="label label-success">WINNER</h1>
           <div ng-if="challenge.challengerUser.profileImageURL">
             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengerUser.profileImageURL}}' alt='{{challenge.challengerUser.displayName}}'/>
           </div>
@@ -99,7 +125,7 @@
         </div>
         <h3 class="col-md-3 text-center vcenter">vs</h3>
         <div class="col-md-3 text-center thumbnail">
-          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">BOSS</h1>
+          <h1 ng-if="challenge.challengeeUser.id===challenge.winnerUserId" class="label label-success">WINNER</h1>
           <div ng-if="challenge.challengeeUser.profileImageURL">
             <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_50,h_50,c_fill/{{challenge.challengeeUser.profileImageURL}}' alt='{{challenge.challengeeUser.displayName}}'/>
           </div>
