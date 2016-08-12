@@ -2,10 +2,11 @@
 
 module.exports = function(app) {
     // Challenge Routes
-    var news = require('../controllers/news.server.controller');
+    var news = require('../controllers/news.server.controller'),
+        newsPolicy = require('../policies/news.server.policy');
 
-    app.route('/api/news/create').post(news.createChallengeResultNews);
-    app.route('/api/news/createChallengeLost').post(news.createChallengeLostNews);
-    app.route('/api/news/getNews').post(news.getNews);
+    app.route('/api/news/create').post(newsPolicy.isAllowed, news.createChallengeResultNews);
+    app.route('/api/news/createChallengeLost').post(newsPolicy.isAllowed, news.createChallengeLostNews);
+    app.route('/api/news/getNews').post(newsPolicy.isAllowed, news.getNews);
 
 };
