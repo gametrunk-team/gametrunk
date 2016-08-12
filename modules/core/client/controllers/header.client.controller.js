@@ -2,22 +2,15 @@
 
 /*globals $:false */
 
-angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window', '$http',
-  function($rootScope, $scope, $location, $state, Authentication, Menus, $window, $http) {
-    $http.get('/api/props').success(function (props) {
-      $.get("http://ipinfo.io", function(response) {
-        if (props.adminIp === response.ip) {
-          $scope.network = true;
-        }
-      }, "jsonp");
-    });
+angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '$location', '$state', 'Authentication', 'Menus', '$window',
+  function($rootScope, $scope, $location, $state, Authentication, Menus, $window) {
     
     // Expose view variables
     $scope.$state = $state;
     $scope.authentication = Authentication;
 
     // Get the topbar menu
-    $scope.menu = Menus.getMenu('topbar');
+    // $scope.menu = Menus.getMenu('topbar'); // Adds in non-functional admin button
 
     // Toggle the menu items
     $scope.isCollapsed = false;
@@ -40,7 +33,6 @@ angular.module('core').controller('HeaderController', ['$rootScope', '$scope', '
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
-    
 
   }
 ]);
