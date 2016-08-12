@@ -7,7 +7,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     // This provides Authentication context.
     $scope.authentication = Authentication;
     if ($scope.authentication.user) {
-      $scope.isAdmin = $scope.authentication.user.roles[0] === 'admin';
+      $scope.isAdmin = $scope.authentication.user.roles[0] === 'admin' || $scope.authentication.user.roles[1] === 'admin';
     }
     // says when it's okay to render the deck
     $scope.initialized = false;
