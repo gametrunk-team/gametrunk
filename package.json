@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "acl": "~0.4.4",
+    "angular-chart.js": "^1.0.0",
     "angular-toastr": "^2.0.0",
     "async": "^2.0.1",
     "body-parser": "^1.14.2",
