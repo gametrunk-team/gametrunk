@@ -8,11 +8,15 @@ var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
     User = db.user,
+    Challenge = db.challenge,
     _ = require('lodash');
+
+const http = require('http');
 
 var PropertiesReader = require('properties-reader');
 var properties = new PropertiesReader('./config/properties.ini');
 var cSize = properties.get('circuitSize') ? properties.get('circuitSize') : 10;
+var drIp = properties.get('adminIp') ? properties.get('adminIp') : null;
 
 exports.read = function(req, res) {
     res.json(req.model);
@@ -142,6 +146,7 @@ exports.userByID = function(req, res, next, id) {
  Update User ranking
  */
 exports.updateRanking = function(req, res) {
+    console.log("updating ranking");
     if (!req.body.challenger || !req.body.challengee) {
         return;
     }
@@ -158,7 +163,7 @@ exports.updateRanking = function(req, res) {
                     newRankObj, {where: {rank: oldRank}})
                     .then(function (result) {
                     }).error(function (err) {
-                    res.status(400).send({
+                    res.status(400).end({
                         message: errorHandler.getErrorMessage(err)
                     });
                 });
@@ -174,14 +179,83 @@ exports.updateRanking = function(req, res) {
                 {rank: challengee.rank}, {where: {id: challenger.id}})
                 .then(function (result) {
                     req.user.rank = challengee.rank;
-                    res.status(200).send();
+                    res.status(200).end();
                 }).error(function (err) {
-                res.status(400).send({
+                res.status(400).end({
                     message: errorHandler.getErrorMessage(err)
                 });
             });
         });
     });
+};
 
+// Sends rankings to the display room
+exports.drRankings = function(req, res) {
+                User.findAll({
+                    order: [
+                        ['rank', 'ASC']
+                    ]
+                }).then(function(users) {
+                    if (!users) {
+                        console.log("no users");
+                        return res.status(400).send({
+                            message: 'Unable to get list of users'
+                        });
+                    } else {
+                        // Define display rank
+                        users = _.map(users, function(user) {
+                            if (user.dataValues.rank === null) {
+                                user.dataValues.displayRank = "Un";
+                            } else if (user.dataValues.rank < cSize + 1) {
+                                user.dataValues.displayRank = user.dataValues.rank;
+                            } else if (user.dataValues.rank < 2*cSize + 1) {
+                                user.dataValues.displayRank = user.dataValues.rank - cSize;
+                            } else if (user.dataValues.rank < 3*cSize + 1) {
+                                user.dataValues.displayRank = user.dataValues.rank - 2*cSize;
+                            } else {
+                                user.dataValues.displayRank = "Un";
+                            }
+                            return user;
+                        });
+                        res.json(users);
+                    }
+                }).catch(function(err) {
+                    res.jsonp(err);
+                });
+};
 
+exports.drUsers = function(req, res) {
+    User.findAll({
+        order: [
+            ['lastName', 'ASC']
+        ]
+    }).then(function (users) {
+        if (!users) {
+            return res.status(400).send({
+                message: 'Unable to get list of users'
+            });
+        } else {
+            res.json(users);
+        }
+    }).catch(function (err) {
+        res.jsonp(err);
+    });
+};
+
+exports.drChallenges = function(req, res) {
+                Challenge.findAll({
+                    where: {
+                        'winnerUserId': null
+                    }
+                }).then(function(challenges) {
+                    if (!challenges) {
+                        return res.status(400).send({
+                            message: 'Unable to get list of users'
+                        });
+                    } else {
+                        res.json(challenges);
+                    }
+                }).catch(function(err) {
+                    res.jsonp(err);
+                });
 };

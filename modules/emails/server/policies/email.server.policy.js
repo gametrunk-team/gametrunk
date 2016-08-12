@@ -1,5 +1,5 @@
 /**
- * Created by breed on 7/25/16.
+ * Created by breed on 8/12/16.
  */
 
 'use strict';
@@ -40,28 +40,7 @@ exports.invokeRolesPolicies = function() {
         [{
             roles: ['user'],
             allows: [{
-                resources: '/api/rankings/user',
-                permissions: '*'
-            }, {
-                resources: '/api/rankings/user/:userId',
-                permissions: '*'
-            }, {
-                resources: '/api/rankings/update',
-                permissions: '*'
-            }, {
-                resources: '/api/rankings/challengees',
-                permissions: '*'
-            }]
-        }, {
-            roles: ['admin'],
-            allows: [{
-                resources: '/api/rankings/drRankings',
-                permissions: '*'
-            }, {
-                resources: '/api/rankings/drUsers',
-                permissions: '*'
-            }, {
-                resources: '/api/rankings/drResults',
+                resources: '/api/emails/challengeCreated',
                 permissions: '*'
             }]
         }]

@@ -1,9 +1,18 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout', 'Card', '$rootScope',
-  function($scope, Authentication, $http, $compile, $timeout, Card, $rootScope) {
+/*globals $:false */
+
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$http', '$compile', '$timeout', '$rootScope',
+  function($scope, Authentication, $http, $compile, $timeout, $rootScope) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+    if ($scope.authentication.user) {
+      if ($scope.authentication.user.roles[0] === 'admin' || $scope.authentication.user.roles[1] === 'admin') {
+        $scope.isAdmin = true;
+      } else {
+        $scope.userView = true;
+      }
+    }
     // says when it's okay to render the deck
     $scope.initialized = false;
     $scope.mainDeck = {
@@ -15,6 +24,17 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         widget_base_dimensions: ['auto', 250],
         responsive_breakpoint: 850
       }
+    };
+
+    $scope.displayRoom = $scope.isAdmin;
+    $rootScope.displayRoom = $scope.displayRoom;
+    
+    $scope.setUserView = function() {
+      $scope.userView = true;
+    };
+    
+    $scope.desetUserView = function() {
+      if ($scope.isAdmin) $scope.userView = false;
     };
 
     // examples Of how you can fetch content for cards
@@ -159,6 +179,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     $timeout(function () {
       $scope.initialized = true;
     });
+
+    console.log($scope.userView, $scope.isAdmin, $scope.authentication.user);
 
 
   }

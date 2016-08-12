@@ -11,6 +11,7 @@ var db = require(path.resolve('./config/lib/sequelize')).models;
 var User = db.user;
 //var mg = require('nodemailer-mailgun-transport');
 var async = require('async');
+var moment = require('moment');
 
 /*var emailQueue = kue.createQueue({
     prefix: 'q',
@@ -150,12 +151,90 @@ exports.sendChallengeCreatedNotification = function(req, res) {
             var locals = {
                 challengerName : challenger.firstName,
                 challengedName : challengee.firstName,
+                challengeId: req.body.challengeId,
+                acceptingUserId: challengee.id,
+                timeString: moment(req.body.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
                 subject: "Default Subject"
             };
 
-            var emails = [challenger.email, challengee.email];
+            var emails = [challengee.email];
 
-            createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + locals.challengedName + " on gametrunk!", 'challenge-created', locals, false, function(err) {
+            createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, false, function(err) {
+                if(err) {
+                    res.status(400).end(err);
+                } else {
+                    res.status(200).end();
+                }
+            });
+        });
+    });
+};
+
+exports.sendChallengeResponseNotification = function(req, res) {
+
+    var challenger;
+    var challengee;
+    var responseText;
+    var summaryText;
+    
+    if(req.body.accept === 1) {
+        responseText = "accepted";
+        summaryText = "You can change the details of this challenge on the My Challenges card on your gametrunk dashboard.";
+    } else {
+        responseText = "declined";
+        summaryText = "You will not play this challenge, but you will be moved up to your opponent's rank by forfeit!";
+    }
+
+    User.findById(req.body.challengeObj.challengerUserId).then(function(challengerUserObj) {
+        challenger = challengerUserObj;
+
+        User.findById(req.body.challengeObj.challengeeUserId).then(function(challengeeUserObj) {
+            challengee = challengeeUserObj;
+
+            var locals = {
+                challengeeName : challengee.firstName,
+                challengeId: req.body.challengeObj.challengeId,
+                timeString: moment(req.body.challengeObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                responseText: responseText,
+                summaryText: summaryText,
+                subject: "Default Subject"
+            };
+
+            var emails = [challenger.email];
+
+            createEmailJob(mailerConfig.auth.user, emails, locals.challengeeName + " " + responseText + " your challenge on Gametrunk!", 'challenge-response', locals, false, function(err) {
+                if(err) {
+                    res.status(400).end(err);
+                } else {
+                    res.status(200).end();
+                }
+            });
+        });
+    });
+};
+
+
+exports.sendChallengeTimeChangedNotification = function(req, res) {
+
+    var changedTimeUser;
+    var otherUser;
+
+    User.findById(req.body.changedTimeUserId).then(function(changedTimeUserObj) {
+        changedTimeUser = changedTimeUserObj;
+
+        User.findById(req.body.otherUserId).then(function(otherUserObj) {
+            otherUser = otherUserObj;
+
+            var locals = {
+                changedTimeName : changedTimeUser.firstName,
+                challengeId: req.body.challengeObj.challengeId,
+                timeString: moment(req.body.challengeObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                subject: "Default Subject"
+            };
+
+            var emails = [otherUser.email];
+
+            createEmailJob(mailerConfig.auth.user, emails, locals.changedTimeName + " changed the time of your challenge on Gametrunk!", 'challenge-time-changed', locals, false, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {

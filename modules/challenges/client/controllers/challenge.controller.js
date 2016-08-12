@@ -50,7 +50,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         }
                     });
                     $scope.getChallenges();
-                    console.log("getting the user!!!");
                 });
             }).error(function (response) {
                 $scope.error = response.message;
@@ -86,8 +85,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         $scope.cancelModal = function (challengeId) {
-            console.log("making the cancel modal");
-            console.log($scope.challengeId);
+
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/cancel-modal.client.view.html', // todo
                 controller: 'DeleteController', // todo
@@ -107,8 +105,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         $scope.createChallengeModal = function () {
-            console.log("making the cancel modal");
-            console.log($scope.challengeId);
+
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/challenge-modal.client.view.html', // todo
                 controller: 'ChallengeController', // todo
@@ -132,18 +129,20 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 scheduledTime: $scope.dt,
                 challengerUserId: $scope.challengerId,
                 challengeeUserId: $scope.model.opponentId,
-                winnerUserId: null
+                winnerUserId: null,
+                accepted: null
             };
 
             $http.post('/api/challenge/create', challengObj)
                 .success(function (response) {
                     $scope.challengeId = response.id;
+                    challengObj.challengeId = response.id;
+
+                    $http.post('/api/emails/challengeCreated', challengObj);
                 })
                 .error(function (response) {
                     $scope.error = response.message;
                 });
-
-            $http.post('/api/emails/challengeCreated', challengObj);
 
             $scope.$close(true);
             // Display a success toast, with a title
@@ -152,9 +151,9 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.getChallenges = function() {
-            console.log("challenger Id: " + $scope.challengerId);
             var params = {
-                userId: $scope.challengerId
+                userId: $scope.challengerId,
+                paranoid: true
             };
 
             $http.post('/api/challenge/mychallenges', params).success(function(response) {
@@ -170,11 +169,73 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         .success(function (data) {
                             value.challengeeUser = data;
                         });
+
+                    console.log("CHALLENGE: ", value);
+
                 });
                 $scope.filterChallenges();
             });
 
         };
+        
+        $scope.acceptChallenge = function(challengeId, challengerUserId, challengeeUserId, scheduledTime) {
+          
+            $http.post('api/challenge/accept', {challengeObj: {challengeId: challengeId, challengerUserId: challengerUserId, challengeeUserId: challengeeUserId, scheduledTime: scheduledTime}}).success(function() {
+
+                toastr.success('Challenge Accepted!','Success');
+
+                $scope.initPage();
+
+            }).catch(function(err) {
+
+                toastr.error('Error accepting challenge (' + err.message + ')', 'Error');
+
+            });
+            
+        };
+
+        $scope.declineChallenge = function(challengeId, challengerUserId, challengeeUserId, scheduledTime) {
+
+            var modal = $uibModal.open({
+                templateUrl: 'modules/challenges/client/views/conformation-modal.client.view.html', // todo
+                controller: 'DeclineController', // todo
+                scope: $scope,
+                backdrop: false,
+                windowClass: 'app-modal-window',
+                resolve: {
+                    challengeId: function () {
+                        return challengeId;
+                    }
+                }
+            });
+
+            modal.result.then(function(result) {
+
+                if (result) {
+
+                    $http.post('api/challenge/decline', {
+                        challengeObj: {
+                            challengeId: challengeId,
+                            challengerUserId: challengerUserId,
+                            challengeeUserId: challengeeUserId,
+                            scheduledTime: scheduledTime
+                        }
+                    }).success(function () {
+
+                        toastr.success('Challenge Declined', 'Success');
+
+                        $scope.initPage();
+
+                    }).catch(function (err) {
+
+                        toastr.error('Error declining challenge (' + err.message + ')', 'Error');
+
+                    });
+                }
+                
+            });
+        };
+        
 
         $scope.deleteChallenge = function(challengeId) {
             console.log($scope);
