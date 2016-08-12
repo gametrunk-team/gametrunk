@@ -25,7 +25,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         responsive_breakpoint: 850
       }
     };
-    
+
     $scope.displayRoom = $scope.isAdmin;
     $rootScope.displayRoom = $scope.displayRoom;
     
@@ -34,7 +34,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     };
     
     $scope.desetUserView = function() {
-      $scope.userView = false;
+      if ($scope.isAdmin) $scope.userView = false;
     };
 
     // examples Of how you can fetch content for cards
@@ -170,6 +170,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     $timeout(function () {
       $scope.initialized = true;
     });
+
+    console.log($scope.userView, $scope.isAdmin, $scope.authentication.user);
 
 
   }

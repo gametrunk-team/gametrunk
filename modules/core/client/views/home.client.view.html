@@ -17,6 +17,7 @@
         <!--Deckster Deck does not display correctly when placed in a tab-->
       </uib-tabset>
   </div>
+
   <div ng-hide="authentication.user || displayRoom" class="jumbotron text-center">
     <div>
       <div class="row">
@@ -31,6 +32,7 @@
       </div>
     </div>
   </div>
-  <deckster-deck ng-show="authentication.user && userView" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
+
+  <deckster-deck ng-show="userView" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
   </body>
 </section>

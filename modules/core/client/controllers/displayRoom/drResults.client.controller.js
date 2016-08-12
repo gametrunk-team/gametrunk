@@ -108,9 +108,9 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
                 $scope.upcomingChallenges = [];
                 $scope.getChallenges();
             };
-        }
 
-        $scope.initPage();
+            $scope.initPage();
+        }
 
         $scope.deleteChallenge = function(challengeId) {
             var params = {
