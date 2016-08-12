@@ -2,8 +2,9 @@
 
 module.exports = function(app) {
     // Challenge Routes
-    var challenge = require('../controllers/challenge.server.controller');
-
+    var challenge = require('../controllers/challenge.server.controller'),
+        challengePolicy = require('../policies/challenge.server.policy');
+    
     app.route('/api/challenge/create').post(challenge.createChallenge);
     app.route('/api/challenge/delete').post(challenge.deleteChallenge);
     app.route('/api/challenge/update').post(challenge.updateChallenge);
@@ -18,3 +19,4 @@ module.exports = function(app) {
     app.param('id', challenge.getChallenge);
 
 };
+
