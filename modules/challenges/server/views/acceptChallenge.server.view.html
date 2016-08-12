@@ -1,0 +1,37 @@
+{% extends '../../../core/server/views/layout.server.view.html' %} {% block content %}
+<section ng-show="{{correctUser && accept === 1}}">
+<h1>Challenge Accepted</h1>
+<div class="alert alert-success" role="alert">
+  <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+  <span class="sr-only">Success</span>
+  You accepted {{challengerName}}'s challenge! {{challengerName}} will be notified via email.
+</div>
+</section>
+
+<section ng-hide="{{correctUser}}">
+  <h1>Error Responding to Challenge</h1>
+  <div class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error</span>
+    You are not the correct person to accept this challenge. The user who received this challenge must accept it.
+  </div>
+</section>
+
+<section ng-show="{{alreadyResponded}}">
+  <h1>Error Responding to Challenge</h1>
+  <div class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error</span>
+    You have already responded to this challenge.
+  </div>
+</section>
+
+<section ng-if="{{correctUser && accept === 0}}">
+  <h1>Challenge Declined</h1>
+  <div class="alert alert-success" role="alert">
+    <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+    <span class="sr-only">Success</span>
+    You declined {{challengerName}}'s challenge. {{challengerName}} will be notified via email.
+  </div>
+</section>
+{% endblock %}

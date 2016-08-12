@@ -132,18 +132,20 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 scheduledTime: $scope.dt,
                 challengerUserId: $scope.challengerId,
                 challengeeUserId: $scope.model.opponentId,
-                winnerUserId: null
+                winnerUserId: null,
+                accepted: null
             };
 
             $http.post('/api/challenge/create', challengObj)
                 .success(function (response) {
                     $scope.challengeId = response.id;
+                    challengObj.challengeId = response.id;
+
+                    $http.post('/api/emails/challengeCreated', challengObj);
                 })
                 .error(function (response) {
                     $scope.error = response.message;
                 });
-
-            $http.post('/api/emails/challengeCreated', challengObj);
 
             $scope.$close(true);
             // Display a success toast, with a title
@@ -152,7 +154,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.getChallenges = function() {
-            console.log("challenger Id: " + $scope.challengerId);
             var params = {
                 userId: $scope.challengerId
             };
