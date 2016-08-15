@@ -180,8 +180,5 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       $scope.initialized = true;
     });
 
-    console.log($scope.userView, $scope.isAdmin, $scope.authentication.user);
-
-
   }
 ]);

@@ -58,8 +58,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.initPage();
 
-        $scope.editModal = function (challengeeUser, challengerUser, challengeId) {
-            console.log("making the edit modal");
+        $scope.editModal = function (challenge) {
             var modal = $uibModal.open({
                 templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html', // todo
                 controller: 'ResultController', // todo
@@ -67,14 +66,8 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 backdrop: false,
                 windowClass: 'app-modal-window',
                 resolve: {
-                    challengerUser: function () {
-                        return challengerUser;
-                    },
-                    challengeeUser: function () {
-                        return challengeeUser;
-                    },
-                    challengeId: function () {
-                        return challengeId;
+                    challenge: function () {
+                        return challenge;
                     }
                 }
             });
@@ -145,7 +138,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                 });
 
             $scope.$close(true);
-            // Display a success toast, with a title
             toastr.success('Challenge created','Success');
         };
 
@@ -169,9 +161,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
                         .success(function (data) {
                             value.challengeeUser = data;
                         });
-
-                    console.log("CHALLENGE: ", value);
-
+                    value.selected = null;
                 });
                 $scope.filterChallenges();
             });
@@ -238,14 +228,11 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         
 
         $scope.deleteChallenge = function(challengeId) {
-            console.log($scope);
             var params = {
                 id: challengeId
             };
-            console.log("deleting challenge with id " + $scope.challengeId);
             $http.post('/api/challenge/delete', params)
                 .success(function (data) {
-                    console.log("success");
                 });
             $scope.$dismiss();
         };
@@ -267,17 +254,13 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             angular.forEach($scope.challenges,function(value,index){
                 var scheduledDate = new Date(value.scheduledTime);
                 if(scheduledDate>minTimeToday && scheduledDate<maxTimeToday) {
-                    console.log("adding challenge to today: " + value);
                     $scope.challengesToday.push(value);
                 } else if(scheduledDate<minTimeToday) {
-                    console.log("adding challenge to past challenges: " + value);
                     $scope.pastChallenges.push(value);
                 } else if(scheduledDate>maxTimeToday) {
-                    console.log("adding challenge to upcoming: " + value);
                     $scope.upcomingChallenges.push(value);
                 }
             });
-            console.log("the final count" + $scope.challenges);
         };
 
         // TODO: would probably be good to break the modal logic below out into its own controller
@@ -322,6 +305,74 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
         $scope.dateChange = function() {
             $scope.initTimePicker($scope.dt);
+        };
+        
+        // edit challenge result
+        $scope.Won = function(challenge, winnerId) {
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!','Success');
+                $scope.initPage();
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            // Updating rankings
+            var rankingObject = {
+                challenger: winnerId,
+                challengee: challenge.challengeeUser.id
+            };
+
+            $http.post('/api/rankings/update', rankingObject).success(function() {
+                toastr.success('Challenge Updated!','Success');
+                $scope.initPage();
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
+
+        $scope.Lost = function(challenge, winnerId) {
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!', 'Success');
+                $scope.initPage();
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            //create news
+            var newsObj = {
+                challenger: challenge.challengerUser.id,
+                challengee: challenge.challengeeUser.id
+            };
+
+            $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                    // toastr.success('Challenge Updated!','Success');
+                    // $scope.initPage();
+            }
+            ).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
+        $scope.Submit = function(challenge, winnerId) {
+            if(winnerId===challenge.challengerUser.id) {
+                $scope.Won(challenge, winnerId);
+            } else if(winnerId===challenge.challengeeUser.id) {
+                $scope.Lost(challenge, winnerId);
+            }
         };
     }
 ]);
