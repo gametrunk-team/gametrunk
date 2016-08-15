@@ -159,7 +159,7 @@ exports.sendChallengeCreatedNotification = function(req, res) {
 
             var emails = [challengee.email];
 
-            createEmailJob(mailerConfig.auth.user, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, false, function(err) {
+            createEmailJob(process.env.EMAIL_FROM, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, false, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {
@@ -202,7 +202,7 @@ exports.sendChallengeResponseNotification = function(req, res) {
 
             var emails = [challenger.email];
 
-            createEmailJob(mailerConfig.auth.user, emails, locals.challengeeName + " " + responseText + " your challenge on Gametrunk!", 'challenge-response', locals, false, function(err) {
+            createEmailJob(process.env.EMAIL_FROM, emails, locals.challengeeName + " " + responseText + " your challenge on Gametrunk!", 'challenge-response', locals, false, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {
@@ -234,7 +234,7 @@ exports.sendChallengeTimeChangedNotification = function(req, res) {
 
             var emails = [otherUser.email];
 
-            createEmailJob(mailerConfig.auth.user, emails, locals.changedTimeName + " changed the time of your challenge on Gametrunk!", 'challenge-time-changed', locals, false, function(err) {
+            createEmailJob(process.env.EMAIL_FROM, emails, locals.changedTimeName + " changed the time of your challenge on Gametrunk!", 'challenge-time-changed', locals, false, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {
