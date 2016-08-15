@@ -146,18 +146,37 @@ exports.userByID = function(req, res, next, id) {
  Update User ranking
  */
 exports.updateRanking = function(req, res) {
-    console.log("updating ranking");
     if (!req.body.challenger || !req.body.challengee) {
         return;
     }
 
     User.findById(req.body.challenger).then(function(challenger) {
         User.findById(req.body.challengee).then(function (challengee) {
-
+            // Switch challenger and challengee if appropriate
             if (challenger.rank < challengee.rank) {
-                return;
+                var temp = challenger;
+                challenger = challengee;
+                challengee = temp;
             }
 
+            // Determine whether this is a ranked game
+            // if not, return
+            if (challenger.rank === null || challenger.rank > 3*cSize) {
+                if (challengee.rank !== 3*cSize) {
+                    return;
+                }
+            } else if (challenger.rank % cSize === 2 || challenger.rank % cSize === 1) {
+                if (challengee.rank + 1 !== challenger.rank) {
+                    return;
+                }
+            } else if (challenger.rank % cSize === 3) {
+                if (challengee.rank + 2 < challenger.rank) {
+                    return;
+                }
+            } else if (challenger.rank - 3 > challengee.rank) {
+                return;
+            }
+            
             var update = function (newRankObj, oldRank) {
                 User.update(
                     newRankObj, {where: {rank: oldRank}})

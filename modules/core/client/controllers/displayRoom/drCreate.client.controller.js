@@ -90,8 +90,6 @@ angular.module('core').controller('DrCreateController', ['$scope', '$filter', 'D
                     $scope.error = response.message;
                 });
 
-            $http.post('/api/emails/challengeCreated', challengObj);
-
             $scope.$close(true);
             
             // Display a success toast, with a title
