@@ -31,6 +31,7 @@ var mailerConfig = _.omit({
     }, _.isUndefined),
     host: process.env.HOST,
     port: process.env.PORT,
+    secure: true,
     tls: {
         rejectUnauthorized:false
     }
