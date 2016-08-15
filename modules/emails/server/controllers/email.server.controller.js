@@ -65,6 +65,8 @@ var sendEmail = function(data, done) {
         });*/
         if(data.bulk) {
             poolTransporter.sendMail(data, function(err) {
+                console.log("USING POOL TRANSPORTER\n");
+                console.log("DATA: ", data);
                if(err) {
                    console.log(err);
                }
@@ -72,6 +74,8 @@ var sendEmail = function(data, done) {
             });
         } else {
             transporter.sendMail(data, function(err) {
+                console.log("USING REGULAR TRANSPORTER\n");
+                console.log("DATA: ", data);
                 if(err) {
                     console.log(err);
                 }
