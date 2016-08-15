@@ -54,6 +54,10 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
         $scope.dismiss = function() {
             $scope.$dismiss();
         };
+        
+        $scope.confirm = function () {
+            $scope.$close(true);
+        };
 
 
         // TODO: would probably be good to break the modal logic below out into its own controller
