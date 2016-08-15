@@ -25,7 +25,6 @@
     "moment": "^2.14.1",
     "angular-chart.js": "^1.0.0",
     "chart.js": "npm:chart.js#^2.2.1",
-    "d3": "1.8.4",
     "nvd3": "1.8.4",
     "angular-nvd3": "^1.0.8"
   },
