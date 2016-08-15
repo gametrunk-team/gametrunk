@@ -3,8 +3,8 @@
 module.exports = {
   app: {
     title: 'gametrunk',
-    description: 'Full-Stack Javascript with SequelizeJS, ExpressJS, AngularJS, and NodeJS',
-    keywords: 'Deckster,SequelizeJS,ExpressJS,AngularJS,NodeJS,Karma',
+    description: 'Gametrunk is a web application that allows users to challenge one another to games in the real world.',
+    keywords: 'gametrunk, game, pingpong, rank',
     googleAnalyticsTrackingID: process.env.GOOGLE_ANALYTICS_TRACKING_ID || 'GOOGLE_ANALYTICS_TRACKING_ID'
   },
   port: process.env.PORT || 3000,
