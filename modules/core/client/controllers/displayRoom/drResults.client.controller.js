@@ -19,29 +19,76 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
         $scope.pastChallenges = [];
         $scope.upcomingChallenges = [];
 
-        $scope.editModal = function (challengeeUser, challengerUser, challengeId) {
-            var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/edit-challenge.client.view.html', // todo
-                controller: 'ResultController', // todo
-                scope: $scope,
-                backdrop: false,
-                windowClass: 'app-modal-window',
-                resolve: {
-                    challengerUser: function () {
-                        return challengerUser;
-                    },
-                    challengeeUser: function () {
-                        return challengeeUser;
-                    },
-                    challengeId: function () {
-                        return challengeId;
-                    }
-                }
+        // edit challenge result
+        $scope.Won = function(challenge, winnerId) {
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!','Success');
+                $scope.initPage();
+            }).error(function (response) {
+                $scope.error = response.message;
             });
 
-            modal.result.then(function(){
+
+            // Updating rankings
+            var rankingObject = {
+                challenger: winnerId,
+                challengee: challenge.challengeeUser.id
+            };
+
+            $http.post('/api/rankings/update', rankingObject).success(function() {
+                toastr.success('Challenge Updated!','Success');
                 $scope.initPage();
+            }).error(function(response) {
+                $scope.error = response.message;
             });
+        };
+
+
+        $scope.Lost = function(challenge, winnerId) {
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!', 'Success');
+                $scope.initPage();
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            //create news
+            var newsObj = {
+                challenger: challenge.challengerUser.id,
+                challengee: challenge.challengeeUser.id
+            };
+
+            $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                    // toastr.success('Challenge Updated!','Success');
+                    // $scope.initPage();
+                }
+            ).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
+        $scope.Submit = function(challenge, winnerId) {
+            if(winnerId===challenge.challengerUser.id) {
+                $scope.Won(challenge, winnerId);
+            } else if(winnerId===challenge.challengeeUser.id) {
+                $scope.Lost(challenge, winnerId);
+            }
+        };
+
+        $scope.dismiss = function() {
+            $scope.$dismiss();
         };
 
         $scope.cancelModal = function (challengeId) {
@@ -95,9 +142,11 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
                         .success(function (data) {
                             value.challengeeUser = data;
                         });
+                    value.selected = null;
                 });
                 $scope.filterChallenges();
             });
+
         };
 
         if ($rootScope.displayRoom) {

@@ -4,97 +4,55 @@
 
 'use strict';
 
-angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http','Authentication','challengerUser', 'challengeeUser','challengeId',
-    function($scope, $state, $http, Authentication, challengerUser, challengeeUser, challengeId) {
+angular.module('challenge').controller('ResultController', ['$scope', '$state', '$http','Authentication','challenge',
+    function($scope, $state, $http, Authentication, challenge) {
+
+        var challengerUser = challenge.challengerUser;
+        var challengeeUser = challenge.challengeeUser;
+        var challengeId = challenge.id;
 
         $scope.model = {
             Id: -1
         };
 
-        $scope.challengerUser = challengerUser;
-        $scope.challengeeUser = challengeeUser;
         $scope.challengeId = challengeId;
 
-        $scope.opponent = $scope.users.filter(function( obj ) {
-            return obj.id === $scope.challengeeId;
-        })[0];
-
-        $scope.Won = function() {
-            // Update challenge
-            var challengObj = {
-                id: $scope.challengeId,
-                winnerUserId: $scope.challengerUser.id
-            };
-            $http.post('/api/challenge/update', challengObj).error(function (response) {
-                $scope.error = response.message;
-            });
-
-
-            // Updating rankings
-            var rankingObject = {
-                challenger: $scope.challengerUser.id,
-                challengee: $scope.challengeeUser.id
-            };
-            $http.post('/api/rankings/update', rankingObject).error(function(response) {
-                $scope.error = response.message;
-            });
-        };
-
-
-        $scope.Lost = function() {
-            // Update challenge
-            var challengObj = {
-                id: $scope.challengeId,
-                winnerUserId: $scope.challengeeUser.id
-            };
-            $http.post('/api/challenge/update', challengObj).error(function (response) {
-                $scope.error = response.message;
-            });
-
-
-            //create news
-            var newsObj = {
-                challenger: $scope.challengerUser.id,
-                challengee: $scope.challengeeUser.id
-            };
-
-            $http.post('/api/news/createChallengeLost', newsObj).error(function(response) {
-                $scope.error = response.message;
-            });
-        };
-
-        $scope.getSelectedChallenge = function() {
-
-            var challengObj = {
-                id: $scope.challengeId
-            };
-            $http.post('/api/challenge/get', challengObj)
-                .success(function (response) {
-                    console.log(response);
-                    $scope.dt = response.scheduledTime;
-                    $scope.dt = new Date(response.scheduledTime);
-                    $scope.initTimePicker($scope.dt);
-                })
-                .error(function (response) {
-                    console.log(response);
-                });
-        };
-
-        $scope.getSelectedChallenge();
-
         $scope.Submit = function() {
-            console.log($scope);
-            if($scope.model.Id===$scope.challengerUser.id) {
-                $scope.Won();
-            } else if($scope.model.Id===$scope.challengeeUser.id) {
-                $scope.Lost();
+            // Update challenge
+            var challengObj = {
+                id: $scope.challengeId,
+                scheduledTime: $scope.dt
+            };
+            $http.post('/api/challenge/update', challengObj).error(function (response) {
+                $scope.error = response.message;
+            });
+            
+            var param = {};
+            if(Authentication.user.id===challengeeUser.id) {
+                param = {
+                    challengObj: challengObj,
+                    changedTimeUserId: challengeeUser.id,
+                    otherUserId: challengerUser.id
+                };
+            } else {
+                param = {
+                    challengObj: challengObj,
+                    changedTimeUserId: challengerUser.id,
+                    otherUserId: challengeeUser.id
+                };
             }
-            $scope.dismiss();
+
+            $http.post('/api/emails/challengeTimeChangeNotification', param).success(function() {
+                toastr.success('Time updated & notification email sent!', 'Success');
+                $scope.initPage();
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+            $scope.$close(true);
         };
 
         $scope.dismiss = function() {
-            console.log($scope);
-            $scope.$close(true);
+            $scope.$dismiss();
         };
 
 
@@ -117,12 +75,11 @@ angular.module('challenge').controller('ResultController', ['$scope', '$state', 
         };
 
         $scope.init = function() {
-            $scope.dt = new Date();
-            $scope.dt.setHours(12);
-            $scope.dt.setMinutes(0);
-            $scope.dt.setMilliseconds(0);
+            $scope.dt = new Date(challenge.scheduledTime);
             $scope.initTimePicker($scope.dt);
         };
+
+        $scope.init();
 
         $scope.clear = function() {
             $scope.dt = null;

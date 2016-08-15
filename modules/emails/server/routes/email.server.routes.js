@@ -6,4 +6,5 @@ module.exports = function(app) {
         emailPolicy = require('../policies/email.server.policy');
     
     app.route('/api/emails/challengeCreated').post(emailPolicy.isAllowed, email.sendChallengeCreatedNotification);
+    app.route('/api/emails/challengeTimeChangeNotification').post(emailPolicy.isAllowed, email.sendChallengeTimeChangedNotification);
 };

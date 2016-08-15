@@ -11,7 +11,12 @@
   <div class="list-group news" ng-if="newsList[0]">
     <a ng-repeat="news in newsList" class="list-group-item row news">
       <span class="col-sm-2 row-centered">
+              <div ng-if="news.photoUrl">
         <img class="img-circle" ng-src='https://res.cloudinary.com/gametrunk/image/upload/w_70,h_70,c_fill,e_grayscale/{{news.photoUrl}}'/>
+      </div>
+      <div ng-if="!news.photoUrl">
+                <img class="img-circle" style="-webkit-filter: grayscale(1);filter:gray;filter:grayscale(1)" ng-src='/modules/core/client/img/brand/favicon.png' width="70px"/>
+      </div>
       </span>
         <span class="col-sm-8 pull-right" style="margin:auto; display: table;">
           <p class="text-center" style="margin:auto; padding-top: 22px; padding-bottom: 22px; font-size: 1.2em"><i class="fa {{news.iconClass}}"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{news.text}}</p>

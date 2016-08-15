@@ -169,3 +169,7 @@ body {
 
 .btn-space {
   margin-bottom: 3px; }
+
+.centerBlock {
+  display: table;
+  margin: 0 auto; }
