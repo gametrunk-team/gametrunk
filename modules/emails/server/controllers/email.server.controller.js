@@ -227,8 +227,8 @@ exports.sendChallengeTimeChangedNotification = function(req, res) {
 
             var locals = {
                 changedTimeName : changedTimeUser.firstName,
-                challengeId: req.body.challengeObj.challengeId,
-                timeString: moment(req.body.challengeObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                challengeId: req.body.challengObj.id,
+                timeString: moment(req.body.challengObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
                 subject: "Default Subject"
             };
 

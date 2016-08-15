@@ -42,7 +42,11 @@ exports.invokeRolesPolicies = function() {
             allows: [{
                 resources: '/api/emails/challengeCreated',
                 permissions: '*'
-            }]
+            },
+                {
+                    resources: '/api/emails/challengeTimeChangeNotification',
+                    permissions: '*'
+                }]
         }]
     );
 };
@@ -51,6 +55,7 @@ exports.invokeRolesPolicies = function() {
  * Check If User Policy Allows
  */
 exports.isAllowed = function(req, res, next) {
+    console.log(req.user.roles);
     var roles = (req.user) ? req.user.roles : ['guest'];
 
     // Check for user roles

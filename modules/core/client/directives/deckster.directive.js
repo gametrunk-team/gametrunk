@@ -115,15 +115,12 @@ angular.module('core')
                 };
 
                 this.onReload = function (card) {
-                    console.log('card reloaded', card);
                 };
 
                 this.onResize = function (card) {
-                    console.log('card resized', card);
                 };
 
                 this.onExpand = function (card)  {
-                    console.log('card expanded', card);
                 };
 
                 this.scrollToCard = function () {
