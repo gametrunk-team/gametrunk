@@ -53,7 +53,6 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                         };
                         $scope.data[index].values.push(obj);
                     });
-                    console.log($scope.data);
                 });
             });
         });
@@ -96,31 +95,5 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                 yDomain: [30,1],
     }
         };
-
-        // $scope.data = generateData(4,40);
-        //
-        // /* Random Data Generator (took from nvd3.org) */
-        // function generateData(groups, points) {
-        //     var data = [],
-        //         shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
-        //         random = d3.random.normal();
-        //
-        //     for (var i = 0; i < groups; i++) {
-        //         data.push({
-        //             key: 'Group ' + i,
-        //             values: []
-        //         });
-        //
-        //         for (var j = 0; j < points; j++) {
-        //             data[i].values.push({
-        //                 x: random()
-        //                 , y: random()
-        //                 , size: Math.random()
-        //                 , shape: 'circle'
-        //             });
-        //         }
-        //     }
-        //     return data;
-        // }
     }
 ]);

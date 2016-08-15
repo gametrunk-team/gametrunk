@@ -18,7 +18,8 @@
     "ApplicationConfiguration": true,
     "ga": true,
     "grecaptcha": true,
-    "toastr": true
+    "toastr": true,
+    "d3": true
   },
   "predef": [ // Extra globals.
     "inject",

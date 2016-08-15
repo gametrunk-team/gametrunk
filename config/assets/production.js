@@ -6,9 +6,9 @@ module.exports = {
       css: [
         'public/lib/bootstrap/dist/css/bootstrap.min.css',
         'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
-        'public/lib/gridster/dist/jquery.gridster.css',
-        'public/lib/decksterjs/dist/jquery.deckster.css',
-        'public/lib/components-font-awesome/css/font-awesome.css',
+        'public/lib/gridster/dist/jquery.gridster.min.css',
+        'public/lib/decksterjs/dist/jquery.deckster.min.css',
+        'public/lib/components-font-awesome/css/font-awesome.min.css',
         'public/lib/nvd3/build/nv.d3.min.css'
       ],
       js: [
@@ -25,12 +25,10 @@ module.exports = {
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'public/lib/angular-file-upload/angular-file-upload.min.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
-        'public/lib/Chart.js/dist/Chart.min.js',
-        'public/lib/angular-chart.js/dist/angular-chart.min.js',
-        'public/lib/angular-timeago/dist/angular-timeago.js',
+        'public/lib/angular-timeago/dist/angular-timeago.min.js',
         'https://www.google.com/recaptcha/api.js',
-        'public/lib/decksterjs/dist/jquery.deckster.js',
-        'public/lib/ng-lodash/build/ng-lodash.js',
+        'public/lib/decksterjs/dist/jquery.deckster.min.js',
+        'public/lib/ng-lodash/build/ng-lodash.min.js',
         'public/lib/d3/d3.min.js',
         'public/lib/nvd3/build/nv.d3.min.js',
         'public/lib/angular-nvd3/dist/angular-nvd3.min.js'
