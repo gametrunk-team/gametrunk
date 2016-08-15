@@ -23,6 +23,7 @@
     "bower": "^1.7.1",
     "brace-expansion": "^1.1.2",
     "chalk": "^1.1.1",
+    "chart.js": "^2.2.1",
     "cloudinary": "",
     "compression": "^1.5.0",
     "connect-flash": "~0.1.1",
