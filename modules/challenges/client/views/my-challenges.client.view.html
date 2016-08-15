@@ -15,12 +15,12 @@
       </div>
       </div>
       <div class="col-sm-5" style="padding: 20px">
-        <section style="padding-top: 5px;" ng-show="challenge.accepted == null">
-        <h1 style="margin-left: 64px; font-size: 12px;" class="label label-default">PENDING</h1>
+        <section style="padding-top: 5px;" ng-show="challenge.accepted == null && challenge.winnerUserId === null">
+          <h1 style="margin-left: 64px; font-size: 12px;" class="label label-default">PENDING</h1>
           <br>&nbsp;
           <div class="buttons" ng-show="authentication.user.id === challenge.challengeeUserId" style="padding: 15px; margin: 0 auto; float: left">
-        <a class="btn btn-success" ng-click="acceptChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)" align="center"><i class="fa fa-check"></i> Accept</a>
-          <a class="btn btn-danger" ng-click="declineChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)"><i class="fa fa-times"></i> Decline</a>
+            <a class="btn btn-success" ng-click="acceptChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)" align="center"><i class="fa fa-check"></i> Accept</a>
+            <a class="btn btn-danger" ng-click="declineChallenge(challenge.id, challenge.challengerUserId, challenge.challengeeUserId, challenge.scheduledTime)"><i class="fa fa-times"></i> Decline</a>
           </div>
         </section>
         <section ng-show="challenge.accepted == true">
