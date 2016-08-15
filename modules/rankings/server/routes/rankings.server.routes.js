@@ -16,13 +16,16 @@ module.exports = function(app) {
     //require('./user.server.routes.js')(app);
 
     app.route('/api/rankings/user').get(rankingsPolicy.isAllowed, rankings.list);
-
     app.route('/api/rankings/user/:userId').get(rankingsPolicy.isAllowed, rankings.read);
-
     app.route('/api/rankings/update').post(rankingsPolicy.isAllowed, news.createChallengeResultNews, rankings.updateRanking);
     
     // Gets possible challengees (up to three ranks above)
     app.route('/api/rankings/challengees').get(rankingsPolicy.isAllowed, rankings.getChallengees);
+    
+    // Display room route (only return data if ip matches)
+    app.route('/api/rankings/drRankings').get(rankingsPolicy.isAllowed, rankings.drRankings);
+    app.route('/api/rankings/drResults').get(rankingsPolicy.isAllowed, rankings.drChallenges);
+    app.route('/api/rankings/drUsers').get(rankingsPolicy.isAllowed, rankings.drUsers);
 
     app.param('userId', rankings.userByID);
 };

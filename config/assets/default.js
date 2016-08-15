@@ -25,9 +25,14 @@ module.exports = {
         'public/lib/angular-file-upload/angular-file-upload.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
         'public/lib/angular-timeago/dist/angular-timeago.js',
+        'public/lib/moment/moment.js',
+        'public/lib/moment/locale/*.js',
+        'public/lib/moment/min/moment-with-locales.js',
         'https://www.google.com/recaptcha/api.js',
         'public/lib/decksterjs/dist/jquery.deckster.js',
-        'public/lib/ng-lodash/build/ng-lodash.js'
+        'public/lib/ng-lodash/build/ng-lodash.js',
+        'public/lib/Chart.js/dist/Chart.min.js',
+        'public/lib/angular-chart.js/dist/angular-chart.min.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },

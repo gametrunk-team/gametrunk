@@ -7,8 +7,13 @@ var
     path = require('path'),
     db = require(path.resolve('./config/lib/sequelize')).models,
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    emails = require(path.resolve('./modules/emails/server/controllers/email.server.controller')),
+    rankings = require(path.resolve('./modules/rankings/server/controllers/rankings.server.controller')),
     Sequelize = require('sequelize'),
-    Challenge = db.challenge;
+    sequelizeFile = require(path.resolve('./config/lib/sequelize.js')),
+    sequelize = sequelizeFile.sequelize,
+    Challenge = db.challenge,
+    User = db.user;
 
 /*
 Create Challenge
@@ -31,7 +36,7 @@ exports.createChallenge = function(req, res) {
 exports.deleteChallenge = function(req, res) {
     console.log("DELETING " + req.body.id);
     Challenge.destroy({where: {id: req.body.id}});
-    res.status(200).send();
+    res.status(200).end();
 };
 
 /*
@@ -83,6 +88,55 @@ exports.getChallenge = function(req, res) {
 };
 
 /*
+ Accept a challenge
+ */
+exports.acceptChallenge = function(req, res) {
+    sequelize.transaction(function (t) {
+        return sequelize.query("UPDATE challenges SET accepted = true WHERE id = " + req.body.challengeObj.challengeId + " AND accepted IS NULL", {transaction: t});
+    }).then(function () {
+
+        req.body.accept = 1;
+        emails.sendChallengeResponseNotification(req, res);
+
+        return res.status(200).send();
+    }).catch(function(err) {
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
+    });
+};
+
+/*
+ Decline a challenge
+ */
+exports.declineChallenge = function(req, res) {
+    sequelize.transaction(function (t) {
+        return sequelize.query("UPDATE challenges SET accepted = false WHERE id = " + req.body.challengeObj.challengeId + " AND accepted IS NULL", {transaction: t}).then(function() {
+          return sequelize.query('UPDATE challenges SET "winnerUserId" = ' + req.body.challengeObj.challengerUserId + ' WHERE id = ' + req.body.challengeObj.challengeId , {transaction: t});
+        });
+    }).then(function () {
+
+        req.body.challengee = req.body.challengeObj.challengeeUserId;
+        req.body.challenger = req.body.challengeObj.challengerUserId;
+
+        rankings.updateRanking(req, res);
+
+        Challenge.destroy({where: {id: req.body.challengeObj.challengeId}});
+
+        req.body.accept = 0;
+        emails.sendChallengeResponseNotification(req, res);
+
+        return res.status(200).send();
+    }).catch(function(err) {
+        console.log(err);
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
+    });
+};
+
+
+/*
  Get All Challenges
  */
 exports.getAllChallenges = function(req, res) {
@@ -104,6 +158,100 @@ exports.getAllChallenges = function(req, res) {
 };
 
 /*
+  Respond to challenge from Email
+ */
+exports.respondToChallenge = function(req, res) {
+
+    var challengerName = null;
+    var accept = parseInt(req.query.accept);
+
+    if(req.isAuthenticated() && req.query.id && req.query.userid) {
+
+        var correctUser = (parseInt(req.query.userid) === req.user.id);
+
+        if(correctUser) {
+            
+            req.body.accept = accept;
+
+            Challenge.findById(req.query.id).then(function (challenge) {
+
+                req.body.challengeObj = challenge;
+
+                if(challenge.accepted === null) {
+
+                    User.findById(challenge.challengerUserId).then(function (user) {
+
+                        var challengerName = user.firstName;
+
+                        sequelize.transaction(function (t) {
+
+                            if (accept === 0) {
+                                return sequelize.query('UPDATE challenges SET "winnerUserId" = ' + challenge.challengerUserId + ' WHERE id = ' + req.query.id, {transaction: t}).then(function () {
+                                    return sequelize.query("UPDATE challenges SET accepted = false WHERE id = " + req.query.id, {transaction: t});
+                                });
+                            } else if (accept === 1) {
+                                return sequelize.query("UPDATE challenges SET accepted = true WHERE id = " + req.query.id, {transaction: t});
+                            }
+
+                        }).then(function (result) {
+
+                            if (accept === 0) {
+
+                                req.body.challenger = challenge.challengerUserId;
+                                req.body.challengee = challenge.challengeeUserId;
+
+                                rankings.updateRanking(req, res);
+
+                                Challenge.destroy({where: {id: challenge.id}});
+
+                            }
+
+                            res.render(path.resolve('./modules/challenges/server/views/acceptChallenge'), {
+                                challenge: req.query.id,
+                                challengerName: challengerName,
+                                accept: accept,
+                                correctUser: correctUser
+                            });
+
+                            emails.sendChallengeResponseNotification(req, res);
+
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                    }).catch(function (err) {
+                        console.log("Challenge does not exist!");
+                    });
+
+                } else {
+
+                    res.render(path.resolve('./modules/challenges/server/views/acceptChallenge'), {
+                        challenge: req.query.id,
+                        challengerName: challengerName,
+                        alreadyResponded: true,
+                        correctUser: correctUser
+                    });
+
+                }
+            });
+
+        } else {
+
+            res.render(path.resolve('./modules/challenges/server/views/acceptChallenge'), {
+                challenge: req.query.id,
+                challengerName: challengerName,
+                correctUser: correctUser
+            });
+            
+        }
+
+    } else {
+
+        res.redirect('/api/auth/google');
+
+    }
+};
+
+/*
  Get All Challenges
  */
 exports.getMyChallenges = function(req, res) {
@@ -114,7 +262,8 @@ exports.getMyChallenges = function(req, res) {
         where: Sequelize.or(
             { challengerUserId : req.body.userId },
             { challengeeUserId: req.body.userId }
-        )
+        ),
+        paranoid: req.body.paranoid
     }).then(function(challenges) {
         if (!challenges) {
             return res.status(400).send({

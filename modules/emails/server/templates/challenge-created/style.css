@@ -21,3 +21,5 @@ img {height: auto;}
 .fineprint {line-height: 18px; color: #999; padding: 20px 20px 0; font-size: 11px; text-align: center;}
 a {color: #127bcd;}
 .center-it{float: none; margin: 0 auto;}
+button, .accept {padding: 20px; background: #00856c; color: white; font-size: 25px; border: 0; border-radius: 10px;}
+button, .decline{padding: 20px; background: #ff5c3c; color: white; font-size: 25px; border: 0; border-radius: 10px;}

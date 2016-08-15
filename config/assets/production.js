@@ -24,6 +24,8 @@ module.exports = {
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'public/lib/angular-file-upload/angular-file-upload.min.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+        'public/lib/Chart.js/dist/Chart.min.js',
+        'public/lib/angular-chart.js/dist/angular-chart.min.js',
         'public/lib/angular-timeago/dist/angular-timeago.js',
         'https://www.google.com/recaptcha/api.js',
         'public/lib/decksterjs/dist/jquery.deckster.js',

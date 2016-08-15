@@ -21,7 +21,10 @@
     "angular-timeago": "^0.4.3",
     "components-font-awesome": "^4.6.3",
     "angular-toastr": "^2.0.0",
-    "ng-lodash": "^0.5.0"
+    "ng-lodash": "^0.5.0",
+    "moment": "^2.14.1",
+    "angular-chart.js": "^1.0.0",
+    "chart.js": "npm:chart.js#^2.2.1"
   },
   "resolutions": {
     "angular": "~1.4",

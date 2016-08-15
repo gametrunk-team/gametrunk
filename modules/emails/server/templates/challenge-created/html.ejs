@@ -37,9 +37,31 @@
         <td class="innerpadding borderbottom">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                    <td class="bodycopy">
-                        <h2><%= challengerName %> challenged <%= challengedName %> on gametrunk!</h2>
-                        <p>Meet up with your opponent right now to battle for your next rank!</p>
+                    <td class="bodycopy" align="center">
+                        <h1><%= challengerName %> challenged you on gametrunk!</h1>
+                        <br>
+                    </td>
+                    </tr>
+                <tr>
+                    <td class = "bodycopy" align = "center">
+                        <h3><%=challengerName %> challenged you to a ping-pong match on</h3>
+
+                        <h2><%= timeString %></h2>
+
+                        <h3>You can either accept or decline the challenge. Please note that if you decline this challenge you will drop in rank.</h3>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bodycopy" align="center" style="padding: 5px;">
+                        <a href="https://gametrunk.herokuapp.com/api/challenge/response?id=<%=challengeId%>&accept=1&userid=<%=acceptingUserId%>" target="_blank"><button class="accept">Accept</button></a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="https://gametrunk.herokuapp.com/api/challenge/response?id=<%=challengeId%>&accept=0&userid=<%=acceptingUserId%>" target="_blank"><button class="decline">Decline</button></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bodycopy" align = "center">
+                    <h3>Once accepted, you can change the time and date of this challenge in the "My Challenges" card on your dashboard.</h3>
                     </td>
                 </tr>
             </table>

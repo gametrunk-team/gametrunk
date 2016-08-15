@@ -9,7 +9,7 @@
     <div style="display:inline-block"><img ng-src="modules/core/client/img/brand/favicon.ico" alt="Trunky the Elephant" class="img-responsive text-center" width="50px"/></div>
     <div style="display:inline-block"><a ui-sref="home" class="navbar-brand">gametrunk</a></div>
   </div>
-  <nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
+  <nav class="collapse navbar-collapse" uib-collapse="!isCollapsed" role="navigation">
     <ul class="nav navbar-nav" ng-if="menu.shouldRender(authentication.user);">
       <li ng-repeat="item in menu.items| orderBy: 'position'" ng-if="item.shouldRender(authentication.user);" ng-switch="item.type" ng-class="{ active: $state.includes(item.state), dropdown: item.type === 'dropdown' }" class="{{item.class}}" dropdown="item.type === 'dropdown'">
         <a ng-switch-when="dropdown" class="dropdown-toggle" uib-dropdown-toggle role="button">{{::item.title}}&nbsp;<span class="caret"></span></a>
@@ -21,9 +21,9 @@
         <a ng-switch-default ui-sref="{{item.state}}" ng-bind="item.title"></a>
       </li>
     </ul>
-    <ul class="nav navbar-nav navbar-right" ng-hide="authentication.user">
+    <ul class="nav navbar-nav navbar-right" >
       <li class="divider-vertical"></li>
-      <li ui-sref-active="active">
+      <li ui-sref-active="active" ng-hide="authentication.user || displayRoom">
         <a ng-click="callOauthProvider('/api/auth/google')">
           <img ng-src="/modules/users/client/img/buttons/google.png" class="img-responsive" width="125">
         </a>
