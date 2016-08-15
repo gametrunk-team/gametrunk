@@ -3,13 +3,14 @@
 angular.module('core').controller('StatsCardController', ['$scope', '$timeout', '$window', 'Authentication', 'Circuit', '$http','Rankings','Challenges',
     function($scope, $timeout, $window, Authentication, Circuit, $http, Rankings, Challenges) {
 
+        $scope.data = [];
+
         Rankings.query(function(data) {
             $scope.users = data;
             $http.get('/api/user').success(function (response) {
                 $scope.currentUserId = response.id;
 
                 $http.get('/api/challenge/getall').success(function (data) {
-                    $scope.stats = [];
                     $scope.labels = [];
                     $scope.colors = [];
                     $scope.challenges = data;
@@ -38,48 +39,61 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                     });
 
                     angular.forEach($scope.users, function (value, index) {
-                        var obj = [{
+
+                        $scope.data.push({
+                            key: value.displayName + ', Rank ' + value.rank,
+                            values: []
+                        });
+
+                        var obj = {
                             x: value.gamesPlayed,
                             y: value.rank,
-                            r: value.winLossRatio * 10.0,
-                            label: 'this is a test'
-                        }];
-                        $scope.stats.push(obj);
-                        if ($scope.currentUserId===value.id)
-                        {
-                            $scope.labels.push('me');
-                            $scope.colors.push('#ff0000');
-                        } else {
-                            $scope.labels.push(value.displayName);
-                            $scope.colors.push('');
-                        }
+                            size: value.winLossRatio!==0 ? value.winLossRatio  : 1,
+                            shape: 'circle'
+                        };
+                        $scope.data[index].values.push(obj);
                     });
                 });
             });
         });
 
         $scope.options = {
-            tooltips: {
-                enabled: false
-            },
-            yAxisLabel: "My Y Axis Label",
-            xAxisLabel: "My Y Axis Label",
-            responsive: true,
-            title: {
-                display: true,
-            },
-            scales: {
-                xAxes: [{}],
-                yAxes: [{
-                    ticks: {
-                        reverse: true
+            chart: {
+                type: 'scatterChart',
+                height: 450,
+                color: d3.scale.category10().range(),
+                scatter: {
+                    onlyCircles: true
+                },
+                showDistX: true,
+                showDistY: true,
+                tooltip: {
+                    contentGenerator: function (key, x, y, e, graph) {
+                        return '<p>' + key.series[0].key + '</p>' + '<p>Games Played: ' + key.series[0].values[0].x + '</p><p>Win/Loss Ratio: ' + Math.round(key.series[0].values[0].size  * 100) / 100+ '</p>';
                     }
-                }]
-            },
-            legend: {
-                display: true,
-                position: 'bottom'
-            }
+                },
+                duration: 350,
+                xAxis: {
+                    axisLabel: 'Number of Games Played'
+                },
+                yAxis: {
+                    axisLabel: 'Rank',
+                    axisLabelDistance: -5
+                },
+                zoom: {
+                    //NOTE: All attributes below are optional
+                    enabled: false,
+                    scaleExtent: [1, 10],
+                    useFixedDomain: false,
+                    useNiceScale: false,
+                    horizontalOff: false,
+                    verticalOff: false,
+                    unzoomEventType: 'dblclick.zoom'
+                },
+                showLegend: false,
+                // yDomain: [d3.max($scope.data, function (d) { return d.v; }), d3.min($scope.data, function (d) { return d.v; })]
+                yDomain: [30,1],
+    }
         };
     }
 ]);
