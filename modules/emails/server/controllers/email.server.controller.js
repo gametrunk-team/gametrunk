@@ -49,11 +49,16 @@ var transporter = nodemailer.createTransport(mailerConfig);
 var poolTransporter = nodemailer.createTransport(smtpPool(mailerConfig));
 
 var sendEmail = function(data, done) {
+
+    console.log("IN SEND MAIL FUNCTION");
+
     if (process.env.TEST_EMAIL === 'true') {
         console.log("\n\n========= ", data.to, " =============", "\n\n============= BEGIN TEST EMAIL CONTENT =============\n\n", data.html,
             '\n\n============= TEXT =============\n\n', data.text, "\n\n============= END TEST EMAIL CONTENT =============\n\n");
         done();
     } else {
+
+
         /*nodemailerMailgun.sendMail(data, function(err, info) {
            if(err){
                console.log("ERROR SENDING EMAIL: ", err);
@@ -164,7 +169,7 @@ exports.sendChallengeCreatedNotification = function(req, res) {
 
             var emails = [challengee.email];
 
-            createEmailJob(process.env.EMAIL_FROM, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, false, function(err) {
+            createEmailJob(process.env.EMAIL_FROM, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, true, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {
