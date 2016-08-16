@@ -32,10 +32,11 @@ module.exports = {
         'https://www.google.com/recaptcha/api.js',
         'public/lib/decksterjs/dist/jquery.deckster.js',
         'public/lib/ng-lodash/build/ng-lodash.js',
+        'public/lib/angulartics/dist/angulartics.min.js',
+        'public/lib/angulartics-google-analytics/dist/angulartics-ga.min.js', 
           'public/lib/d3/d3.min.js',
           'public/lib/nvd3/build/nv.d3.min.js',
           'public/lib/angular-nvd3/dist/angular-nvd3.min.js'
-
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
