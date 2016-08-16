@@ -38,6 +38,9 @@ Get all users
 exports.getAllUsers = function(req, res) {
 
   User.findAll().then(function(users) {
+    users = _.filter(users, function(user) {
+      return user.roles.indexOf("admin") === -1;
+    });
     return res.json(users);
   }).catch(function(err) {
     return res.status(400).send({
@@ -52,6 +55,9 @@ exports.getAllUsers = function(req, res) {
 exports.getOpponents = function(req, res) {
 
   User.findAll().then(function(users) {
+    users = _.filter(users, function(user) {
+      return user.roles.indexOf("admin") === -1;
+    });
     return res.json(users);
   }).catch(function(err) {
     return res.status(400).send({
