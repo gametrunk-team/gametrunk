@@ -69,7 +69,7 @@ exports.getChallenge = function(req, res) {
             });
         });
     } else if(req.body.challengee) {
-        Challenge.findOne({where: {chalengee: req.body.challengee}}).then(function (challenge) {
+        Challenge.findOne({where: {challengeeUserId: req.body.challengee}}).then(function (challenge) {
             return res.json(challenge);
         }).catch(function(err) {
             return res.status(400).send({

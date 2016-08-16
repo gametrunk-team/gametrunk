@@ -28,8 +28,8 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             };
 
             $http.post('/api/challenge/update', challengObj).success(function() {
-                toastr.success('Challenge Updated!','Success');
-                $scope.initPage();
+                // toastr.success('Challenge Updated!','Success');
+                // $scope.initPage();
             }).error(function (response) {
                 $scope.error = response.message;
             });
@@ -57,13 +57,12 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
                 winnerUserId: winnerId
             };
             $http.post('/api/challenge/update', challengObj).success(function() {
-                toastr.success('Challenge Updated!', 'Success');
-                $scope.initPage();
             }).error(function (response) {
                 $scope.error = response.message;
             });
 
 
+            console.log(challenge.challengeeUser.id, challenge.challengerUser.id);
             //create news
             var newsObj = {
                 challenger: challenge.challengerUser.id,
@@ -77,9 +76,23 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             ).error(function(response) {
                 $scope.error = response.message;
             });
+
+            // Updating rankings
+            var rankingObject = {
+                challenger: challenge.challengerUser.id,
+                challengee: challenge.challengeeUser.id
+            };
+
+            $http.post('/api/rankings/update', rankingObject).success(function() {
+                toastr.success('Challenge Updated!','Success');
+                $scope.initPage();
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
         };
 
         $scope.Submit = function(challenge, winnerId) {
+            console.log(challenge, winnerId);
             if(winnerId===challenge.challengerUser.id) {
                 $scope.Won(challenge, winnerId);
             } else if(winnerId===challenge.challengeeUser.id) {

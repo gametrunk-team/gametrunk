@@ -9,7 +9,10 @@ var path = require('path'),
     db = require(path.resolve('./config/lib/sequelize')).models,
     User = db.user,
     Challenge = db.challenge,
-    _ = require('lodash');
+    _ = require('lodash'),
+    Sequelize = require('sequelize'),
+    sequelizeFile = require(path.resolve('./config/lib/sequelize.js')),
+    sequelize = sequelizeFile.sequelize;
 
 const http = require('http');
 
@@ -34,6 +37,11 @@ exports.list = function(req, res) {
                 message: 'Unable to get list of users'
             });
         } else {
+            // Filter out admins
+            users = _.filter(users, function(user) {
+                return user.roles.indexOf("admin") === -1;
+            });
+            
             // Define display rank
             users = _.map(users, function(user) {
                 if (user.dataValues.rank === null) {
@@ -83,6 +91,10 @@ exports.getChallengees = function(req, res) {
                 {rank: {lt: upperBound}}
             ]
         }).then(function (users) {
+            users = _.filter(users, function(user) {
+                return user.roles.indexOf("admin") === -1;
+            });
+            
             users = _.map(users, function(user) {
                 if (user.dataValues.rank === null) {
                     user.dataValues.displayRank = "Un";
@@ -150,6 +162,8 @@ exports.updateRanking = function(req, res) {
         return;
     }
 
+    console.log(req.body.challenger, req.body.challengee);
+
     User.findById(req.body.challenger).then(function(challenger) {
         User.findById(req.body.challengee).then(function (challengee) {
             // Switch challenger and challengee if appropriate
@@ -176,7 +190,7 @@ exports.updateRanking = function(req, res) {
             } else if (challenger.rank - 3 > challengee.rank) {
                 return;
             }
-            
+
             var update = function (newRankObj, oldRank) {
                 User.update(
                     newRankObj, {where: {rank: oldRank}})
@@ -216,11 +230,13 @@ exports.drRankings = function(req, res) {
                     ]
                 }).then(function(users) {
                     if (!users) {
-                        console.log("no users");
                         return res.status(400).send({
                             message: 'Unable to get list of users'
                         });
                     } else {
+                        users = _.filter(users, function(user) {
+                           return user.roles.indexOf("admin") === -1;
+                        });
                         // Define display rank
                         users = _.map(users, function(user) {
                             if (user.dataValues.rank === null) {
@@ -239,6 +255,7 @@ exports.drRankings = function(req, res) {
                         res.json(users);
                     }
                 }).catch(function(err) {
+                    console.log(err);
                     res.jsonp(err);
                 });
 };
@@ -254,6 +271,9 @@ exports.drUsers = function(req, res) {
                 message: 'Unable to get list of users'
             });
         } else {
+            users = _.filter(users, function(user) {
+                return user.roles.indexOf("admin") === -1;
+            });
             res.json(users);
         }
     }).catch(function (err) {
