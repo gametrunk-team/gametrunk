@@ -29,7 +29,9 @@ module.exports = {
         'public/lib/angular-timeago/dist/angular-timeago.js',
         'https://www.google.com/recaptcha/api.js',
         'public/lib/decksterjs/dist/jquery.deckster.js',
-        'public/lib/ng-lodash/build/ng-lodash.js'
+        'public/lib/ng-lodash/build/ng-lodash.js',
+        'public/lib/angulartics/dist/angulartics.min.js',
+        'public/lib/angulartics-google-analytics/dist/angulartics-ga.min.js'
       ]
     },
     css: 'public/dist/application.min.css',
