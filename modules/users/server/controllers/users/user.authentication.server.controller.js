@@ -40,13 +40,6 @@ exports.signup = function(req, res) {
   user.hashedPassword = user.encryptPassword(req.body.password, user.salt);
   user.displayName = user.firstName + ' ' + user.lastName;
 
-  //MUST DELETE THIS WHEN PRODUCTION
-  if (req.body.is_admin === true) {
-    user.roles = ["admin", "user"];
-  } else {
-    user.roles = ["user"];
-  }
-
   user.save().then(function() {
     req.login(user, function(err) {
       if (err)
@@ -346,7 +339,6 @@ exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
                             }).then(function (conflict) {
 
                               if (conflict) {
-                                console.log("Conflict, setting rank as null");
                                 newUser.rank = null;
                               } else {
                                 newUser.rank = newRank;

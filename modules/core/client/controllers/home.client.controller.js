@@ -102,7 +102,6 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       {
         title: 'Rankings',
         id: 'rankingsCard',
-        hasPopout: true,
         summaryContentHtml: viewRankings,
         detailsContentHtml: viewRankings,
         position: {
