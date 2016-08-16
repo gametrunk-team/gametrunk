@@ -4,7 +4,20 @@
 var ApplicationConfiguration = (function() {
   // Init module configuration options
   var applicationModuleName = 'seanjs';
-  var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngLodash', 'yaru22.angular-timeago','nvd3'];
+
+  var applicationModuleVendorDependencies = [
+    'ngResource',
+    'ngAnimate',
+    'ngMessages',
+    'ui.router',
+    'ui.bootstrap',
+    'ui.utils',
+    'angularFileUpload',
+    'ngLodash',
+    'yaru22.angular-timeago',
+    'angulartics',
+    'angulartics.google.analytics',
+    'nvd3'];
 
   // Add a new vertical module
   var registerModule = function(moduleName, dependencies) {
@@ -122,7 +135,8 @@ ApplicationConfiguration.registerModule('challenge', ['core']);
 'use strict';
 
 // Use Applicaion configuration module to register a new module
-ApplicationConfiguration.registerModule('core', ['yaru22.angular-timeago']);
+
+ApplicationConfiguration.registerModule('core', ['yaru22.angular-timeago','angulartics']);
 ApplicationConfiguration.registerModule('core.admin', ['core']);
 ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
 
@@ -541,12 +555,11 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
             // Updating rankings
             var rankingObject = {
-                challenger: winnerId,
+                challenger: challenge.challengerUser.id,
                 challengee: challenge.challengeeUser.id
             };
 
             $http.post('/api/rankings/update', rankingObject).success(function() {
-                toastr.success('Challenge Updated!','Success');
                 $scope.initPage();
             }).error(function(response) {
                 $scope.error = response.message;
@@ -585,10 +598,81 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         $scope.Submit = function(challenge, winnerId) {
+
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!','Success');
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            var rankingObject = {};
+            var newsObj = {};
+
+            // Updating rankings if winner is of lower rank
             if(winnerId===challenge.challengerUser.id) {
-                $scope.Won(challenge, winnerId);
+                if(challenge.challengerUser.rank > challenge.challengeeUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function() {
+                        $scope.initPage();
+                    }).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                            // toastr.success('Challenge Updated!','Success');
+                            // $scope.initPage();
+                        }
+                    ).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                }
             } else if(winnerId===challenge.challengeeUser.id) {
-                $scope.Lost(challenge, winnerId);
+                if(challenge.challengeeUser.rank > challenge.challengerUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function() {
+                        $scope.initPage();
+                    }).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                            // toastr.success('Challenge Updated!','Success');
+                            // $scope.initPage();
+                        }
+                    ).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                }
             }
         };
     }
@@ -1046,7 +1130,7 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                         var wins = 0.0;
                         var losses = 0.0;
                         angular.forEach($scope.challenges, function (challenge, index) {
-                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id) {
+                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id && challenge.winnerUserId !== null && challenge.winnerUserId !== -1) {
                                 games++;
                                 if (challenge.winnerUserId === user.id) {
                                     wins++;
@@ -1350,71 +1434,77 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
         $scope.pastChallenges = [];
         $scope.upcomingChallenges = [];
 
-        // edit challenge result
-        $scope.Won = function(challenge, winnerId) {
-            // Update challenge
-            var challengObj = {
-                id: challenge.id,
-                winnerUserId: winnerId
-            };
-
-            $http.post('/api/challenge/update', challengObj).success(function() {
-                toastr.success('Challenge Updated!','Success');
-                $scope.initPage();
-            }).error(function (response) {
-                $scope.error = response.message;
-            });
-
-
-            // Updating rankings
-            var rankingObject = {
-                challenger: winnerId,
-                challengee: challenge.challengeeUser.id
-            };
-
-            $http.post('/api/rankings/update', rankingObject).success(function() {
-                toastr.success('Challenge Updated!','Success');
-                $scope.initPage();
-            }).error(function(response) {
-                $scope.error = response.message;
-            });
-        };
-
-
-        $scope.Lost = function(challenge, winnerId) {
-            // Update challenge
-            var challengObj = {
-                id: challenge.id,
-                winnerUserId: winnerId
-            };
-            $http.post('/api/challenge/update', challengObj).success(function() {
-                toastr.success('Challenge Updated!', 'Success');
-                $scope.initPage();
-            }).error(function (response) {
-                $scope.error = response.message;
-            });
-
-
-            //create news
-            var newsObj = {
-                challenger: challenge.challengerUser.id,
-                challengee: challenge.challengeeUser.id
-            };
-
-            $http.post('/api/news/createChallengeLost', newsObj).success(function() {
-                    // toastr.success('Challenge Updated!','Success');
-                    // $scope.initPage();
-                }
-            ).error(function(response) {
-                $scope.error = response.message;
-            });
-        };
-
         $scope.Submit = function(challenge, winnerId) {
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!','Success');
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            var rankingObject = {};
+            var newsObj = {};
+
+            // Updating rankings if winner is of lower rank
             if(winnerId===challenge.challengerUser.id) {
-                $scope.Won(challenge, winnerId);
+                if(challenge.challengerUser.rank > challenge.challengeeUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function() {
+                        $scope.initPage();
+                    }).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                        }
+                    ).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                }
             } else if(winnerId===challenge.challengeeUser.id) {
-                $scope.Lost(challenge, winnerId);
+                if (challenge.challengeeUser.rank > challenge.challengerUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function () {
+                        $scope.initPage();
+                    }).error(function (response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function () {
+                        }
+                    ).error(function (response) {
+                        $scope.error = response.message;
+                    });
+                }
             }
         };
 
@@ -1526,37 +1616,6 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
                     $scope.upcomingChallenges.push(value);
                 }
             });
-        };
-
-        // TODO: would probably be good to break the modal logic below out into its own controller
-
-        $scope.min = null;
-        $scope.max = null;
-        $scope.dt = null;
-
-        $scope.initTimePicker = function(selectedDate) {
-            var min = new Date(selectedDate.getTime());
-            min.setHours(0);
-            min.setMinutes(0);
-            $scope.min = min;
-
-            var max = new Date(selectedDate.getTime());
-            max.setHours(24);
-            max.setMinutes(0);
-            $scope.max = max;
-        };
-
-        $scope.init = function() {
-            $scope.dt = new Date();
-            $scope.dt.setHours(12);
-            $scope.dt.setMinutes(0);
-            $scope.dt.setMilliseconds(0);
-            $scope.initTimePicker($scope.dt);
-        };
-        $scope.init();
-
-        $scope.clear = function() {
-            $scope.dt = null;
         };
 
         $scope.open = function() {
@@ -1718,7 +1777,6 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       {
         title: 'Rankings',
         id: 'rankingsCard',
-        hasPopout: true,
         summaryContentHtml: viewRankings,
         detailsContentHtml: viewRankings,
         position: {
