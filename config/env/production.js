@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 module.exports = {
   secure: {
     ssl: Boolean(process.env.ssl) || false,
