@@ -98,9 +98,9 @@
 @media (max-width: 767px) {
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a {
     color: #777; }
+
   .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-seanjs .navbar-nav .open .dropdown-menu > li > a:focus {
     color: #333; } }
-
 .navbar-nav > li > a {
   text-shadow: none; }
 
@@ -173,3 +173,5 @@ body {
 .centerBlock {
   display: table;
   margin: 0 auto; }
+
+/*# sourceMappingURL=core.css.map */
