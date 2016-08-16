@@ -8,7 +8,8 @@ module.exports = {
         'public/lib/bootstrap/dist/css/bootstrap-theme.css',
         'public/lib/gridster/dist/jquery.gridster.css',
         'public/lib/decksterjs/dist/jquery.deckster.css',
-        'public/lib/components-font-awesome/css/font-awesome.css'
+        'public/lib/components-font-awesome/css/font-awesome.css',
+        'public/lib/nvd3/build/nv.d3.min.css'
       ],
       js: [
         'public/lib/jquery/dist/jquery.min.js',
@@ -32,7 +33,10 @@ module.exports = {
         'public/lib/decksterjs/dist/jquery.deckster.js',
         'public/lib/ng-lodash/build/ng-lodash.js',
         'public/lib/angulartics/dist/angulartics.min.js',
-        'public/lib/angulartics-google-analytics/dist/angulartics-ga.min.js'
+        'public/lib/angulartics-google-analytics/dist/angulartics-ga.min.js', 
+          'public/lib/d3/d3.min.js',
+          'public/lib/nvd3/build/nv.d3.min.js',
+          'public/lib/angular-nvd3/dist/angular-nvd3.min.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },

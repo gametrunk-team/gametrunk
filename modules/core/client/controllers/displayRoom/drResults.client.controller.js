@@ -19,71 +19,77 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
         $scope.pastChallenges = [];
         $scope.upcomingChallenges = [];
 
-        // edit challenge result
-        $scope.Won = function(challenge, winnerId) {
-            // Update challenge
-            var challengObj = {
-                id: challenge.id,
-                winnerUserId: winnerId
-            };
-
-            $http.post('/api/challenge/update', challengObj).success(function() {
-                toastr.success('Challenge Updated!','Success');
-                $scope.initPage();
-            }).error(function (response) {
-                $scope.error = response.message;
-            });
-
-
-            // Updating rankings
-            var rankingObject = {
-                challenger: winnerId,
-                challengee: challenge.challengeeUser.id
-            };
-
-            $http.post('/api/rankings/update', rankingObject).success(function() {
-                toastr.success('Challenge Updated!','Success');
-                $scope.initPage();
-            }).error(function(response) {
-                $scope.error = response.message;
-            });
-        };
-
-
-        $scope.Lost = function(challenge, winnerId) {
-            // Update challenge
-            var challengObj = {
-                id: challenge.id,
-                winnerUserId: winnerId
-            };
-            $http.post('/api/challenge/update', challengObj).success(function() {
-                toastr.success('Challenge Updated!', 'Success');
-                $scope.initPage();
-            }).error(function (response) {
-                $scope.error = response.message;
-            });
-
-
-            //create news
-            var newsObj = {
-                challenger: challenge.challengerUser.id,
-                challengee: challenge.challengeeUser.id
-            };
-
-            $http.post('/api/news/createChallengeLost', newsObj).success(function() {
-                    // toastr.success('Challenge Updated!','Success');
-                    // $scope.initPage();
-                }
-            ).error(function(response) {
-                $scope.error = response.message;
-            });
-        };
-
         $scope.Submit = function(challenge, winnerId) {
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!','Success');
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            var rankingObject = {};
+            var newsObj = {};
+
+            // Updating rankings if winner is of lower rank
             if(winnerId===challenge.challengerUser.id) {
-                $scope.Won(challenge, winnerId);
+                if(challenge.challengerUser.rank > challenge.challengeeUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function() {
+                        $scope.initPage();
+                    }).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                        }
+                    ).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                }
             } else if(winnerId===challenge.challengeeUser.id) {
-                $scope.Lost(challenge, winnerId);
+                if (challenge.challengeeUser.rank > challenge.challengerUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function () {
+                        $scope.initPage();
+                    }).error(function (response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function () {
+                        }
+                    ).error(function (response) {
+                        $scope.error = response.message;
+                    });
+                }
             }
         };
 
@@ -195,37 +201,6 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
                     $scope.upcomingChallenges.push(value);
                 }
             });
-        };
-
-        // TODO: would probably be good to break the modal logic below out into its own controller
-
-        $scope.min = null;
-        $scope.max = null;
-        $scope.dt = null;
-
-        $scope.initTimePicker = function(selectedDate) {
-            var min = new Date(selectedDate.getTime());
-            min.setHours(0);
-            min.setMinutes(0);
-            $scope.min = min;
-
-            var max = new Date(selectedDate.getTime());
-            max.setHours(24);
-            max.setMinutes(0);
-            $scope.max = max;
-        };
-
-        $scope.init = function() {
-            $scope.dt = new Date();
-            $scope.dt.setHours(12);
-            $scope.dt.setMinutes(0);
-            $scope.dt.setMilliseconds(0);
-            $scope.initTimePicker($scope.dt);
-        };
-        $scope.init();
-
-        $scope.clear = function() {
-            $scope.dt = null;
         };
 
         $scope.open = function() {

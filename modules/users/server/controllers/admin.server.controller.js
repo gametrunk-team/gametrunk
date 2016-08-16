@@ -6,7 +6,8 @@
 var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   db = require(path.resolve('./config/lib/sequelize')).models,
-  User = db.user;
+  User = db.user,
+    _ = require('lodash');
 
 
 /**
@@ -101,6 +102,9 @@ exports.list = function(req, res) {
         message: 'Unable to get list of users'
       });
     } else {
+      users = _.filter(users, function(user) {
+        return user.roles.indexOf("admin") === -1;
+      });
       res.json(users);
     }
   }).catch(function(err) {
