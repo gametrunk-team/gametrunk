@@ -329,6 +329,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         
         // edit challenge result
         $scope.Won = function(challenge, winnerId) {
+            console.log(winnerId + " won this challenge. Ran the Won function.");
             // Update challenge
             var challengObj = {
                 id: challenge.id,
@@ -345,7 +346,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
             // Updating rankings
             var rankingObject = {
-                challenger: winnerId,
+                challenger: challenge.challengerUser.id,
                 challengee: challenge.challengeeUser.id
             };
 
@@ -359,6 +360,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.Lost = function(challenge, winnerId) {
+            console.log(winnerId + " won this challenge; ran the Lost function");
             // Update challenge
             var challengObj = {
                 id: challenge.id,
@@ -388,10 +390,81 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         $scope.Submit = function(challenge, winnerId) {
+
+            // Update challenge
+            var challengObj = {
+                id: challenge.id,
+                winnerUserId: winnerId
+            };
+
+            $http.post('/api/challenge/update', challengObj).success(function() {
+                toastr.success('Challenge Updated!','Success');
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+
+
+            var rankingObject = {};
+            var newsObj = {};
+
+            // Updating rankings if winner is of lower rank
             if(winnerId===challenge.challengerUser.id) {
-                $scope.Won(challenge, winnerId);
+                if(challenge.challengerUser.rank > challenge.challengeeUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function() {
+                        $scope.initPage();
+                    }).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                            // toastr.success('Challenge Updated!','Success');
+                            // $scope.initPage();
+                        }
+                    ).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                }
             } else if(winnerId===challenge.challengeeUser.id) {
-                $scope.Lost(challenge, winnerId);
+                if(challenge.challengeeUser.rank > challenge.challengerUser.rank) {
+                    rankingObject = {
+                        challenger: challenge.challengeeUser.id,
+                        challengee: challenge.challengerUser.id
+                    };
+
+                    $http.post('/api/rankings/update', rankingObject).success(function() {
+                        $scope.initPage();
+                    }).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                } else {
+                    //create news
+                    newsObj = {
+                        challenger: challenge.challengerUser.id,
+                        challengee: challenge.challengeeUser.id
+                    };
+                    $scope.initPage();
+
+                    $http.post('/api/news/createChallengeLost', newsObj).success(function() {
+                            // toastr.success('Challenge Updated!','Success');
+                            // $scope.initPage();
+                        }
+                    ).error(function(response) {
+                        $scope.error = response.message;
+                    });
+                }
             }
         };
     }
