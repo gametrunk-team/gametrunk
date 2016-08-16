@@ -524,6 +524,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         
         // edit challenge result
         $scope.Won = function(challenge, winnerId) {
+            console.log(winnerId + " won this challenge. Ran the Won function.");
             // Update challenge
             var challengObj = {
                 id: challenge.id,
@@ -554,6 +555,7 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
 
 
         $scope.Lost = function(challenge, winnerId) {
+            console.log(winnerId + " won this challenge; ran the Lost function");
             // Update challenge
             var challengObj = {
                 id: challenge.id,

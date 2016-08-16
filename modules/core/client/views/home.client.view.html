@@ -13,9 +13,9 @@
         <uib-tab heading="Add Results" select="desetUserView()">
           <add-results></add-results>
         </uib-tab>
-      <uib-tab heading="User View" select="setUserView()"></uib-tab>
-        <!--Deckster Deck does not display correctly when placed in a tab-->
-      </uib-tabset>
+      <!--<uib-tab heading="User View" select="setUserView()"></uib-tab>-->
+        <!--&lt;!&ndash;Deckster Deck does not display correctly when placed in a tab&ndash;&gt;-->
+      <!--</uib-tabset>-->
   </div>
 
   <div ng-hide="authentication.user || displayRoom" class="jumbotron text-center">
@@ -33,6 +33,6 @@
     </div>
   </div>
 
-  <deckster-deck ng-show="userView" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>
+  <!--<deckster-deck ng-show="userView" deck="mainDeck" initialized="initialized" ng-if="initialized"></deckster-deck>-->
   </body>
 </section>

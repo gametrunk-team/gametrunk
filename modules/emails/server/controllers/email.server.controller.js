@@ -101,7 +101,7 @@ exports.sendChallengeCreatedNotification = function(req, res) {
                 challengedName : challengee.firstName,
                 challengeId: req.body.challengeId,
                 acceptingUserId: challengee.id,
-                timeString: moment(req.body.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                timeString: moment.utc(req.body.challengeObj.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
                 subject: "Default Subject"
             };
 
@@ -142,7 +142,7 @@ exports.sendChallengeResponseNotification = function(req, res) {
             var locals = {
                 challengeeName : challengee.firstName,
                 challengeId: req.body.challengeObj.challengeId,
-                timeString: moment(req.body.challengeObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                timeString: moment.utc(req.body.challengeObj.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
                 responseText: responseText,
                 summaryText: summaryText,
                 subject: "Default Subject"
@@ -176,7 +176,7 @@ exports.sendChallengeTimeChangedNotification = function(req, res) {
             var locals = {
                 changedTimeName : changedTimeUser.firstName,
                 challengeId: req.body.challengObj.id,
-                timeString: moment(req.body.challengObj.scheduledTime).format('dddd, MMMM Do [at] h:mmA'),
+                timeString: moment.utc(req.body.challengeObj.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
                 subject: "Default Subject"
             };
 
