@@ -30,8 +30,7 @@ var transporter = nodemailer.createTransport(mailerConfig);
 var poolTransporter = nodemailer.createTransport(smtpPool(mailerConfig));
 
 var sendEmail = function(data, done) {
-
-    console.log("IN SEND MAIL FUNCTION");
+    
 
     if (process.env.TEST_EMAIL === 'true') {
         console.log("\n\n========= ", data.to, " =============", "\n\n============= BEGIN TEST EMAIL CONTENT =============\n\n", data.html,
