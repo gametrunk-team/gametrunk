@@ -21,7 +21,7 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                         var wins = 0.0;
                         var losses = 0.0;
                         angular.forEach($scope.challenges, function (challenge, index) {
-                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id) {
+                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id && challenge.winnerUserId !== null && challenge.winnerUserId !== -1) {
                                 games++;
                                 if (challenge.winnerUserId === user.id) {
                                     wins++;

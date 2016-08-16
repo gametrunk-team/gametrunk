@@ -9,19 +9,8 @@ var templatesDir   = path.resolve(__dirname, '../templates');
 var emailTemplates = require('email-templates').EmailTemplate;
 var db = require(path.resolve('./config/lib/sequelize')).models;
 var User = db.user;
-//var mg = require('nodemailer-mailgun-transport');
 var async = require('async');
 var moment = require('moment');
-
-/*var emailQueue = kue.createQueue({
-    prefix: 'q',
-    redis: {
-        port: 9099,
-        host: process.env.REDIS_HOST,
-        auth: process.env.REDIS_PASSWORD,
-        db: process.env.REDIS_DATABASE
-    }
-});*/
 
 var mailerConfig = _.omit({
     service: process.env.EMAIL_SERVICE,
@@ -31,52 +20,30 @@ var mailerConfig = _.omit({
     }, _.isUndefined),
     host: process.env.HOST,
     port: process.env.PORT,
+    secure: true,
     tls: {
         rejectUnauthorized:false
     }
 }, _.isEmpty);
 
-/*var auth = {
-    auth: {
-        api_key: process.env.MAILGUN_API_KEY,
-        domain: process.env.MAILGUN_DOMAIN
-    }
-};*/
-
-//var nodemailerMailgun = nodemailer.createTransport(mg(auth));
 var transporter = nodemailer.createTransport(mailerConfig);
 var poolTransporter = nodemailer.createTransport(smtpPool(mailerConfig));
 
 var sendEmail = function(data, done) {
+    
+
     if (process.env.TEST_EMAIL === 'true') {
         console.log("\n\n========= ", data.to, " =============", "\n\n============= BEGIN TEST EMAIL CONTENT =============\n\n", data.html,
             '\n\n============= TEXT =============\n\n', data.text, "\n\n============= END TEST EMAIL CONTENT =============\n\n");
         done();
     } else {
-        /*nodemailerMailgun.sendMail(data, function(err, info) {
-           if(err){
-               console.log("ERROR SENDING EMAIL: ", err);
-               done(err);
-           } else {
-               console.log("EMAIL SENT: ", info);
-               done(info);
-           }
-        });*/
-        if(data.bulk) {
-            poolTransporter.sendMail(data, function(err) {
-               if(err) {
-                   console.log(err);
-               }
-                done(err);
-            });
-        } else {
-            transporter.sendMail(data, function(err) {
-                if(err) {
-                    console.log(err);
-                }
-                done(err);
-            });
-       }
+
+        poolTransporter.sendMail(data, function (err) {
+            if (err) {
+                console.log(err);
+            }
+            done(err);
+        });
     }
 };
 
@@ -108,13 +75,6 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
                 data.html = results;
                 data.to = email;
 
-                /*emailQueue.create('send email', data)
-                 .priority('medium')
-                 .removeOnComplete(true)
-                 .save(function(err) {
-                 cb(err);
-                 });*/
-
                 sendEmail(data, cb);
                 callback();
             }
@@ -125,22 +85,10 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
    });
 };
 
-/*emailQueue.process('send email', 20, function (job, done) {
-    sendEmail(job.data, done);
-});*/
-
 exports.sendChallengeCreatedNotification = function(req, res) {
 
     var challenger;
     var challengee;
-    
-    /*kue.Job.rangeByState( 'inactive', 0, 50, 'asc', function( err, jobs ) {
-        jobs.forEach( function( job ) {
-            job.remove( function(){
-                console.log( 'removed ', job.id ) ;
-            });
-        });
-    });*/
     
     User.findById(req.body.challengerUserId).then(function(challengerUserObj) {
         challenger = challengerUserObj;
@@ -159,7 +107,7 @@ exports.sendChallengeCreatedNotification = function(req, res) {
 
             var emails = [challengee.email];
 
-            createEmailJob(process.env.EMAIL_FROM, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, false, function(err) {
+            createEmailJob(process.env.EMAIL_FROM, emails, locals.challengerName + " challenged " + " you on gametrunk!", 'challenge-created', locals, true, function(err) {
                 if(err) {
                     res.status(400).end(err);
                 } else {
