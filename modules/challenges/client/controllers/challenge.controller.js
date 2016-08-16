@@ -78,23 +78,23 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
         };
 
         $scope.confirmResultModal = function (challenge, winnerId) {
-            var modal = $uibModal.open({
-                templateUrl: 'modules/challenges/client/views/result-confirmation-modal.client.view.html', // todo
-                controller: 'ResultController', // todo
-                scope: $scope,
-                backdrop: false,
-                windowClass: 'app-modal-window',
-                resolve: {
-                    challenge: function () {
-                        return challenge;
-                    }
-                }
-            });
-
-            modal.result.then(function(){
+            // var modal = $uibModal.open({
+            //     templateUrl: 'modules/challenges/client/views/result-confirmation-modal.client.view.html', // todo
+            //     controller: 'ResultController', // todo
+            //     scope: $scope,
+            //     backdrop: false,
+            //     windowClass: 'app-modal-window',
+            //     resolve: {
+            //         challenge: function () {
+            //             return challenge;
+            //         }
+            //     }
+            // });
+            //
+            // modal.result.then(function(){
                 $scope.Submit(challenge, winnerId);
                 $scope.initPage();
-            });
+            // });
         };
 
         $scope.cancelModal = function (challengeId) {
@@ -350,7 +350,6 @@ angular.module('challenge').controller('ChallengeController', ['$scope', '$state
             };
 
             $http.post('/api/rankings/update', rankingObject).success(function() {
-                toastr.success('Challenge Updated!','Success');
                 $scope.initPage();
             }).error(function(response) {
                 $scope.error = response.message;
