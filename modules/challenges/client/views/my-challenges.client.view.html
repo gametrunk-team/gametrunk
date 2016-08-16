@@ -25,7 +25,7 @@
         </section>
         <section ng-show="challenge.accepted == true">
           <h1 style="width: 100%" class="label label-success">ACCEPTED</h1>
-          <p></p><a class="btn btn-primary" ng-if="challenge.selected!=null" ng-click="Submit(challenge, challenge.selected)"><i class="glyphicon glyphicon-floppy-disk"></i> Save</a> 
+          <p></p><a class="btn btn-primary" ng-if="challenge.selected!=null" ng-click="confirmResultModal(challenge, challenge.selected)"><i class="glyphicon glyphicon-floppy-disk"></i> Save</a> 
         </section>
       </div>
     <div class="col-sm-5" ng-model="challenge.selected">
@@ -73,7 +73,7 @@
       </section>
       <section ng-show="challenge.accepted == true">
         <h1 style="width: 100%" class="label label-success">ACCEPTED</h1>
-        <p></p><a class="btn btn-primary" ng-if="challenge.selected!=null" ng-click="Submit(challenge, challenge.selected)"><i class="glyphicon glyphicon-floppy-disk"></i> Save</a> 
+        <p></p><a class="btn btn-primary" ng-if="challenge.selected!=null" ng-click="confirmResultModal(challenge, challenge.selected)"><i class="glyphicon glyphicon-floppy-disk"></i> Save</a> 
       </section>
     </div>
     <div class="col-sm-5" ng-model="challenge.selected">
@@ -167,7 +167,7 @@
       </section>
       <section ng-show="challenge.accepted == true">
         <h1 style="width: 100%" class="label label-success">ACCEPTED</h1>
-        <p></p><a class="btn btn-primary" ng-if="challenge.selected!=null" ng-click="Submit(challenge, challenge.selected)"><i class="glyphicon glyphicon-floppy-disk"></i> Save</a> 
+        <p></p><a class="btn btn-primary" ng-if="challenge.selected!=null" ng-click="confirmResultModal(challenge, challenge.selected)"><i class="glyphicon glyphicon-floppy-disk"></i> Save</a> 
       </section>
     </div>
     <div class="col-sm-5" ng-model="challenge.selected">

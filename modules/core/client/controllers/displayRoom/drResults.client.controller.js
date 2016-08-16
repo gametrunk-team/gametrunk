@@ -197,37 +197,6 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             });
         };
 
-        // TODO: would probably be good to break the modal logic below out into its own controller
-
-        $scope.min = null;
-        $scope.max = null;
-        $scope.dt = null;
-
-        $scope.initTimePicker = function(selectedDate) {
-            var min = new Date(selectedDate.getTime());
-            min.setHours(0);
-            min.setMinutes(0);
-            $scope.min = min;
-
-            var max = new Date(selectedDate.getTime());
-            max.setHours(24);
-            max.setMinutes(0);
-            $scope.max = max;
-        };
-
-        $scope.init = function() {
-            $scope.dt = new Date();
-            $scope.dt.setHours(12);
-            $scope.dt.setMinutes(0);
-            $scope.dt.setMilliseconds(0);
-            $scope.initTimePicker($scope.dt);
-        };
-        $scope.init();
-
-        $scope.clear = function() {
-            $scope.dt = null;
-        };
-
         $scope.open = function() {
             $scope.popup.opened = true;
         };
