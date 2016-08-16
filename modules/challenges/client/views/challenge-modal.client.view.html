@@ -1,11 +1,11 @@
 <div ng-controller="ChallengeController">
-  <div class="jumbotron text-center">
-    <h2>Create a Challenge</h2>
+  <div class="jumbotron text-center challengemodal">
+    <h2 class="modaltitle">Create a Challenge</h2>
     <br>
-    <h4>Your Circuit: <span ng-bind="circuit"></span></h4>
+    <h4 class="yrcirc">Your Circuit: <span ng-bind="circuit"></span></h4>
     <h5>{{message}}</h5>
 
-    <form novalidate class="simple-form" ng-show="users.length > 0">
+    <form novalidate class="simple-form " ng-show="users.length > 0">
       <ul>
 
         <li ng-repeat="user in users | orderBy:'rank'" ng-style="myStyle" class="list-group-item row" ng-class="{selected: user.id==model.opponentId, deselected: user.id!=model.opponentId}" ng-click="model.opponentId=user.id">
@@ -25,27 +25,25 @@
       </ul>
 
       <div class="row">
-        <div>
-          <p class="input-group">
+
+          <div class="input-group datepick">
             <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions"
                    ng-required="true" close-text="Close" ng-change="dateChange()" />
 
                     <span class="input-group-btn">
             <button type="button" class="btn btn-default" ng-click="open()"><i class="glyphicon glyphicon-calendar"></i></button>
           </span>
-          </p>
-        </div>
-      </div>
-      <br>
+          </div>
+        <div class="timepick" align="center" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
 
-      <div align="center" uib-timepicker ng-model="dt" hour-step="1" minute-step="15" name="sTime"   show-meridian="true" min="min" max="max"></div>
+      </div>
 
       <p class="alert alert-info">Schedule for: {{dt | date:'EEEE, MMMM d' }} at {{dt | date:'hh:mm a' }}</p>
 
       <td class="form-group" show-errors>
         <label></label>
-        <input class="btn btn-primary" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
-        <input class="btn btn-primary" type="submit" class="form-control" ng-click="dismiss()" value="Cancel" />
+        <input class="btn btn-primary createchal" type="submit" class="form-control" ng-click="createChallenge()" value="Create Challenge" />
+        <input class="btn btn-primary cancel" type="submit" class="form-control" ng-click="dismiss()" value="Cancel" />
       </td>
     </form>
 

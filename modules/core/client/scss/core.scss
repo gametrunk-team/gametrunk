@@ -123,6 +123,12 @@ body {
 }
 
 
+@media screen and (min-width: 768px) {
+  .jumbotron {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+}
 
 .jumbotron {
   margin: 60px;
@@ -210,4 +216,36 @@ body {
 .centerBlock {
   display: table;
   margin: 0 auto;
+}
+
+
+.challengemodal {
+  .modaltitle {
+    margin-top: 0px;
+  }
+  .yrcirc {
+    margin: 0px 0 20px 0;
+  }
+  .list-group-item {
+    margin:0 25px 8px 0;
+    }
+  }
+
+.datepick {
+  width: 40%;
+  margin:34px 65px 0 40px;
+  float: left;
+}
+
+.timepick {
+  width:32%;
+  float: left;
+}
+
+.createchal, .cancel {
+  margin:10px 0 0 0;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
 }
