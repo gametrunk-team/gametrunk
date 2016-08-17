@@ -164,7 +164,7 @@ body {
   width: 100%;
   height: 80px;
   /* Height of the footer */
-  background: #cbcbcb; }
+  background: #2B313D; }
 
 .news {
   font-family: "Times New Roman", Georgia, Serif; }
@@ -203,3 +203,19 @@ body {
   font-size: 18px;
   line-height: 1.3333333;
   border-radius: 6px; }
+
+.hometron {
+  background: rgba(30, 30, 30, 0.65); }
+
+.hometitle {
+  color: #d3d3d3 !important; }
+
+.hometagline {
+  color: #d3d3d3 !important; }
+
+.halfsize {
+  width: 40%;
+  margin: auto; }
+
+.widthheaderimage {
+  width: 40px; }
