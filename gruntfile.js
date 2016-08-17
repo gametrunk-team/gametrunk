@@ -134,6 +134,11 @@ module.exports = function(grunt) {
       }
     },
     sass: {
+      server: {
+        options: {
+          sourceMap: true
+        }
+      },
       dist: {
         files: [{
           expand: true,

@@ -107,6 +107,11 @@
 body {
   padding-bottom: 60px; }
 
+@media screen and (min-width: 768px) {
+  .jumbotron {
+    padding-top: 36px;
+    padding-bottom: 36px; } }
+
 .jumbotron {
   margin: 60px; }
 
@@ -159,7 +164,7 @@ body {
   width: 100%;
   height: 80px;
   /* Height of the footer */
-  background: #cbcbcb; }
+  background: #2B313D; }
 
 .news {
   font-family: "Times New Roman", Georgia, Serif; }
@@ -173,3 +178,44 @@ body {
 .centerBlock {
   display: table;
   margin: 0 auto; }
+
+.challengemodal .modaltitle {
+  margin-top: 0px; }
+
+.challengemodal .yrcirc {
+  margin: 0px 0 20px 0; }
+
+.challengemodal .list-group-item {
+  margin: 0 25px 8px 0; }
+
+.datepick {
+  width: 40%;
+  margin: 34px 65px 0 40px;
+  float: left; }
+
+.timepick {
+  width: 32%;
+  float: left; }
+
+.createchal, .cancel {
+  margin: 10px 0 0 0;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px; }
+
+.hometron {
+  background: rgba(30, 30, 30, 0.65); }
+
+.hometitle {
+  color: #d3d3d3 !important; }
+
+.hometagline {
+  color: #d3d3d3 !important; }
+
+.halfsize {
+  width: 40%;
+  margin: auto; }
+
+.widthheaderimage {
+  width: 40px; }
