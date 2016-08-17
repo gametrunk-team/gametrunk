@@ -109,9 +109,9 @@ $ grunt test:client
 ---
 
 ## Credits
-- Adam Stone
-- Bailey Reed
-- Jack Mertens
+- [Adam Stone](http://github.com/astone123)
+- [Bailey Reed](http://github.com/baileyreed39)
+- [Jack Mertens](http://github.com/jm3rt3ns)
 
 ---
 
