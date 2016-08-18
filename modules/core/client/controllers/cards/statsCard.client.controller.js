@@ -20,35 +20,28 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                         var games = 0;
                         var wins = 0.0;
                         var losses = 0.0;
-                        angular.forEach($scope.challenges, function (challenge, index) {
-                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id && challenge.winnerUserId !== null && challenge.winnerUserId !== -1) {
+                        angular.forEach($scope.challenges, function (challenge) {
+                            if ((challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id) && challenge.winnerUserId) {
                                 games++;
                                 if (challenge.winnerUserId === user.id) {
                                     wins++;
-                                } else if (challenge.winnerUserId === challenge.challengeeUserId) {
+                                } else {
                                     losses++;
                                 }
                             }
                         });
                         user.gamesPlayed = games;
-                        if (losses === 0) {
-                            user.winLossRatio = 0;
-                        } else {
-                            user.winLossRatio = wins / losses;
-                        }
-                    });
-
-                    angular.forEach($scope.users, function (value, index) {
+                        user.winLossRatio = wins / user.gamesPlayed;
 
                         $scope.data.push({
-                            key: value.displayName + ', Rank ' + value.rank,
+                            key: user.displayName + ', Rank ' + user.rank,
                             values: []
                         });
 
                         var obj = {
-                            x: value.gamesPlayed,
-                            y: value.rank,
-                            size: value.winLossRatio!==0 ? value.winLossRatio  : 1,
+                            x: user.gamesPlayed,
+                            y: user.rank,
+                            size: user.winLossRatio,
                             shape: 'circle'
                         };
                         $scope.data[index].values.push(obj);
@@ -69,7 +62,7 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                 showDistY: true,
                 tooltip: {
                     contentGenerator: function (key, x, y, e, graph) {
-                        return '<p>' + key.series[0].key + '</p>' + '<p>Games Played: ' + key.series[0].values[0].x + '</p><p>Win/Loss Ratio: ' + Math.round(key.series[0].values[0].size  * 100) / 100+ '</p>';
+                        return '<p>' + key.series[0].key + '</p>' + '<p>Games Played: ' + key.series[0].values[0].x + '</p><p>Win Percentage: ' + Math.round(key.series[0].values[0].size  * 100) + '%</p>';
                     }
                 },
                 duration: 350,
