@@ -26,6 +26,7 @@ module.exports = function(app) {
     app.route('/api/rankings/drRankings').get(rankingsPolicy.isAllowed, rankings.drRankings);
     app.route('/api/rankings/drResults').get(rankingsPolicy.isAllowed, rankings.drChallenges);
     app.route('/api/rankings/drUsers').get(rankingsPolicy.isAllowed, rankings.drUsers);
+    app.route('/api/rankings/drDropUser').post(rankingsPolicy.isAllowed, rankings.drDropUser);
 
     app.param('userId', rankings.userByID);
 };

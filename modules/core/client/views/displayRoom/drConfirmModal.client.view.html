@@ -1,0 +1,14 @@
+<div class="jumbotron text-center">
+  <div style="padding: 10px;">
+    <label>Are you absolutely sure that you want to drop {{$parent.selectedUser.displayName}}'s rank to the bottom? </label>
+    <div class="alert alert-warning" role="alert" style="size: 8px; font-family: Arial;"><strong>Warning:</strong> There is no way to reverse this. They will have climb the ranks again.</div>
+  </div>
+  <form novalidate class="simple-form">
+    <td class="form-group" show-errors>
+
+      <input class="btn btn-danger" type="submit" class="form-control" ng-click="drop()" value="Confirm" />
+      <input class="btn btn-default" type="submit" class="form-control" ng-click="cancel()" value="Cancel" />
+
+    </td>
+  </form>
+</div>
