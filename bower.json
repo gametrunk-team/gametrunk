@@ -26,7 +26,8 @@
     "angulartics-google-analytics": "^0.2.1",
     "angulartics": "^1.1.2",
     "nvd3": "1.8.4",
-    "angular-nvd3": "^1.0.8"
+    "angular-nvd3": "^1.0.8",
+    "ng-idle": "^1.2.2"
   },
   "resolutions": {
     "angular": "~1.4",
