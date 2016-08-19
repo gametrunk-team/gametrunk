@@ -20,7 +20,6 @@ angular.module('core').controller('DrShuffleController', ['$scope', '$filter', '
         };
 
         $scope.buildShufflePager = function() {
-            $scope.pagedItems = [];
             $scope.itemsPerPage = 100;
             $scope.currentPage = 1;
             $scope.figureOutItemsToDisplayShuffle();
@@ -33,11 +32,6 @@ angular.module('core').controller('DrShuffleController', ['$scope', '$filter', '
                 $scope.buildShufflePager();
             });
         }
-
-        $scope.pageChanged = function() {
-            $scope.figureOutItemsToDisplay();
-        };
-
 
         $scope.pageChanged = function() {
             $scope.figureOutItemsToDisplayShuffle();
