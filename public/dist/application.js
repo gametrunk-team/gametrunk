@@ -136,7 +136,7 @@ ApplicationConfiguration.registerModule('challenge', ['core']);
 
 // Use Applicaion configuration module to register a new module
 
-ApplicationConfiguration.registerModule('core', ['yaru22.angular-timeago','angulartics']);
+ApplicationConfiguration.registerModule('core', ['yaru22.angular-timeago','angulartics', 'ngIdle']);
 ApplicationConfiguration.registerModule('core.admin', ['core']);
 ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
 
@@ -1446,18 +1446,53 @@ angular.module('core').controller('DrShuffleController', ['$scope', '$filter', '
 
 'use strict';
 
-angular.module('core').controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit', '$rootScope',
-    function($scope, $filter, DrRankings, Circuit, $rootScope) {
+angular.module('core')
+
+    .config(['IdleProvider', function(IdleProvider) {
+        IdleProvider.idle(60);
+        IdleProvider.timeout(false);
+    }])
+
+    .controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit', '$rootScope', 'Idle',
+    function($scope, $filter, DrRankings, Circuit, $rootScope, Idle) {
+
+        console.log("\n\nCONTROLLER LOADED\n\n");
+
         $scope.world = [];
         $scope.major = [];
         $scope.minor = [];
         $scope.mosh = [];
 
         if ($rootScope.displayRoom) {
+
+            Idle.watch();
+
             DrRankings.query(function (data) {
                 $scope.users = data;
                 $scope.buildPager();
             });
+
+            var populateRankings = function() {
+                console.log("\n\nGETTING RANKINGS\n\n");
+                DrRankings.query(function (data) {
+                    $scope.users = data;
+                    $scope.buildPager();
+                });
+            };
+
+            $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
+
+            $scope.$on('IdleStart', function() {
+                console.log("\n\nYOU ARE IDLE\n\n");
+                clearInterval($scope.getRankingsRepeat);
+            });
+
+            $scope.$on('IdleEnd', function() {
+                console.log("\n\nYOU ARE NOT IDLE\n\n");
+                populateRankings();
+                $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
+            });
+
         }
 
         $scope.figureOutItemsToDisplay = function() {
@@ -1504,8 +1539,16 @@ angular.module('core').controller('DrRankingController', ['$scope', '$filter', '
 
 'use strict';
 
-angular.module('core').controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults', '$rootScope',
-    function($scope, $http, $uibModal, DrResults, $rootScope) {
+angular.module('core')
+
+    .config(['IdleProvider', function(IdleProvider) {
+        IdleProvider.idle(60);
+        IdleProvider.timeout(false);
+    }])
+
+    .controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults', '$rootScope', 'Idle',
+    function($scope, $http, $uibModal, DrResults, $rootScope, Idle) {
+        
         $scope.selectedTime = 'Now';
         $scope.message = "";
 
@@ -1665,6 +1708,16 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             };
 
             $scope.initPage();
+
+            Idle.watch();
+
+            $scope.$on('IdleStart', function() {
+                
+            });
+
+            $scope.$on('IdleEnd', function() {
+                $scope.initPage();
+            });
         }
 
         $scope.deleteChallenge = function(challengeId) {
