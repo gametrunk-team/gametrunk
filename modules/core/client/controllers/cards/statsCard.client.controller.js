@@ -31,7 +31,12 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                             }
                         });
                         user.gamesPlayed = games;
-                        user.winLossRatio = wins / user.gamesPlayed;
+
+                        if(user.gamesPlayed===0) {
+                            user.winLossRatio = 0;
+                        } else {
+                            user.winLossRatio = wins / user.gamesPlayed;
+                        }
 
                         $scope.data.push({
                             key: user.displayName + ', Rank ' + user.rank,
