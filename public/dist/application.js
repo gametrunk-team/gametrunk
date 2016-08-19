@@ -1456,8 +1456,6 @@ angular.module('core')
     .controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit', '$rootScope', 'Idle',
     function($scope, $filter, DrRankings, Circuit, $rootScope, Idle) {
 
-        console.log("\n\nCONTROLLER LOADED\n\n");
-
         $scope.world = [];
         $scope.major = [];
         $scope.minor = [];
@@ -1473,7 +1471,6 @@ angular.module('core')
             });
 
             var populateRankings = function() {
-                console.log("\n\nGETTING RANKINGS\n\n");
                 DrRankings.query(function (data) {
                     $scope.users = data;
                     $scope.buildPager();
@@ -1483,12 +1480,10 @@ angular.module('core')
             $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
 
             $scope.$on('IdleStart', function() {
-                console.log("\n\nYOU ARE IDLE\n\n");
                 clearInterval($scope.getRankingsRepeat);
             });
 
             $scope.$on('IdleEnd', function() {
-                console.log("\n\nYOU ARE NOT IDLE\n\n");
                 populateRankings();
                 $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
             });
