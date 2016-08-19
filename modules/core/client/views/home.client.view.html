@@ -7,15 +7,19 @@
 
   <div ng-show="displayRoom">
     <uib-tabset active="active">
-        <uib-tab heading="View Rankings" style="color: rgba(255, 255, 255, 0.5)" select="desetUserView()">
+        <uib-tab style="color: rgba(255, 255, 255, 0.5)">
+          <uib-tab-heading style="color:black;"><h4>View Rankings</h4></uib-tab-heading>
           <rankings-display></rankings-display>
         </uib-tab>
-        <uib-tab heading="Add Results" select="desetUserView()">
+        <uib-tab>
+          <uib-tab-heading style="color:black;"><h4>Add Results</h4></uib-tab-heading>
           <add-results></add-results>
         </uib-tab>
-      <!--<uib-tab heading="User View" select="setUserView()"></uib-tab>-->
-        <!--&lt;!&ndash;Deckster Deck does not display correctly when placed in a tab&ndash;&gt;-->
-      <!--</uib-tabset>-->
+        <uib-tab>
+          <uib-tab-heading style="color:black;"><h4>Admin</h4></uib-tab-heading>
+          <ranking-shuffle></ranking-shuffle>
+        </uib-tab>
+    </uib-tabset>
   </div>
 
   <div ng-hide="authentication.user || displayRoom" class="jumbotron text-center hometron">

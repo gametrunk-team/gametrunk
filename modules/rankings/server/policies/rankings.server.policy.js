@@ -63,6 +63,9 @@ exports.invokeRolesPolicies = function() {
             }, {
                 resources: '/api/rankings/drResults',
                 permissions: '*'
+            }, {
+                resources: '/api/rankings/drDropUser',
+                permissions: '*'
             }]
         }]
     );
