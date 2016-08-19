@@ -14,36 +14,38 @@ angular.module('core')
     .controller('DrRankingController', ['$scope', '$filter', 'DrRankings', 'Circuit', '$rootScope', 'Idle',
     function($scope, $filter, DrRankings, Circuit, $rootScope, Idle) {
 
-        Idle.watch();
-
         $scope.world = [];
         $scope.major = [];
         $scope.minor = [];
         $scope.mosh = [];
 
-        var populateRankings = function() {
-            DrRankings.query(function (data) {
-                $scope.users = data;
-                $scope.buildPager();
-            });
-        };
-
-        $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
-
-        $scope.$on('IdleStart', function() {
-            clearInterval($scope.getRankingsRepeat);
-        });
-
-        $scope.$on('IdleEnd', function() {
-            populateRankings();
-            $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
-        });
-
         if ($rootScope.displayRoom) {
+
+            Idle.watch();
+
             DrRankings.query(function (data) {
                 $scope.users = data;
                 $scope.buildPager();
             });
+
+            var populateRankings = function() {
+                DrRankings.query(function (data) {
+                    $scope.users = data;
+                    $scope.buildPager();
+                });
+            };
+
+            $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
+
+            $scope.$on('IdleStart', function() {
+                clearInterval($scope.getRankingsRepeat);
+            });
+
+            $scope.$on('IdleEnd', function() {
+                populateRankings();
+                $scope.getRankingsRepeat = setInterval(populateRankings, 5000);
+            });
+
         }
 
         $scope.figureOutItemsToDisplay = function() {

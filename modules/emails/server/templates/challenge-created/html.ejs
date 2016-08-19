@@ -37,7 +37,7 @@
         <td class="innerpadding borderbottom">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                    <td class="bodycopy" align="center">
+                    <td class="bodycopy" align="center" style="line-height: normal;">
                         <h1><%= challengerName %> challenged you on gametrunk!</h1>
                         <br>
                     </td>
@@ -54,9 +54,9 @@
                 </tr>
                 <tr>
                     <td class="bodycopy" align="center" style="padding: 5px;">
-                        <a href="https://<%=domain%>/api/challenge/response?id=<%=challengeId%>&accept=1&userid=<%=acceptingUserId%>" target="_blank"><button class="accept">Accept</button></a>
+                        <a href="http://<%=domain%>/api/challenge/response?id=<%=challengeId%>&accept=1&userid=<%=acceptingUserId%>" target="_blank"><button class="accept">Accept</button></a>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="https://<%=domain%>/api/challenge/response?id=<%=challengeId%>&accept=0&userid=<%=acceptingUserId%>" target="_blank"><button class="decline">Decline</button></a>
+                        <a href="http://<%=domain%>/api/challenge/response?id=<%=challengeId%>&accept=0&userid=<%=acceptingUserId%>" target="_blank"><button class="decline">Decline</button></a>
                     </td>
                 </tr>
                 <tr>

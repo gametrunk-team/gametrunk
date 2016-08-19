@@ -61,9 +61,6 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
 
     console.log("\n\n===== MAILING LIST =====\n\n");
     console.log(to);
-    /*_.each(data.to, function(user) {
-        console.log(user);
-    });*/
 
     var renderTemplate = new emailTemplates(path.join(templatesDir, data.template));
     async.each(to, function(email, callback) {
