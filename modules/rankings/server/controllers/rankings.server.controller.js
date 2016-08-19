@@ -298,3 +298,57 @@ exports.drChallenges = function(req, res) {
                     res.jsonp(err);
                 });
 };
+
+exports.drDropUser = function(req, res) {
+    console.log("DROPPING USER " + req.body.id);
+
+    var highRank = req.body.rank;
+
+    sequelize.transaction(function (t) { // Note that we use a callback rather than a promise.then()
+        return User.count({
+            where: {
+                rank: {
+                    $not: null
+                }
+            }
+        }, {transaction: t}).then(function (count) {
+            var lastRank = count;
+
+            var update = function (newRankObj, oldRank) {
+                User.update(
+                    newRankObj, {where: {rank: oldRank}}, {transaction: t})
+                    .then(function (result) {
+                    }).error(function (err) {
+                        t.rollback();
+                        res.status(400).end({
+                            message: errorHandler.getErrorMessage(err)
+                        });
+                    });
+            };
+
+            for (var i = highRank + 1; i < lastRank + 1; i++) {
+                update({rank: i - 1}, i);
+            }
+
+            User.update(
+                {rank: lastRank}, {where: {id: req.body.id}}, {transaction: t})
+                .then(function (result) {
+                    res.status(200).end();
+                }).error(function (err) {
+                    t.rollback();
+                    res.status(400).end({
+                    message: errorHandler.getErrorMessage(err)
+                });
+            });
+        }).error(function (err) {
+            t.rollback();
+            res.status(400).end({
+                message: errorHandler.getErrorMessage(err)
+            });
+        });
+    }).then(function (t) {
+    }).catch(function (err) {
+        // Rolled back
+        console.error(err);
+    });
+};

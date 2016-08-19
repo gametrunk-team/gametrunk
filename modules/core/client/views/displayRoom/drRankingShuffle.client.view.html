@@ -1,0 +1,22 @@
+<section>
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Push Down Users</h1>
+        <p>Use this tool sparingly to set users to the bottom rank.</p>
+      </div>
+      <div class="col-md-4" style="margin-top: 2em">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
+      </div>
+    </div>
+  </div>
+  <div class="list-group">
+    <a ng-repeat="user in shuffleItems" class="list-group-item row">
+      <h4 class="list-group-item-heading" ng-bind="user.displayName"></h4>
+      <button class="btn btn-small pull-right small" style="margin-bottom:20px;" ng-click="selectUser(user)">Push Down</button>
+      <p class="list-group-item-text" ng-bind="user.email"></p>
+    </a>
+  </div>
+
+  <pagination boundary-links="true" max-size="8" items-per-page="itemsPerPage" total-items="filterLength" ng-model="currentPage" ng-change="pageChanged()"></pagination>
+</section>
