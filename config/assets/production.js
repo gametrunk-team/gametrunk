@@ -17,6 +17,7 @@ module.exports = {
         'public/lib/spin.js/jquery.spin.js',
         'public/lib/gridster/dist/jquery.gridster.min.js',
         'public/lib/angular/angular.min.js',
+        'public/lib/ng-idle/angular-idle.min.js',
         'public/lib/angular-resource/angular-resource.min.js',
         'public/lib/angular-animate/angular-animate.min.js',
         'public/lib/angular-messages/angular-messages.min.js',

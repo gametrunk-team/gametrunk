@@ -57,11 +57,10 @@ var createEmailJob = function(from, to, subject, template, locals, bulk, cb) {
       bulk: bulk
   };
 
+    data.locals.domain = process.env.DOMAIN;
+
     console.log("\n\n===== MAILING LIST =====\n\n");
     console.log(to);
-    /*_.each(data.to, function(user) {
-        console.log(user);
-    });*/
 
     var renderTemplate = new emailTemplates(path.join(templatesDir, data.template));
     async.each(to, function(email, callback) {
@@ -101,7 +100,7 @@ exports.sendChallengeCreatedNotification = function(req, res) {
                 challengedName : challengee.firstName,
                 challengeId: req.body.challengeId,
                 acceptingUserId: challengee.id,
-                timeString: moment.utc(req.body.challengeObj.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
+                timeString: moment.utc(req.body.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
                 subject: "Default Subject"
             };
 
@@ -176,7 +175,7 @@ exports.sendChallengeTimeChangedNotification = function(req, res) {
             var locals = {
                 changedTimeName : changedTimeUser.firstName,
                 challengeId: req.body.challengObj.id,
-                timeString: moment.utc(req.body.challengeObj.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
+                timeString: moment.utc(req.body.challengObj.scheduledTime).local().format('dddd, MMMM Do [at] h:mmA'),
                 subject: "Default Subject"
             };
 

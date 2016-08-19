@@ -4,8 +4,16 @@
 
 'use strict';
 
-angular.module('core').controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults', '$rootScope',
-    function($scope, $http, $uibModal, DrResults, $rootScope) {
+angular.module('core')
+
+    .config(['IdleProvider', function(IdleProvider) {
+        IdleProvider.idle(60);
+        IdleProvider.timeout(false);
+    }])
+
+    .controller('DrResultsController', ['$scope', '$http', '$uibModal', 'DrResults', '$rootScope', 'Idle',
+    function($scope, $http, $uibModal, DrResults, $rootScope, Idle) {
+        
         $scope.selectedTime = 'Now';
         $scope.message = "";
 
@@ -165,6 +173,16 @@ angular.module('core').controller('DrResultsController', ['$scope', '$http', '$u
             };
 
             $scope.initPage();
+
+            Idle.watch();
+
+            $scope.$on('IdleStart', function() {
+                
+            });
+
+            $scope.$on('IdleEnd', function() {
+                $scope.initPage();
+            });
         }
 
         $scope.deleteChallenge = function(challengeId) {
