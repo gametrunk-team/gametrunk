@@ -1129,35 +1129,33 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                         var games = 0;
                         var wins = 0.0;
                         var losses = 0.0;
-                        angular.forEach($scope.challenges, function (challenge, index) {
-                            if (challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id && challenge.winnerUserId !== null && challenge.winnerUserId !== -1) {
+                        angular.forEach($scope.challenges, function (challenge) {
+                            if ((challenge.challengerUserId === user.id || challenge.challengeeUserId === user.id) && challenge.winnerUserId) {
                                 games++;
                                 if (challenge.winnerUserId === user.id) {
                                     wins++;
-                                } else if (challenge.winnerUserId === challenge.challengeeUserId) {
+                                } else {
                                     losses++;
                                 }
                             }
                         });
                         user.gamesPlayed = games;
-                        if (losses === 0) {
+
+                        if(user.gamesPlayed===0) {
                             user.winLossRatio = 0;
                         } else {
-                            user.winLossRatio = wins / losses;
+                            user.winLossRatio = wins / user.gamesPlayed;
                         }
-                    });
-
-                    angular.forEach($scope.users, function (value, index) {
 
                         $scope.data.push({
-                            key: value.displayName + ', Rank ' + value.rank,
+                            key: user.displayName + ', Rank ' + user.rank,
                             values: []
                         });
 
                         var obj = {
-                            x: value.gamesPlayed,
-                            y: value.rank,
-                            size: value.winLossRatio!==0 ? value.winLossRatio  : 1,
+                            x: user.gamesPlayed,
+                            y: user.rank,
+                            size: user.winLossRatio,
                             shape: 'circle'
                         };
                         $scope.data[index].values.push(obj);
@@ -1178,7 +1176,7 @@ angular.module('core').controller('StatsCardController', ['$scope', '$timeout', 
                 showDistY: true,
                 tooltip: {
                     contentGenerator: function (key, x, y, e, graph) {
-                        return '<p>' + key.series[0].key + '</p>' + '<p>Games Played: ' + key.series[0].values[0].x + '</p><p>Win/Loss Ratio: ' + Math.round(key.series[0].values[0].size  * 100) / 100+ '</p>';
+                        return '<p>' + key.series[0].key + '</p>' + '<p>Games Played: ' + key.series[0].values[0].x + '</p><p>Win Percentage: ' + Math.round(key.series[0].values[0].size  * 100) + '%</p>';
                     }
                 },
                 duration: 350,
@@ -1255,6 +1253,30 @@ angular.module('core').controller('ContactController', ['$scope', 'ContactForm',
   }
 
 ]);
+/**
+ * Created by breed on 8/18/16.
+ */
+
+'use strict';
+
+angular.module('core').controller('DrConfirmModalController', ['$scope', '$http', '$uibModal', '$window',
+    function ($scope, $http, $uibModal, $window) {
+
+        $scope.drop = function () {
+            console.log("dropping", $scope.$parent.selectedUser.displayName);
+
+            $http.post('/api/rankings/drDropUser', $scope.$parent.selectedUser).success(function (result) {
+                $scope.$close(true);
+                $window.init();
+            });
+        };
+
+        $scope.cancel = function () {
+            $scope.$close(true);
+        };
+    }
+]);
+
 /**
  * Created by breed on 8/10/16.
  */
@@ -1351,6 +1373,69 @@ angular.module('core').controller('DrCreateController', ['$scope', '$filter', 'D
             
             // Display a success toast, with a title
             toastr.success('Challenge created','Success');
+        };
+    }
+]);
+
+/**
+ * Created by breed on 8/18/16.
+ */
+
+'use strict';
+
+angular.module('core').controller('DrShuffleController', ['$scope', '$filter', 'DrRankings', '$uibModal', '$rootScope', '$window',
+    function($scope, $filter, DrRankings, $uibModal, $rootScope, $window) {
+
+        $scope.shuffleItems = [];
+
+        $scope.figureOutItemsToDisplayShuffle = function() {
+            $scope.filteredItems = $filter('filter')($scope.users, {
+                $: $scope.search
+            });
+            $scope.filterLength = $scope.filteredItems.length;
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+            var end = begin + $scope.itemsPerPage;
+            $scope.shuffleItems = $scope.filteredItems.slice(begin, end);
+        };
+
+        $scope.buildShufflePager = function() {
+            $scope.pagedItems = [];
+            $scope.itemsPerPage = 100;
+            $scope.currentPage = 1;
+            $scope.figureOutItemsToDisplayShuffle();
+        };
+
+        if ($rootScope.displayRoom) {
+            DrRankings.query(function(data) {
+                $scope.users = data;
+                $scope.users.sort(function(a,b) {return (a.lastName > b.lastName) ? 1 : ((b.lastName > a.lastName) ? -1 : 0);} );
+                $scope.buildShufflePager();
+            });
+        }
+
+        $scope.pageChanged = function() {
+            $scope.figureOutItemsToDisplay();
+        };
+
+
+        $scope.pageChanged = function() {
+            $scope.figureOutItemsToDisplayShuffle();
+        };
+
+        $scope.selectUser = function(user) {
+            $scope.selectedUser = user;
+
+            var modal = $uibModal.open({
+                templateUrl: 'modules/core/client/views/displayRoom/drConfirmModal.client.view.html',
+                controller: 'DrConfirmModalController',
+                scope: $scope,
+                windowClass: 'app-modal-window'
+            });
+
+            modal.result.then(function(){
+                console.log("modal closed");
+                window.location.reload(true);
+            });
         };
     }
 ]);
@@ -2096,6 +2181,20 @@ angular.module('core')
             }
         };
     }]);
+
+/**
+ * Created by breed on 8/18/16.
+ */
+
+'use strict';
+
+angular.module('core').directive('rankingShuffle', function() {
+    return {
+        restrict: 'E',
+        templateUrl: '/modules/core/client/views/displayRoom/drRankingShuffle.client.view.html',
+        controller: 'DrShuffleController'
+    };
+});
 
 /**
  * Created by breed on 8/9/16.
